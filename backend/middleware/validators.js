@@ -59,6 +59,27 @@ const changePasswordRules = [
     .matches(/[0-9]/).withMessage('Nouveau mot de passe : au moins un chiffre'),
 ];
 
+const forgotPasswordRules = [
+  body('email').isEmail().withMessage('Email invalide').normalizeEmail(),
+  body('type').optional().isIn(['admin', 'client']).withMessage('Type de compte invalide'),
+];
+
+const resetPasswordRules = [
+  body('token').trim().notEmpty().withMessage('Token requis'),
+  body('password')
+    .isLength({ min: 8 }).withMessage('Mot de passe : 8 caractères minimum')
+    .matches(/[A-Z]/).withMessage('Mot de passe : au moins une majuscule')
+    .matches(/[0-9]/).withMessage('Mot de passe : au moins un chiffre'),
+];
+
+const verifyEmailRules = [
+  body('token').trim().notEmpty().withMessage('Token requis'),
+];
+
+const resendVerificationRules = [
+  body('email').isEmail().withMessage('Email invalide').normalizeEmail(),
+];
+
 // ── Machines ──────────────────────────────────────────────────
 
 const machineCreateRules = [
@@ -216,6 +237,10 @@ module.exports = {
   clientLoginRules,
   clientRegisterRules,
   changePasswordRules,
+  forgotPasswordRules,
+  resetPasswordRules,
+  verifyEmailRules,
+  resendVerificationRules,
   // Machines
   machineCreateRules,
   machineUpdateRules,

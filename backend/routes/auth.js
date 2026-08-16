@@ -8,6 +8,10 @@ const {
   clientLoginRules,
   clientRegisterRules,
   changePasswordRules,
+  forgotPasswordRules,
+  resetPasswordRules,
+  verifyEmailRules,
+  resendVerificationRules,
 } = require('../middleware/validators');
 
 router.post('/admin/login', adminLoginRules, validate, c.adminLogin);
@@ -17,5 +21,11 @@ router.post('/client/register', clientRegisterRules, validate, c.clientRegister)
 router.post('/refresh', c.refreshToken);
 router.get('/me', authenticate, c.getMe);
 router.patch('/change-password', authenticate, changePasswordRules, validate, c.changePassword);
+
+// Récupération de compte / confirmation d'email (routes publiques)
+router.post('/forgot-password', forgotPasswordRules, validate, c.forgotPassword);
+router.post('/reset-password', resetPasswordRules, validate, c.resetPassword);
+router.post('/verify-email', verifyEmailRules, validate, c.verifyEmail);
+router.post('/resend-verification', resendVerificationRules, validate, c.resendVerification);
 
 module.exports = router;

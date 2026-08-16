@@ -1,6 +1,7 @@
-require('dotenv').config({ path: '../.env' });
-const fs = require('fs');
 const path = require('path');
+// Chemin absolu : le script doit fonctionner quel que soit le répertoire courant
+require('dotenv').config({ path: path.join(__dirname, '../.env') });
+const fs = require('fs');
 const mysql = require('mysql2/promise');
 
 async function migrate() {
@@ -17,8 +18,33 @@ async function migrate() {
 
     const sql = fs.readFileSync(path.join(__dirname, 'schema.sql'), 'utf8');
     console.log('📦 Exécution du schéma SQL...');
-    await connection.query(sql);
-    console.log('Migration terminée avec succès !');
+
+    // Exécution instruction par instruction pour que la migration reste
+    // rejouable : les CREATE INDEX déjà appliqués sont ignorés (MySQL ne
+    // supporte pas CREATE INDEX IF NOT EXISTS).
+    const statements = sql
+      .split(/;\s*$/m)
+      .map(s => s.replace(/^\s*--.*$/gm, '').trim())
+      .filter(Boolean);
+
+    let applied = 0;
+    let skipped = 0;
+
+    for (const statement of statements) {
+      try {
+        await connection.query(statement);
+        applied++;
+      } catch (err) {
+        // 1061 = index déjà existant, 1050 = table déjà existante
+        if (err.errno === 1061 || err.errno === 1050) {
+          skipped++;
+          continue;
+        }
+        throw err;
+      }
+    }
+
+    console.log(`Migration terminée : ${applied} instruction(s) appliquée(s), ${skipped} ignorée(s) (déjà en place).`);
     console.log(` Base de données "${process.env.DB_NAME}" créée et configurée.`);
   } catch (error) {
     console.error(' Erreur de migration:', error.message);

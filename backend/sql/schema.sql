@@ -311,6 +311,22 @@ CREATE TABLE IF NOT EXISTS promo_codes (
 ) ENGINE=InnoDB;
 
 -- ────────────────────────────────────────────────────────────
+-- AUTH TOKENS (reset mot de passe / vérification email)
+-- On stocke un hash SHA-256 du token, jamais le token en clair.
+-- ────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS auth_tokens (
+  id          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  user_id     INT UNSIGNED NOT NULL,
+  user_type   ENUM('admin', 'client') NOT NULL DEFAULT 'client',
+  type        ENUM('password_reset', 'email_verification') NOT NULL,
+  token_hash  CHAR(64) NOT NULL,
+  expires_at  DATETIME NOT NULL,
+  used_at     DATETIME NULL,
+  created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY uq_auth_tokens_hash (token_hash)
+) ENGINE=InnoDB;
+
+-- ────────────────────────────────────────────────────────────
 -- INDEX POUR PERFORMANCES
 -- ────────────────────────────────────────────────────────────
 CREATE INDEX idx_orders_client ON orders(client_id);
