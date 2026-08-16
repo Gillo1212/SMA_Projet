@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AppNotification } from '../../mocks/notifications';
+import type { AppNotification } from '../../hooks/useNotifications';
 
 interface NotificationsDropdownProps {
   notifications: AppNotification[];

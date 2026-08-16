@@ -1,21 +1,11 @@
 import { useState } from 'react';
-import { blogArticles as initialArticles, blogCategories } from '../../../mocks/blog';
+import { useBlogPosts } from '../../../hooks/useBlog';
+import { LoadingState, ErrorState } from '../../../components/feature/AsyncState';
 import ArticleModal from './components/ArticleModal';
 import DeleteModal from './components/DeleteModal';
+import type { BlogPost } from '../../../types/models';
 
-interface Article {
-  id: string;
-  slug: string;
-  title: string;
-  excerpt: string;
-  content: string;
-  image: string;
-  category: string;
-  author: string;
-  authorRole: string;
-  readTime: string;
-  date: string;
-}
+type Article = BlogPost;
 
 interface Toast {
   message: string;
@@ -23,14 +13,17 @@ interface Toast {
 }
 
 const categoryColors: Record<string, string> = {
+  innovation: 'bg-indigo-50 text-indigo-700',
   innovations: 'bg-indigo-50 text-indigo-700',
   conseils: 'bg-sky-50 text-sky-700',
+  'conseils-maintenance': 'bg-sky-50 text-sky-700',
   temoignages: 'bg-amber-50 text-amber-700',
+  'etudes-de-cas': 'bg-amber-50 text-amber-700',
   actualites: 'bg-emerald-50 text-emerald-700',
 };
 
 export default function AdminBlogPage() {
-  const [articles, setArticles] = useState<Article[]>(initialArticles as Article[]);
+  const { posts: articles, isLoading, error, refetch, create, update, remove } = useBlogPosts();
   const [search, setSearch] = useState('');
   const [filterCat, setFilterCat] = useState('all');
   const [modalMode, setModalMode] = useState<'add' | 'edit' | null>(null);
@@ -39,37 +32,64 @@ export default function AdminBlogPage() {
   const [articleToDelete, setArticleToDelete] = useState<Article | null>(null);
   const [toast, setToast] = useState<Toast | null>(null);
 
-  const filtered = articles.filter(a => {
-    const matchSearch = a.title.toLowerCase().includes(search.toLowerCase()) ||
-      a.author.toLowerCase().includes(search.toLowerCase());
-    const matchCat = filterCat === 'all' || a.category === filterCat;
-    return matchSearch && matchCat;
-  });
-
   function showToast(message: string, type: 'success' | 'error' = 'success') {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3500);
   }
 
-  function handleSave(article: Article) {
-    if (modalMode === 'add') {
-      setArticles(prev => [article, ...prev]);
-      showToast(`Article "${article.title.substring(0, 40)}..." publié`);
-    } else {
-      setArticles(prev => prev.map(a => a.id === article.id ? article : a));
-      showToast('Article mis à jour avec succès');
+  async function handleSave(article: Article) {
+    try {
+      if (modalMode === 'add') {
+        await create(article);
+        showToast(`Article "${article.title.substring(0, 40)}…" publié`);
+      } else {
+        await update(article.id, article);
+        showToast('Article mis à jour avec succès');
+      }
+      setModalMode(null);
+      setSelectedArticle(null);
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Enregistrement impossible', 'error');
     }
-    setModalMode(null);
-    setSelectedArticle(null);
   }
 
-  function handleDeleteConfirm() {
+  async function handleDeleteConfirm() {
     if (!articleToDelete) return;
-    setArticles(prev => prev.filter(a => a.id !== articleToDelete.id));
-    showToast(`Article supprimé`);
-    setShowDeleteModal(false);
-    setArticleToDelete(null);
+    try {
+      await remove(articleToDelete.id);
+      showToast('Article supprimé');
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Suppression impossible', 'error');
+    } finally {
+      setShowDeleteModal(false);
+      setArticleToDelete(null);
+    }
   }
+
+  if (isLoading) return <LoadingState label="Chargement des articles…" />;
+  if (error) return <ErrorState message={error} onRetry={refetch} />;
+
+  // Catégories dérivées du contenu réel : elles viennent de la BDD
+  const blogCategories = [
+    { id: 'all', name: 'Toutes' },
+    ...Array.from(
+      new Map(
+        articles.map(a => [a.category, { id: a.category, name: a.categoryName ?? a.category }]),
+      ).values(),
+    ),
+  ];
+
+  const filtered = articles.filter(a => {
+    const q = search.toLowerCase();
+    const matchSearch = a.title.toLowerCase().includes(q) ||
+      a.author.toLowerCase().includes(q);
+    const matchCat = filterCat === 'all' || a.category === filterCat;
+    return matchSearch && matchCat;
+  });
+
+  const publies = articles.filter(a => a.status === 'published' || a.published).length;
+  const brouillons = articles.filter(a => a.status === 'draft').length;
+  const archives = articles.filter(a => a.status === 'archived').length;
 
   return (
     <div className="space-y-6">
@@ -77,9 +97,9 @@ export default function AdminBlogPage() {
       <div className="grid grid-cols-4 gap-4">
         {[
           { label: 'Total articles', value: articles.length, icon: 'ri-article-line', color: 'text-[#1AAA3F]', bg: 'bg-[#1AAA3F]/10' },
-          { label: 'Innovations', value: articles.filter(a => a.category === 'innovations').length, icon: 'ri-lightbulb-line', color: 'text-indigo-600', bg: 'bg-indigo-50' },
-          { label: 'Conseils', value: articles.filter(a => a.category === 'conseils').length, icon: 'ri-bookmark-line', color: 'text-sky-600', bg: 'bg-sky-50' },
-          { label: 'Actualités', value: articles.filter(a => a.category === 'actualites').length, icon: 'ri-newspaper-line', color: 'text-emerald-600', bg: 'bg-emerald-50' },
+          { label: 'Publiés', value: publies, icon: 'ri-checkbox-circle-line', color: 'text-emerald-600', bg: 'bg-emerald-50' },
+          { label: 'Brouillons', value: brouillons, icon: 'ri-draft-line', color: 'text-amber-600', bg: 'bg-amber-50' },
+          { label: 'Archivés', value: archives, icon: 'ri-archive-line', color: 'text-gray-500', bg: 'bg-gray-100' },
         ].map((s, i) => (
           <div key={i} className="bg-white rounded-xl p-5 border border-gray-100 flex items-center gap-4">
             <div className={`w-10 h-10 ${s.bg} rounded-xl flex items-center justify-center flex-shrink-0`}>

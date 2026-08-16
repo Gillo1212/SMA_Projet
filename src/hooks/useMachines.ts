@@ -16,6 +16,9 @@ interface UseMachinesReturn {
   isLoading: boolean;
   error: string | null;
   refetch: () => void;
+  create: (data: Partial<Machine>) => Promise<Machine>;
+  update: (id: string, data: Partial<Machine>) => Promise<Machine>;
+  remove: (id: string) => Promise<void>;
 }
 
 export function useMachines(params?: MachineListParams): UseMachinesReturn {
@@ -43,7 +46,26 @@ export function useMachines(params?: MachineListParams): UseMachinesReturn {
 
   const refetch = useCallback(() => setTick(t => t + 1), []);
 
-  return { machines, isLoading, error, refetch };
+  // Les mutations mettent la liste locale à jour ; en cas d'échec l'erreur
+  // remonte à l'appelant, qui décide de l'affichage.
+  const create = useCallback(async (data: Partial<Machine>) => {
+    const created = await machinesService.create(data);
+    setMachines(prev => [created, ...prev]);
+    return created;
+  }, []);
+
+  const update = useCallback(async (id: string, data: Partial<Machine>) => {
+    const updated = await machinesService.update(id, data);
+    setMachines(prev => prev.map(m => (m.id === id ? updated : m)));
+    return updated;
+  }, []);
+
+  const remove = useCallback(async (id: string) => {
+    await machinesService.delete(id);
+    setMachines(prev => prev.filter(m => m.id !== id));
+  }, []);
+
+  return { machines, isLoading, error, refetch, create, update, remove };
 }
 
 // ── Détail ─────────────────────────────────────────────────────────────────

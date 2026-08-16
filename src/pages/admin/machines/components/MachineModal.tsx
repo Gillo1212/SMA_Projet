@@ -1,18 +1,5 @@
 import { useState, useEffect } from 'react';
-
-interface Machine {
-  id: string;
-  name: string;
-  category: string;
-  type: string;
-  price: number;
-  priceDisplay: string;
-  stock: string;
-  deliveryTime: string;
-  shortDescription: string;
-  paymentMethods: string[];
-  image: string;
-}
+import type { Machine } from '../../../../types/models';
 
 interface Props {
   mode: 'add' | 'edit';
@@ -93,19 +80,26 @@ export default function MachineModal({ mode, machine, onClose, onSave }: Props) 
   function handleSave() {
     if (!validate()) return;
     const typeObj = machineTypes.find(t => t.id === form.type);
-    const saved: Machine = {
-      id: machine?.id ?? `sma-${form.type}-${Date.now()}`,
+
+    // On repart de la machine existante pour ne pas perdre les champs que ce
+    // formulaire n'édite pas (specifications, gallery, features…).
+    const base: Partial<Machine> = machine ?? {};
+    const saved = {
+      ...base,
+      id: machine?.id ?? '',
+      slug: machine?.slug ?? '',
       name: form.name,
-      type: form.type,
+      type: form.type as Machine['type'],
       category: typeObj?.category ?? form.category,
       price: form.price,
       priceDisplay: `${form.price.toLocaleString('fr-FR')} FCFA`,
-      stock: form.stock,
+      stock: form.stock as Machine['stock'],
       deliveryTime: form.deliveryTime,
       shortDescription: form.shortDescription,
       paymentMethods: form.paymentMethods,
       image: form.image || defaultForm.image,
-    };
+    } as Machine;
+
     onSave(saved);
   }
 

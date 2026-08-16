@@ -1,18 +1,7 @@
 import { useState, useEffect } from 'react';
+import type { BlogPost } from '../../../../types/models';
 
-interface Article {
-  id: string;
-  slug: string;
-  title: string;
-  excerpt: string;
-  category: string;
-  author: string;
-  authorRole: string;
-  readTime: string;
-  date: string;
-  image: string;
-  content: string;
-}
+type Article = BlogPost;
 
 interface Props {
   mode: 'add' | 'edit';
@@ -81,8 +70,12 @@ export default function ArticleModal({ mode, article, onClose, onSave }: Props) 
 
   function handleSave() {
     if (!validate()) return;
-    const saved: Article = {
-      id: article?.id ?? `article-${Date.now()}`,
+
+    // On repart de l'article existant pour préserver les champs hors formulaire
+    // (categoryId, status, published…).
+    const saved = {
+      ...(article ?? {}),
+      id: article?.id ?? '',
       slug: article?.slug ?? slugify(form.title),
       title: form.title,
       excerpt: form.excerpt,
@@ -93,7 +86,8 @@ export default function ArticleModal({ mode, article, onClose, onSave }: Props) 
       date: form.date,
       image: form.image || 'https://readdy.ai/api/search-image?query=modern%20professional%20business%20article%20cover%20image%20clean%20minimal&width=800&height=500&seq=article-new-001&orientation=landscape',
       content: form.content,
-    };
+    } as Article;
+
     onSave(saved);
   }
 

@@ -16,6 +16,9 @@ interface UseBlogPostsReturn {
   isLoading: boolean;
   error: string | null;
   refetch: () => void;
+  create: (data: Partial<BlogPost>) => Promise<BlogPost>;
+  update: (id: string, data: Partial<BlogPost>) => Promise<BlogPost>;
+  remove: (id: string) => Promise<void>;
 }
 
 export function useBlogPosts(
@@ -45,7 +48,24 @@ export function useBlogPosts(
 
   const refetch = useCallback(() => setTick(t => t + 1), []);
 
-  return { posts, isLoading, error, refetch };
+  const create = useCallback(async (data: Partial<BlogPost>) => {
+    const created = await blogService.create(data);
+    setPosts(prev => [created, ...prev]);
+    return created;
+  }, []);
+
+  const update = useCallback(async (id: string, data: Partial<BlogPost>) => {
+    const updated = await blogService.update(id, data);
+    setPosts(prev => prev.map(p => (p.id === id ? updated : p)));
+    return updated;
+  }, []);
+
+  const remove = useCallback(async (id: string) => {
+    await blogService.delete(id);
+    setPosts(prev => prev.filter(p => p.id !== id));
+  }, []);
+
+  return { posts, isLoading, error, refetch, create, update, remove };
 }
 
 // ── Détail ─────────────────────────────────────────────────────────────────

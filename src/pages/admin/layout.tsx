@@ -3,7 +3,7 @@ import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import AdminSidebar from './components/AdminSidebar';
 import { useAuthContext } from '../../contexts/AuthContext';
 import NotificationsDropdown from '../../components/feature/NotificationsDropdown';
-import { adminNotifications } from '../../mocks/notifications';
+import { useAdminNotifications } from '../../hooks/useNotifications';
 
 const pageTitles: Record<string, string> = {
   '/admin': 'Tableau de bord',
@@ -20,6 +20,7 @@ export default function AdminLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const { isAuthenticated, isLoading, user, logout } = useAuthContext();
+  const { notifications, markAsRead, markAllAsRead } = useAdminNotifications();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Close sidebar when route changes on mobile
@@ -85,7 +86,11 @@ export default function AdminLayout() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <NotificationsDropdown notifications={adminNotifications} />
+            <NotificationsDropdown
+              notifications={notifications}
+              onMarkRead={markAsRead}
+              onMarkAllRead={markAllAsRead}
+            />
             {user && (
               <div className="flex items-center gap-2 pl-2 border-l border-gray-100">
                 <div className="w-9 h-9 bg-[#1AAA3F]/10 rounded-lg flex items-center justify-center">

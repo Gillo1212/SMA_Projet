@@ -1,22 +1,9 @@
 import { useState } from 'react';
-import { machines as initialMachines } from '../../../mocks/machines';
+import { useMachines } from '../../../hooks/useMachines';
+import { LoadingState, ErrorState, EmptyState } from '../../../components/feature/AsyncState';
 import MachineModal from './components/MachineModal';
 import DeleteModal from './components/DeleteModal';
-
-interface Machine {
-  id: string;
-  name: string;
-  category: string;
-  type: string;
-  price: number;
-  priceDisplay: string;
-  stock: string;
-  deliveryTime: string;
-  shortDescription: string;
-  paymentMethods: string[];
-  image: string;
-  [key: string]: unknown;
-}
+import type { Machine } from '../../../types/models';
 
 interface Toast {
   message: string;
@@ -24,7 +11,16 @@ interface Toast {
 }
 
 export default function AdminMachinesPage() {
-  const [machineList, setMachineList] = useState<Machine[]>(initialMachines as Machine[]);
+  const {
+    machines: machineList,
+    isLoading,
+    error,
+    refetch,
+    create,
+    update,
+    remove,
+  } = useMachines();
+
   const [search, setSearch] = useState('');
   const [filterType, setFilterType] = useState('all');
   const [modalMode, setModalMode] = useState<'add' | 'edit' | null>(null);
@@ -40,12 +36,6 @@ export default function AdminMachinesPage() {
     { id: 'boissons', name: 'Boissons' },
     { id: 'combine', name: 'Combinés' },
   ];
-
-  const filtered = machineList.filter(m => {
-    const matchSearch = m.name.toLowerCase().includes(search.toLowerCase()) || m.id.toLowerCase().includes(search.toLowerCase());
-    const matchType = filterType === 'all' || m.type === filterType;
-    return matchSearch && matchType;
-  });
 
   const stockColors: Record<string, string> = {
     'En stock': 'bg-emerald-50 text-emerald-700',
@@ -73,25 +63,44 @@ export default function AdminMachinesPage() {
     setShowDeleteModal(true);
   }
 
-  function handleSave(machine: Machine) {
-    if (modalMode === 'add') {
-      setMachineList(prev => [machine, ...prev]);
-      showToast(`Machine "${machine.name}" ajoutée avec succès`);
-    } else {
-      setMachineList(prev => prev.map(m => m.id === machine.id ? machine : m));
-      showToast(`Machine "${machine.name}" mise à jour`);
+  async function handleSave(machine: Machine) {
+    try {
+      if (modalMode === 'add') {
+        await create(machine);
+        showToast(`Machine "${machine.name}" ajoutée avec succès`);
+      } else {
+        await update(machine.id, machine);
+        showToast(`Machine "${machine.name}" mise à jour`);
+      }
+      setModalMode(null);
+      setSelectedMachine(null);
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Enregistrement impossible', 'error');
     }
-    setModalMode(null);
-    setSelectedMachine(null);
   }
 
-  function handleDeleteConfirm() {
+  async function handleDeleteConfirm() {
     if (!machineToDelete) return;
-    setMachineList(prev => prev.filter(m => m.id !== machineToDelete.id));
-    showToast(`Machine "${machineToDelete.name}" supprimée`);
-    setShowDeleteModal(false);
-    setMachineToDelete(null);
+    try {
+      await remove(machineToDelete.id);
+      showToast(`Machine "${machineToDelete.name}" supprimée`);
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Suppression impossible', 'error');
+    } finally {
+      setShowDeleteModal(false);
+      setMachineToDelete(null);
+    }
   }
+
+  if (isLoading) return <LoadingState label="Chargement des machines…" />;
+  if (error) return <ErrorState message={error} onRetry={refetch} />;
+
+  const filtered = machineList.filter(m => {
+    const q = search.toLowerCase();
+    const matchSearch = m.name.toLowerCase().includes(q) || m.slug.toLowerCase().includes(q);
+    const matchType = filterType === 'all' || m.type === filterType;
+    return matchSearch && matchType;
+  });
 
   return (
     <div className="space-y-6">
