@@ -11,7 +11,9 @@ exports.getStats = async (req, res, next) => {
         SELECT status, COUNT(*) AS count FROM orders
         WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY) GROUP BY status
       `),
-      query(`
+      // queryOne : cette agrégation ne renvoie qu'une ligne — avec query()
+      // on récupérait un tableau et tous les KPI ressortaient à 0.
+      queryOne(`
         SELECT
           SUM(CASE WHEN payment_status='paid' THEN total_amount ELSE 0 END) AS total_revenue,
           SUM(CASE WHEN payment_status='paid' AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY) THEN total_amount ELSE 0 END) AS monthly_revenue,
@@ -83,7 +85,11 @@ exports.getClientDashboard = async (req, res, next) => {
     ]);
 
     const statsMap = Object.fromEntries(ordersStats.map(s => [s.status, { count: s.count, total: s.total }]));
-    const totalSpent = ordersStats.reduce((sum, s) => sum + (s.status === 'delivered' ? (s.total || 0) : 0), 0);
+    // SUM() sur un DECIMAL revient en chaîne : sans Number() on concatène.
+    const totalSpent = ordersStats.reduce(
+      (sum, s) => sum + (s.status === 'delivered' ? Number(s.total || 0) : 0),
+      0
+    );
 
     res.json({
       success: true,
