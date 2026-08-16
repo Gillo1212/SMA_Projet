@@ -1,8 +1,39 @@
+import { useState } from 'react';
 import { useLocation, Link } from 'react-router-dom';
+import { authService } from '../../services/auth.service';
 
 export default function ConfirmationEmailPage() {
   const location = useLocation();
-  const email = (location.state as { email?: string })?.email ?? 'votre adresse email';
+  const stateEmail = (location.state as { email?: string })?.email;
+  const email = stateEmail ?? 'votre adresse email';
+
+  const [resending, setResending] = useState(false);
+  const [feedback, setFeedback] = useState<{ type: 'ok' | 'ko'; message: string } | null>(null);
+
+  const handleResend = async () => {
+    // Sans adresse en state (accès direct à l'URL), on ne peut rien renvoyer.
+    if (!stateEmail) {
+      setFeedback({
+        type: 'ko',
+        message: 'Adresse inconnue. Reconnectez-vous pour recevoir un nouveau lien.',
+      });
+      return;
+    }
+
+    setResending(true);
+    setFeedback(null);
+    try {
+      const message = await authService.resendVerification(stateEmail);
+      setFeedback({ type: 'ok', message });
+    } catch (err) {
+      setFeedback({
+        type: 'ko',
+        message: err instanceof Error ? err.message : 'Envoi impossible. Réessayez dans un instant.',
+      });
+    } finally {
+      setResending(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#f0f9f4] to-white font-['Inter'] px-4">
@@ -52,13 +83,27 @@ export default function ConfirmationEmailPage() {
           </p>
         </div>
 
+        {feedback && (
+          <div
+            className={`mb-4 p-3 rounded-xl border text-sm text-left ${
+              feedback.type === 'ok'
+                ? 'bg-[#EEFFF2] border-[#1AAA3F]/20 text-[#1AAA3F]'
+                : 'bg-red-50 border-red-100 text-red-600'
+            }`}
+          >
+            <i className={`mr-2 ${feedback.type === 'ok' ? 'ri-mail-check-line' : 'ri-error-warning-line'}`}></i>
+            {feedback.message}
+          </div>
+        )}
+
         <div className="flex flex-col gap-3">
           <button
-            onClick={() => window.location.reload()}
-            className="w-full py-3 border-2 border-[#1AAA3F]/30 text-[#1AAA3F] text-sm font-semibold rounded-xl hover:bg-[#EEFFF2] transition-all cursor-pointer whitespace-nowrap"
+            onClick={handleResend}
+            disabled={resending}
+            className="w-full py-3 border-2 border-[#1AAA3F]/30 text-[#1AAA3F] text-sm font-semibold rounded-xl hover:bg-[#EEFFF2] disabled:opacity-60 transition-all cursor-pointer whitespace-nowrap"
           >
-            <i className="ri-refresh-line mr-2"></i>
-            Renvoyer l&apos;email
+            <i className={`mr-2 ${resending ? 'ri-loader-4-line animate-spin' : 'ri-refresh-line'}`}></i>
+            {resending ? 'Envoi en cours...' : 'Renvoyer l\'email'}
           </button>
           <Link to="/espace-client/connexion"
             className="w-full py-3 bg-[#00272B] text-white text-sm font-semibold rounded-xl hover:bg-[#003a40] transition-all cursor-pointer whitespace-nowrap flex items-center justify-center gap-2">

@@ -300,7 +300,7 @@ export default function ContactPage() {
       <CTABanner
         badge="Réponse rapide"
         title="Besoin d'une Réponse Rapide ?"
-        subtitle="Appelez-nous directement ou envoyez-nous un WhatsApp — notre équipe répond en moins de 2h."
+        subtitle="Appelez-nous directement ou envoyez-nous un WhatsApp - notre équipe répond en moins de 2h."
         buttons={[
           { label: 'Appeler maintenant', href: 'tel:+221331234567', icon: 'ri-phone-line', variant: 'white' },
           { label: 'WhatsApp', href: 'https://wa.me/221771234567', icon: 'ri-whatsapp-line', variant: 'whatsapp', isExternal: true },

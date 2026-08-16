@@ -28,7 +28,7 @@ function drawFooter(doc: jsPDF) {
   doc.setFontSize(7.5);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(...GRAY);
-  doc.text('SMALIM SAS — RC: SN-DKR-2022-B-12345 — NINEA: 007654321 2V3', 14, pageH - 5.5);
+  doc.text('SMALIM SAS - RC: SN-DKR-2022-B-12345 - NINEA: 007654321 2V3', 14, pageH - 5.5);
   doc.text(`Document généré le ${new Date().toLocaleDateString('fr-FR')}`, 148, pageH - 5.5);
 }
 

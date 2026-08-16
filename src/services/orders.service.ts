@@ -2,22 +2,112 @@
  * Service Commandes
  * ──────────────────
  * MOCK → lit les données de src/mocks/admin.ts
- * API  → CRUD sur /orders
+ * API  → /orders, avec normalisation du format backend → frontend
+ *
+ * Attention : le backend identifie une commande par son ID numérique
+ * (routes /orders/:id) mais l'affiche par son `order_number`. Le modèle
+ * frontend porte donc les deux : `id` (technique) et `reference` (lisible).
  */
 
 import { apiClient } from './apiClient';
 import { USE_MOCK, MOCK_DELAY, ENDPOINTS } from '../config/api';
 import { adminCommandes } from '../mocks/admin';
-import type { Order, OrderStatus, OrderListParams } from '../types/models';
+import {
+  parseJSON,
+  toNumber,
+  formatDate,
+  fullName,
+  toOrderStatus,
+  fromOrderStatus,
+  toPaymentMethod,
+  fromPaymentMethod,
+  toPaymentStatus,
+} from './normalize';
+import type { Order, OrderItem, OrderStatus, OrderListParams } from '../types/models';
 
 function delay(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+// ── Normalisation backend → frontend ───────────────────────────────────────
+
+/** Ligne `order_items` renvoyée par GET /orders/:id */
+interface BackendOrderItem {
+  id: number;
+  item_type: 'machine' | 'product';
+  item_id: number;
+  item_name: string;
+  quantity: number | string;
+  unit_price: number | string;
+  total_price: number | string;
+}
+
+/** Ligne `orders` (+ jointure clients) renvoyée par le backend */
+interface BackendOrder {
+  id: number;
+  order_number: string;
+  client_id?: number;
+  status: string;
+  total_amount: number | string;
+  payment_method?: string | null;
+  payment_status?: string;
+  shipping_address?: string | Record<string, unknown> | null;
+  notes?: string | null;
+  created_at?: string;
+  first_name?: string | null;
+  last_name?: string | null;
+  company_name?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  items?: BackendOrderItem[];
+}
+
+function normalizeItem(raw: BackendOrderItem): OrderItem {
+  return {
+    productId: String(raw.item_id),
+    name: raw.item_name,
+    quantity: toNumber(raw.quantity),
+    unitPrice: toNumber(raw.unit_price),
+  };
+}
+
+/** L'adresse est une colonne JSON de forme libre → on l'aplatit pour l'affichage */
+function formatAddress(raw: BackendOrder['shipping_address']): string | undefined {
+  const addr = parseJSON<Record<string, unknown>>(raw, {});
+  const parts = ['address', 'street', 'city', 'country', 'postal_code']
+    .map(k => addr[k])
+    .filter(v => typeof v === 'string' && v.trim());
+  return parts.length ? parts.join(', ') : undefined;
+}
+
+function normalizeOrder(raw: BackendOrder): Order {
+  const items = Array.isArray(raw.items) ? raw.items.map(normalizeItem) : undefined;
+
+  return {
+    id: String(raw.id),
+    reference: raw.order_number ?? String(raw.id),
+    client: raw.company_name || fullName(raw.first_name, raw.last_name) || 'Client supprimé',
+    email: raw.email ?? '',
+    phone: raw.phone ?? undefined,
+    // La liste ne renvoie pas les articles : le résumé n'existe qu'après getById
+    produits: items?.map(i => `${i.quantity}× ${i.name}`).join(', ') ?? '',
+    items,
+    montant: toNumber(raw.total_amount),
+    statut: toOrderStatus(raw.status),
+    paiement: toPaymentMethod(raw.payment_method),
+    paiementStatut: toPaymentStatus(raw.payment_status),
+    date: formatDate(raw.created_at),
+    adresseLivraison: formatAddress(raw.shipping_address),
+    note: raw.notes ?? undefined,
+  };
+}
+
+// ── Service ────────────────────────────────────────────────────────────────
+
 export const ordersService = {
   /**
    * Liste des commandes
-   * @endpoint GET /orders?statut=&search=&page=&limit=
+   * @endpoint GET /orders?status=&search=&page=&limit=
    */
   async getAll(params?: OrderListParams): Promise<Order[]> {
     if (USE_MOCK) {
@@ -38,14 +128,17 @@ export const ordersService = {
       return results;
     }
 
-    return apiClient.get<Order[]>(
-      ENDPOINTS.ORDERS.LIST,
-      params as Record<string, unknown>,
-    );
+    // Le backend filtre sur `status` en anglais
+    const { statut, ...rest } = params ?? {};
+    const raw = await apiClient.get<BackendOrder[]>(ENDPOINTS.ORDERS.LIST, {
+      ...rest,
+      status: statut ? fromOrderStatus(statut) : undefined,
+    } as Record<string, unknown>);
+    return Array.isArray(raw) ? raw.map(normalizeOrder) : [];
   },
 
   /**
-   * Détail d'une commande
+   * Détail d'une commande — seul endpoint qui renvoie les articles
    * @endpoint GET /orders/:id
    */
   async getById(id: string): Promise<Order | null> {
@@ -53,56 +146,66 @@ export const ordersService = {
       await delay(MOCK_DELAY);
       return (adminCommandes.find(o => o.id === id) as unknown as Order) ?? null;
     }
-    return apiClient.get<Order>(ENDPOINTS.ORDERS.DETAIL(id));
+    const raw = await apiClient.get<BackendOrder>(ENDPOINTS.ORDERS.DETAIL(id));
+    return raw ? normalizeOrder(raw) : null;
   },
 
   /**
    * Créer une commande (panier → checkout)
    * @endpoint POST /orders
-   * @body { client, email, phone, items, paiement, adresseLivraison }
+   * @body { items, payment_method, shipping_address, promo_code, notes }
    */
-  async create(data: Partial<Order>): Promise<Order> {
+  async create(data: {
+    items: { id: string; type: 'machine' | 'product'; quantity: number }[];
+    paiement: Order['paiement'];
+    adresseLivraison: Record<string, unknown> | string;
+    promoCode?: string;
+    note?: string;
+    fraisLivraison?: number;
+  }): Promise<Order> {
     if (USE_MOCK) {
       await delay(MOCK_DELAY);
-      const newOrder: Order = {
+      return {
         id: `CMD-${Date.now()}`,
-        client: data.client ?? '',
-        email: data.email ?? '',
-        produits: data.produits ?? '',
-        montant: data.montant ?? 0,
+        reference: `CMD-${Date.now()}`,
+        client: '',
+        email: '',
+        produits: '',
+        montant: 0,
         statut: 'En attente',
-        paiement: data.paiement ?? 'Wave',
+        paiement: data.paiement,
         date: new Date().toISOString().split('T')[0],
-        ...data,
       };
-      return newOrder;
     }
-    return apiClient.post<Order>(ENDPOINTS.ORDERS.CREATE, data);
+
+    const raw = await apiClient.post<BackendOrder>(ENDPOINTS.ORDERS.CREATE, {
+      items: data.items.map(i => ({
+        id: Number(i.id),
+        type: i.type,
+        quantity: i.quantity,
+      })),
+      payment_method: fromPaymentMethod(data.paiement),
+      shipping_address: data.adresseLivraison,
+      promo_code: data.promoCode,
+      notes: data.note,
+      shipping_amount: data.fraisLivraison ?? 0,
+    });
+    return normalizeOrder(raw);
   },
 
   /**
    * Changer le statut d'une commande (admin)
    * @endpoint PATCH /orders/:id/status
-   * @body { statut }
+   * @body { status, note }
    */
-  async updateStatus(id: string, statut: OrderStatus): Promise<Order> {
+  async updateStatus(id: string, statut: OrderStatus, note?: string): Promise<void> {
     if (USE_MOCK) {
       await delay(MOCK_DELAY);
-      const order = adminCommandes.find(o => o.id === id);
-      if (!order) throw new Error('Commande introuvable');
-      return { ...(order as unknown as Order), statut };
+      return;
     }
-    return apiClient.patch<Order>(ENDPOINTS.ORDERS.UPDATE_STATUS(id), { statut });
-  },
-
-  /**
-   * Supprimer une commande (admin)
-   * @endpoint DELETE /orders/:id
-   */
-  async delete(id: string): Promise<void> {
-    if (USE_MOCK) {
-      throw new Error('[MOCK] Connecte ton API pour supprimer des commandes.');
-    }
-    return apiClient.delete(ENDPOINTS.ORDERS.DELETE(id));
+    await apiClient.patch(ENDPOINTS.ORDERS.UPDATE_STATUS(id), {
+      status: fromOrderStatus(statut),
+      note,
+    });
   },
 };

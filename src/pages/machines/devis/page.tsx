@@ -56,7 +56,7 @@ export default function DevisPage() {
     formBody.append('estimation', `${totalEstimated.toLocaleString('fr-FR')} FCFA`);
     formBody.append('message', formData.message);
     if (formData.rdv) {
-      formBody.append('rdv', `Oui — ${formData.rdvDate} à ${formData.rdvTime}`);
+      formBody.append('rdv', `Oui - ${formData.rdvDate} à ${formData.rdvTime}`);
     }
 
     try {

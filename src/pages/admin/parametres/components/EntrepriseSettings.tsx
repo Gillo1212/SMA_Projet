@@ -146,9 +146,9 @@ export default function EntrepriseSettings({ settings, onSave }: Props) {
               name="currency" value={form.currency} onChange={handleChange}
               className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:border-[#1AAA3F] text-[#00272B] cursor-pointer bg-white"
             >
-              <option value="XOF">XOF — Franc CFA (BCEAO)</option>
-              <option value="EUR">EUR — Euro</option>
-              <option value="USD">USD — Dollar américain</option>
+              <option value="XOF">XOF - Franc CFA (BCEAO)</option>
+              <option value="EUR">EUR - Euro</option>
+              <option value="USD">USD - Dollar américain</option>
             </select>
           </div>
           <div>

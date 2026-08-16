@@ -1,18 +1,25 @@
 import { useState, FormEvent } from 'react';
 import { Link } from 'react-router-dom';
+import { authService } from '../../services/auth.service';
 
 export default function MotDePasseOubliePage() {
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    // TODO: call POST /api/auth/forgot-password with { email }
-    await new Promise(r => setTimeout(r, 1200));
-    setLoading(false);
-    setSubmitted(true);
+    setError(null);
+    try {
+      await authService.forgotPassword(email, 'client');
+      setSubmitted(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Impossible d\'envoyer le lien. Réessayez.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -75,6 +82,13 @@ export default function MotDePasseOubliePage() {
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-5">
+                {error && (
+                  <div className="p-3 bg-red-50 border border-red-100 rounded-xl flex items-start gap-2">
+                    <i className="ri-error-warning-line text-red-500 mt-0.5"></i>
+                    <p className="text-sm text-red-600">{error}</p>
+                  </div>
+                )}
+
                 <div>
                   <label className="block text-sm font-semibold text-[#00272B] mb-2">Adresse email</label>
                   <div className="relative">

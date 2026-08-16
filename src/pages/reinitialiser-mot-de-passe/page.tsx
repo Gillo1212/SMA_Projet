@@ -1,5 +1,6 @@
 import { useState, FormEvent } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { authService } from '../../services/auth.service';
 
 export default function ReinitialiserMotDePassePage() {
   const navigate = useNavigate();
@@ -39,10 +40,18 @@ export default function ReinitialiserMotDePassePage() {
       return;
     }
     setLoading(true);
-    // TODO: call POST /api/auth/reset-password with { token, password }
-    await new Promise(r => setTimeout(r, 1200));
-    setLoading(false);
-    setSuccess(true);
+    try {
+      await authService.resetPassword(token, password);
+      setSuccess(true);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Le lien est invalide ou a expiré. Demandez-en un nouveau.'
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (success) {

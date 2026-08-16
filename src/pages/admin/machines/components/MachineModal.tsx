@@ -153,7 +153,7 @@ export default function MachineModal({ mode, machine, onClose, onSave }: Props) 
               type="text"
               value={form.name}
               onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-              placeholder="ex: SMA Café Pro 200"
+              placeholder="ex: TCN Machine à Café Commerciale"
               className={`w-full h-9 px-3 border rounded-lg text-sm focus:outline-none ${errors.name ? 'border-red-300 bg-red-50' : 'border-gray-200 focus:border-[#1AAA3F]'}`}
             />
             {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name}</p>}

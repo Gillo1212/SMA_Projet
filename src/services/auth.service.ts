@@ -137,7 +137,7 @@ export const authService = {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const res = await apiClient.get<Record<string, any>>(ENDPOINTS.AUTH.ME);
 
-    // Backend retourne { success: true, user: {...} } — on extrait user
+    // Backend retourne { success: true, user: {...} } - on extrait user
     const u = res.user ?? res;
     return {
       id: String(u.id),
@@ -146,6 +146,71 @@ export const authService = {
       role: (u.role ?? 'admin') as AuthUser['role'],
       avatar: u.avatar,
     };
+  },
+
+  /**
+   * Demande un lien de réinitialisation de mot de passe.
+   * @endpoint POST /auth/forgot-password
+   * Le backend répond toujours positivement, que le compte existe ou non.
+   */
+  async forgotPassword(email: string, type: 'admin' | 'client' = 'client'): Promise<string> {
+    if (USE_MOCK) {
+      await delay(MOCK_DELAY);
+      return 'Si un compte existe pour cet email, un lien de réinitialisation vient d\'être envoyé.';
+    }
+    const res = await apiClient.post<{ message: string }>(
+      ENDPOINTS.AUTH.FORGOT_PASSWORD,
+      { email, type }
+    );
+    return res.message;
+  },
+
+  /**
+   * Applique un nouveau mot de passe à partir du token reçu par email.
+   * @endpoint POST /auth/reset-password
+   */
+  async resetPassword(token: string, password: string): Promise<string> {
+    if (USE_MOCK) {
+      await delay(MOCK_DELAY);
+      return 'Mot de passe réinitialisé avec succès';
+    }
+    const res = await apiClient.post<{ message: string }>(
+      ENDPOINTS.AUTH.RESET_PASSWORD,
+      { token, password }
+    );
+    return res.message;
+  },
+
+  /**
+   * Confirme une adresse email à partir du token reçu par email.
+   * @endpoint POST /auth/verify-email
+   */
+  async verifyEmail(token: string): Promise<string> {
+    if (USE_MOCK) {
+      await delay(MOCK_DELAY);
+      return 'Adresse email confirmée';
+    }
+    const res = await apiClient.post<{ message: string }>(
+      ENDPOINTS.AUTH.VERIFY_EMAIL,
+      { token }
+    );
+    return res.message;
+  },
+
+  /**
+   * Renvoie un lien de confirmation d'email.
+   * @endpoint POST /auth/resend-verification
+   */
+  async resendVerification(email: string): Promise<string> {
+    if (USE_MOCK) {
+      await delay(MOCK_DELAY);
+      return 'Si un compte non confirmé existe pour cet email, un nouveau lien vient d\'être envoyé.';
+    }
+    const res = await apiClient.post<{ message: string }>(
+      ENDPOINTS.AUTH.RESEND_VERIFICATION,
+      { email }
+    );
+    return res.message;
   },
 
   /** Persiste token + user admin en localStorage */

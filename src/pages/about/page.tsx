@@ -3,53 +3,138 @@ import Footer from '../home/components/Footer';
 import CTABanner from '../../components/feature/CTABanner';
 
 export default function AboutPage() {
+  const innovations = [
+    { axe: 'Digitalisation de la distribution', desc: 'Automates connectés, paiements dématérialisés', impact: 'Accessibilité 24/7' },
+    { axe: 'Valorisation des produits locaux', desc: 'Filière café, cacao, céréales africaines', impact: 'Revenus agricoles accrus' },
+    { axe: 'Traçabilité & Data', desc: 'Suivi des ventes, qualité, maintenance prédictive', impact: 'Transparence et efficacité' },
+    { axe: 'Durabilité', desc: 'Réduction du gaspillage, packaging écoresponsable', impact: 'Empreinte carbone réduite' },
+  ];
+
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
-      
-      {/* Hero Section */}
+
+      {/* Hero */}
       <section className="pt-24 sm:pt-32 pb-12 sm:pb-20 bg-gradient-to-br from-[#EEFFF2] to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-20">
           <div className="text-center max-w-4xl mx-auto">
-            <div className="inline-block px-5 py-2 bg-[#FFF4F0] text-[#1AAA3F] text-sm font-semibold rounded-full mb-5 sm:mb-6">
+            <div className="inline-block px-5 py-2 bg-[#EEFFF2] text-[#0D8C2E] text-sm font-semibold rounded-full mb-5 sm:mb-6">
               QUI SOMMES-NOUS
             </div>
             <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold text-[#00272B] mb-4 sm:mb-6 leading-tight">
-              Votre Partenaire de Confiance en Distribution Automatique
+              Agrobusiness, Distribution Automatisée<br />& Technologies Numériques
             </h1>
             <p className="text-base sm:text-xl text-[#4A4A4A] leading-relaxed">
-              Depuis plus de 15 ans, SMA révolutionne l'accès aux produits de qualité au Sénégal 
-              grâce à des solutions de distribution automatique innovantes et adaptées.
+              SenMartALIM modernise la chaîne de valeur alimentaire en Afrique et au Canada,
+              de la production agricole à la distribution intelligente.
             </p>
           </div>
         </div>
       </section>
 
-      {/* Histoire Section */}
+      {/* Mission & Vision */}
       <section className="py-12 sm:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-20">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-16 items-center">
             <div>
-              <h2 className="text-2xl sm:text-4xl font-bold text-[#00272B] mb-5 sm:mb-6">Notre Histoire</h2>
-              <p className="text-base sm:text-lg text-[#4A4A4A] leading-relaxed mb-5 sm:mb-6">
-                Fondée en 2009, la Sénégalaise de Machines Automatiques (SMA) est née d'une vision simple : 
-                rendre les produits de qualité accessibles partout, à tout moment.
+              <h2 className="text-2xl sm:text-4xl font-bold text-[#00272B] mb-5 sm:mb-6">Notre Mission</h2>
+              <p className="text-xl sm:text-2xl font-semibold text-[#0D8C2E] italic mb-6 leading-relaxed">
+                « Mettre la technologie au service d'une alimentation saine, accessible et traçable. »
               </p>
-              <p className="text-base sm:text-lg text-[#4A4A4A] leading-relaxed mb-5 sm:mb-6">
-                Notre croissance s'appuie sur trois piliers : l'innovation technologique, la qualité de service 
-                et l'adaptation aux besoins locaux.
+              <p className="text-base sm:text-lg text-[#4A4A4A] leading-relaxed mb-5">
+                SMA développe un écosystème intégré allant de la production agricole à la distribution
+                intelligente, avec une forte orientation vers la qualité, la traçabilité et l'impact social.
               </p>
               <p className="text-base sm:text-lg text-[#4A4A4A] leading-relaxed">
-                Aujourd'hui, SMA est le leader incontesté de la distribution automatique au Sénégal, avec plus 
-                de 500 machines installées et une équipe de 45 professionnels dévoués.
+                Nous croyons que l'avenir de l'agroalimentaire passe par l'innovation locale - créer un pont
+                entre les producteurs agricoles africains et les consommateurs urbains à travers la transformation
+                locale, la logistique optimisée et les circuits de distribution modernes.
               </p>
             </div>
             <div className="rounded-2xl overflow-hidden">
-              <img 
+              <img
                 src="https://readdy.ai/api/search-image?query=modern%20vending%20machines%20in%20bright%20contemporary%20african%20office%20building%20lobby%2C%20professional%20installation%2C%20clean%20minimalist%20design%2C%20natural%20lighting%2C%20Senegal%20business%20environment%2C%20high%20quality%20commercial%20space&width=800&height=900&seq=about-history-001&orientation=portrait"
-                alt="Histoire SMA"
+                alt="SenMartALIM distribution"
                 className="w-full h-64 sm:h-full object-cover object-top"
               />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Nos Activités */}
+      <section className="py-12 sm:py-20 bg-[#F8F6F3]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-20">
+          <div className="text-center mb-10 sm:mb-16">
+            <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold text-[#00272B] mb-4">Nos Activités</h2>
+            <p className="text-sm sm:text-lg text-[#4A4A4A] max-w-3xl mx-auto">
+              Un écosystème intégré couvrant l'ensemble de la chaîne de valeur alimentaire
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
+            <div className="bg-white rounded-2xl p-6 sm:p-10">
+              <div className="w-14 h-14 bg-[#0D8C2E] rounded-xl flex items-center justify-center mb-5">
+                <i className="ri-robot-line text-2xl text-white"></i>
+              </div>
+              <h3 className="text-xl sm:text-2xl font-bold text-[#00272B] mb-3">Distribution Automatique & Vente Connectée</h3>
+              <p className="text-sm sm:text-base text-[#4A4A4A] leading-relaxed mb-4">
+                Automates de boissons chaudes et froides, snacks et produits santé sous la marque SenMartALIM.
+                Intégration IoT, paiement digital (Wave, Orange Money, PayPal), gestion centralisée via plateforme cloud
+                et traçabilité des ventes en temps réel.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {['Café & Boissons', 'Snacks Santé', 'IoT & Cloud', 'Paiement Digital'].map(tag => (
+                  <span key={tag} className="px-3 py-1 bg-[#EEFFF2] text-[#0D8C2E] text-xs font-semibold rounded-full">{tag}</span>
+                ))}
+              </div>
+            </div>
+            <div className="bg-white rounded-2xl p-6 sm:p-10">
+              <div className="w-14 h-14 bg-[#00272B] rounded-xl flex items-center justify-center mb-5">
+                <i className="ri-plant-line text-2xl text-white"></i>
+              </div>
+              <h3 className="text-xl sm:text-2xl font-bold text-[#00272B] mb-3">Transformation Agroalimentaire</h3>
+              <p className="text-sm sm:text-base text-[#4A4A4A] leading-relaxed mb-4">
+                Approvisionnement auprès de coopératives agricoles et producteurs locaux. Valorisation des produits
+                africains : café, cacao, céréales, fruits tropicaux. Poudres premium, boissons santé, snacks à base
+                de fruits séchés, noix et céréales locales.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {['Café & Cacao', 'Céréales Locales', 'Fruits Séchés', 'Circuits Courts'].map(tag => (
+                  <span key={tag} className="px-3 py-1 bg-[#EEFFF2] text-[#0D8C2E] text-xs font-semibold rounded-full">{tag}</span>
+                ))}
+              </div>
+            </div>
+            <div className="bg-white rounded-2xl p-6 sm:p-10">
+              <div className="w-14 h-14 bg-[#0D8C2E] rounded-xl flex items-center justify-center mb-5">
+                <i className="ri-cloud-line text-2xl text-white"></i>
+              </div>
+              <h3 className="text-xl sm:text-2xl font-bold text-[#00272B] mb-3">Technologies & Données</h3>
+              <p className="text-sm sm:text-base text-[#4A4A4A] leading-relaxed mb-4">
+                Infrastructure Microsoft Azure pour piloter l'ensemble du numérique : API de paiement,
+                suivi des transactions, Data Lake Azure Synapse, tableaux de bord Power BI.
+                Décisions data-driven pour optimiser la performance commerciale et logistique.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {['Microsoft Azure', 'Power BI', 'Data Lake', 'API Paiement'].map(tag => (
+                  <span key={tag} className="px-3 py-1 bg-[#EEFFF2] text-[#0D8C2E] text-xs font-semibold rounded-full">{tag}</span>
+                ))}
+              </div>
+            </div>
+            <div className="bg-white rounded-2xl p-6 sm:p-10">
+              <div className="w-14 h-14 bg-[#00272B] rounded-xl flex items-center justify-center mb-5">
+                <i className="ri-shake-hands-line text-2xl text-white"></i>
+              </div>
+              <h3 className="text-xl sm:text-2xl font-bold text-[#00272B] mb-3">Partenariats & Déploiements</h3>
+              <p className="text-sm sm:text-base text-[#4A4A4A] leading-relaxed mb-4">
+                Déploiement dans des sites à fort trafic : hôpitaux (CHUP de Pikine), écoles, universités,
+                espaces publics et entreprises privées. Deux modèles : vente directe ou mise à disposition
+                avec partage des revenus.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {['Hôpitaux', 'Universités', 'Entreprises', 'Espaces Publics'].map(tag => (
+                  <span key={tag} className="px-3 py-1 bg-[#EEFFF2] text-[#0D8C2E] text-xs font-semibold rounded-full">{tag}</span>
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -60,136 +145,82 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-20">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-12">
             <div className="bg-white rounded-2xl p-6 sm:p-10">
-              <div className="w-14 h-14 sm:w-16 sm:h-16 bg-[#1AAA3F] rounded-xl flex items-center justify-center mb-5 sm:mb-6">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 bg-[#0D8C2E] rounded-xl flex items-center justify-center mb-5 sm:mb-6">
                 <i className="ri-flag-line text-2xl sm:text-3xl text-white"></i>
               </div>
               <h3 className="text-xl sm:text-2xl font-bold text-[#00272B] mb-3 sm:mb-4">Notre Mission</h3>
               <p className="text-sm sm:text-base text-[#4A4A4A] leading-relaxed">
-                Faciliter l'accès aux produits de qualité pour tous les Sénégalais, grâce à des solutions 
-                de distribution automatique innovantes et adaptées aux modes de paiement locaux.
+                Mettre la technologie au service d'une alimentation saine, accessible et traçable,
+                en créant de la valeur ajoutée sur le territoire tout en soutenant une économie circulaire.
               </p>
             </div>
             <div className="bg-white rounded-2xl p-6 sm:p-10">
-              <div className="w-14 h-14 sm:w-16 sm:h-16 bg-[#25A9F2] rounded-xl flex items-center justify-center mb-5 sm:mb-6">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 bg-[#00272B] rounded-xl flex items-center justify-center mb-5 sm:mb-6">
                 <i className="ri-eye-line text-2xl sm:text-3xl text-white"></i>
               </div>
               <h3 className="text-xl sm:text-2xl font-bold text-[#00272B] mb-3 sm:mb-4">Notre Vision</h3>
               <p className="text-sm sm:text-base text-[#4A4A4A] leading-relaxed">
-                Devenir le partenaire de référence en Afrique de l'Ouest pour les solutions de distribution 
-                automatique, en combinant technologie de pointe et engagement pour le développement local.
+                Extension du parc de distributeurs connectés au Canada et en Afrique de l'Ouest.
+                Développement de l'application mobile SMA Connect pour la commande, le paiement et la fidélité.
               </p>
             </div>
             <div className="bg-white rounded-2xl p-6 sm:p-10 sm:col-span-2 md:col-span-1">
-              <div className="w-14 h-14 sm:w-16 sm:h-16 bg-[#00272B] rounded-xl flex items-center justify-center mb-5 sm:mb-6">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 bg-[#0D8C2E] rounded-xl flex items-center justify-center mb-5 sm:mb-6">
                 <i className="ri-heart-line text-2xl sm:text-3xl text-white"></i>
               </div>
-              <h3 className="text-xl sm:text-2xl font-bold text-[#00272B] mb-3 sm:mb-4">Nos Valeurs</h3>
-              <p className="text-sm sm:text-base text-[#4A4A4A] leading-relaxed">
-                Excellence, Innovation, Intégrité, Proximité client et Engagement communautaire.
-              </p>
+              <h3 className="text-xl sm:text-2xl font-bold text-[#00272B] mb-3 sm:mb-4">Nos Engagements</h3>
+              <ul className="text-sm sm:text-base text-[#4A4A4A] space-y-2">
+                <li className="flex items-start gap-2"><i className="ri-checkbox-circle-fill text-[#0D8C2E] mt-0.5"></i>Qualité & traçabilité des matières premières</li>
+                <li className="flex items-start gap-2"><i className="ri-checkbox-circle-fill text-[#0D8C2E] mt-0.5"></i>Soutien aux producteurs locaux</li>
+                <li className="flex items-start gap-2"><i className="ri-checkbox-circle-fill text-[#0D8C2E] mt-0.5"></i>Innovation continue en distribution</li>
+                <li className="flex items-start gap-2"><i className="ri-checkbox-circle-fill text-[#0D8C2E] mt-0.5"></i>Responsabilité sociale et environnementale</li>
+              </ul>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Chiffres Clés */}
+      {/* Innovation & Impact */}
       <section className="py-12 sm:py-20 bg-[#00272B]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-20">
           <div className="text-center mb-10 sm:mb-16">
-            <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold text-white mb-4">SMA en Chiffres</h2>
-            <p className="text-sm sm:text-lg text-gray-300">Des résultats qui témoignent de notre expertise</p>
+            <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold text-white mb-4">Innovation & Impact</h2>
+            <p className="text-sm sm:text-lg text-gray-300">Nos axes d'innovation pour un impact durable</p>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
-            <div className="text-center">
-              <div className="text-4xl sm:text-5xl md:text-6xl font-bold text-[#1AAA3F] mb-2 sm:mb-3">500+</div>
-              <div className="text-xs sm:text-base text-gray-300">Machines Installées</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl sm:text-5xl md:text-6xl font-bold text-[#1AAA3F] mb-2 sm:mb-3">200+</div>
-              <div className="text-xs sm:text-base text-gray-300">Clients Professionnels</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl sm:text-5xl md:text-6xl font-bold text-[#1AAA3F] mb-2 sm:mb-3">15+</div>
-              <div className="text-xs sm:text-base text-gray-300">Années d'Expérience</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl sm:text-5xl md:text-6xl font-bold text-[#1AAA3F] mb-2 sm:mb-3">45</div>
-              <div className="text-xs sm:text-base text-gray-300">Collaborateurs</div>
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+            {innovations.map((item, i) => (
+              <div key={i} className="bg-white/8 rounded-2xl p-6 sm:p-8 border border-white/10">
+                <h3 className="text-base sm:text-xl font-bold text-white mb-2">{item.axe}</h3>
+                <p className="text-sm text-gray-300 mb-3">{item.desc}</p>
+                <span className="inline-block px-3 py-1 bg-[#0D8C2E]/30 text-[#0D8C2E] text-xs font-semibold rounded-full border border-[#0D8C2E]/40">
+                  Impact : {item.impact}
+                </span>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Équipe */}
+      {/* Perspectives */}
       <section className="py-12 sm:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-20">
           <div className="text-center mb-10 sm:mb-16">
-            <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold text-[#00272B] mb-4">Notre Équipe</h2>
-            <p className="text-sm sm:text-lg text-[#4A4A4A] max-w-3xl mx-auto">
-              Des professionnels passionnés et expérimentés au service de votre satisfaction
-            </p>
+            <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold text-[#00272B] mb-4">Perspectives de Développement</h2>
+            <p className="text-sm sm:text-lg text-[#4A4A4A] max-w-3xl mx-auto">Notre feuille de route pour les prochaines années</p>
           </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8">
-            <div className="text-center group cursor-pointer">
-              <div className="rounded-xl sm:rounded-2xl overflow-hidden mb-3 sm:mb-4">
-                <img src="https://readdy.ai/api/search-image?query=professional%20african%20business%20executive%20man%20in%20elegant%20suit%2C%20confident%20smile%2C%20modern%20office%20background%2C%20corporate%20portrait%20photography%2C%20leadership%20presence%2C%20Senegalese%20professional&width=400&height=500&seq=team-ceo-001&orientation=portrait" alt="Amadou Diop" className="w-full h-40 sm:h-full object-cover object-top" />
-              </div>
-              <h3 className="text-sm sm:text-xl font-bold text-[#00272B] mb-1">Amadou Diop</h3>
-              <p className="text-xs sm:text-sm text-[#1AAA3F] font-semibold mb-1">Directeur Général</p>
-              <p className="text-xs text-[#4A4A4A] hidden sm:block">15 ans d'expérience</p>
-            </div>
-            <div className="text-center group cursor-pointer">
-              <div className="rounded-xl sm:rounded-2xl overflow-hidden mb-3 sm:mb-4">
-                <img src="https://readdy.ai/api/search-image?query=professional%20african%20business%20woman%20in%20elegant%20blazer%2C%20warm%20smile%2C%20modern%20office%20setting%2C%20corporate%20portrait%20photography%2C%20confident%20executive%20presence%2C%20Senegalese%20professional&width=400&height=500&seq=team-ops-001&orientation=portrait" alt="Fatou Sall" className="w-full h-40 sm:h-full object-cover object-top" />
-              </div>
-              <h3 className="text-sm sm:text-xl font-bold text-[#00272B] mb-1">Fatou Sall</h3>
-              <p className="text-xs sm:text-sm text-[#1AAA3F] font-semibold mb-1">Dir. Opérations</p>
-              <p className="text-xs text-[#4A4A4A] hidden sm:block">Logistique & supply chain</p>
-            </div>
-            <div className="text-center group cursor-pointer">
-              <div className="rounded-xl sm:rounded-2xl overflow-hidden mb-3 sm:mb-4">
-                <img src="https://readdy.ai/api/search-image?query=professional%20african%20technology%20engineer%20man%20with%20glasses%2C%20friendly%20expression%2C%20modern%20tech%20office%20background%2C%20corporate%20portrait%20photography%2C%20innovation%20specialist%2C%20Senegalese%20professional&width=400&height=500&seq=team-tech-001&orientation=portrait" alt="Moussa Ndiaye" className="w-full h-40 sm:h-full object-cover object-top" />
-              </div>
-              <h3 className="text-sm sm:text-xl font-bold text-[#00272B] mb-1">Moussa Ndiaye</h3>
-              <p className="text-xs sm:text-sm text-[#1AAA3F] font-semibold mb-1">Resp. Technique</p>
-              <p className="text-xs text-[#4A4A4A] hidden sm:block">Ingénieur automatisé</p>
-            </div>
-            <div className="text-center group cursor-pointer">
-              <div className="rounded-xl sm:rounded-2xl overflow-hidden mb-3 sm:mb-4">
-                <img src="https://readdy.ai/api/search-image?query=professional%20african%20business%20woman%20in%20modern%20attire%2C%20bright%20smile%2C%20contemporary%20office%20environment%2C%20corporate%20portrait%20photography%2C%20customer%20service%20excellence%2C%20Senegalese%20professional&width=400&height=500&seq=team-sales-001&orientation=portrait" alt="Aïssatou Ba" className="w-full h-40 sm:h-full object-cover object-top" />
-              </div>
-              <h3 className="text-sm sm:text-xl font-bold text-[#00272B] mb-1">Aïssatou Ba</h3>
-              <p className="text-xs sm:text-sm text-[#1AAA3F] font-semibold mb-1">Resp. Commerciale</p>
-              <p className="text-xs text-[#4A4A4A] hidden sm:block">Relation client B2B</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Engagements Qualité */}
-      <section className="py-12 sm:py-20 bg-[#EEFFF2]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-20">
-          <div className="text-center mb-10 sm:mb-16">
-            <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold text-[#00272B] mb-4">Nos Engagements Qualité</h2>
-            <p className="text-sm sm:text-lg text-[#4A4A4A] max-w-3xl mx-auto">Des garanties concrètes pour votre tranquillité d'esprit</p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {[
-              { icon: 'ri-shield-check-line', color: 'bg-[#1AAA3F]', title: 'Garantie 2 Ans', desc: 'Toutes nos machines sont garanties 2 ans pièces et main d\'œuvre avec intervention sous 24h.' },
-              { icon: 'ri-tools-line', color: 'bg-[#25A9F2]', title: 'Maintenance Préventive', desc: 'Visites mensuelles programmées pour assurer le bon fonctionnement et la propreté des machines.' },
-              { icon: 'ri-refresh-line', color: 'bg-[#1AAA3F]', title: 'Réapprovisionnement', desc: 'Suivi des stocks en temps réel et réapprovisionnement automatique selon vos besoins.' },
-              { icon: 'ri-customer-service-2-line', color: 'bg-[#25A9F2]', title: 'Support 7j/7', desc: 'Hotline disponible tous les jours pour répondre à vos questions et résoudre vos problèmes.' },
-              { icon: 'ri-leaf-line', color: 'bg-[#1AAA3F]', title: 'Engagement Écologique', desc: 'Machines basse consommation et programme de recyclage des emballages et gobelets.' },
-              { icon: 'ri-award-line', color: 'bg-[#25A9F2]', title: 'Produits Certifiés', desc: 'Sélection rigoureuse de produits de marques reconnues avec certifications qualité.' },
+              { icon: 'ri-global-line', title: 'Expansion Internationale', desc: 'Extension du parc de distributeurs connectés au Canada et en Afrique de l\'Ouest.' },
+              { icon: 'ri-smartphone-line', title: 'Application SMA Connect', desc: 'App mobile pour la commande, le paiement et la fidélité client.' },
+              { icon: 'ri-truck-line', title: 'Chaîne Agro Intégrée', desc: 'Partenariats agricoles et logistiques pour une supply chain complète.' },
+              { icon: 'ri-store-line', title: 'Marque Propre', desc: 'Lancement d\'une gamme de boissons et snacks sains issus de produits locaux.' },
             ].map((item, i) => (
-              <div key={i} className="bg-white rounded-xl p-6 sm:p-8">
-                <div className={`w-12 h-12 sm:w-14 sm:h-14 ${item.color} rounded-lg flex items-center justify-center mb-4 sm:mb-5`}>
-                  <i className={`${item.icon} text-xl sm:text-2xl text-white`}></i>
+              <div key={i} className="bg-[#F8F6F3] rounded-2xl p-6 sm:p-8">
+                <div className="w-12 h-12 bg-[#0D8C2E] rounded-xl flex items-center justify-center mb-4">
+                  <i className={`${item.icon} text-xl text-white`}></i>
                 </div>
-                <h3 className="text-base sm:text-xl font-bold text-[#00272B] mb-2 sm:mb-3">{item.title}</h3>
-                <p className="text-sm sm:text-base text-[#4A4A4A] leading-relaxed">{item.desc}</p>
+                <h3 className="text-base sm:text-lg font-bold text-[#00272B] mb-2">{item.title}</h3>
+                <p className="text-sm text-[#4A4A4A] leading-relaxed">{item.desc}</p>
               </div>
             ))}
           </div>

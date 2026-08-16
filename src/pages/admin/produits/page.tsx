@@ -1,17 +1,28 @@
 import { useState } from 'react';
-import { products } from '../../../mocks/products';
-
-const CATEGORIES = ['Tous', 'Café & Poudres', 'Snacks', 'Boissons'];
+import { useProducts } from '../../../hooks/useProducts';
+import { LoadingState, ErrorState, EmptyState } from '../../../components/feature/AsyncState';
 
 export default function AdminProduitsPage() {
+  const { products, isLoading, error, refetch } = useProducts();
   const [search, setSearch] = useState('');
   const [filterCat, setFilterCat] = useState('Tous');
 
+  if (isLoading) return <LoadingState label="Chargement des consommables…" />;
+  if (error) return <ErrorState message={error} onRetry={refetch} />;
+
+  // Les catégories viennent de la BDD : on les dérive du catalogue chargé
+  const categories = ['Tous', ...Array.from(new Set(products.map(p => p.category))).sort()];
+
   const filtered = products.filter(p => {
-    const matchSearch = p.name.toLowerCase().includes(search.toLowerCase()) || p.sku.toLowerCase().includes(search.toLowerCase());
+    const q = search.toLowerCase();
+    const matchSearch = p.name.toLowerCase().includes(q) || p.sku.toLowerCase().includes(q);
     const matchCat = filterCat === 'Tous' || p.category === filterCat;
     return matchSearch && matchCat;
   });
+
+  const enRupture = products.filter(p => p.stock === 0).length;
+  const stockFaible = products.filter(p => p.stock > 0 && p.stock < 50).length;
+  const valeurStock = products.reduce((s, p) => s + p.price * p.stock, 0);
 
   return (
     <div className="space-y-6">
@@ -19,9 +30,9 @@ export default function AdminProduitsPage() {
       <div className="grid grid-cols-4 gap-4">
         {[
           { label: 'Total produits', value: products.length, icon: 'ri-archive-line', color: 'text-[#1AAA3F]', bg: 'bg-[#1AAA3F]/10' },
-          { label: 'Café & Poudres', value: products.filter(p => p.category === 'Café & Poudres').length, icon: 'ri-cup-line', color: 'text-amber-600', bg: 'bg-amber-50' },
-          { label: 'Snacks', value: products.filter(p => p.category === 'Snacks').length, icon: 'ri-store-line', color: 'text-indigo-600', bg: 'bg-indigo-50' },
-          { label: 'Boissons', value: products.filter(p => p.category === 'Boissons').length, icon: 'ri-goblet-line', color: 'text-sky-600', bg: 'bg-sky-50' },
+          { label: 'Stock faible', value: stockFaible, icon: 'ri-alert-line', color: 'text-amber-600', bg: 'bg-amber-50' },
+          { label: 'En rupture', value: enRupture, icon: 'ri-close-circle-line', color: 'text-red-600', bg: 'bg-red-50' },
+          { label: 'Valeur du stock', value: `${(valeurStock / 1000000).toFixed(1)}M FCFA`, icon: 'ri-money-dollar-circle-line', color: 'text-sky-600', bg: 'bg-sky-50' },
         ].map((s, i) => (
           <div key={i} className="bg-white rounded-xl p-5 border border-gray-100 flex items-center gap-4">
             <div className={`w-10 h-10 ${s.bg} rounded-xl flex items-center justify-center flex-shrink-0`}>
@@ -51,8 +62,8 @@ export default function AdminProduitsPage() {
                 className="w-56 h-9 pl-9 pr-4 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#1AAA3F]"
               />
             </div>
-            <div className="flex gap-2">
-              {CATEGORIES.map(cat => (
+            <div className="flex gap-2 overflow-x-auto">
+              {categories.map(cat => (
                 <button
                   key={cat}
                   onClick={() => setFilterCat(cat)}
@@ -71,6 +82,17 @@ export default function AdminProduitsPage() {
           </button>
         </div>
 
+        {filtered.length === 0 ? (
+          <EmptyState
+            icon="ri-archive-line"
+            title={products.length === 0 ? 'Aucun consommable' : 'Aucun résultat'}
+            description={
+              products.length === 0
+                ? 'Ajoutez des consommables pour les proposer au catalogue.'
+                : 'Aucun produit ne correspond à votre recherche.'
+            }
+          />
+        ) : (
         <div className="overflow-x-auto">
           <table className="w-full min-w-[800px]">
             <thead className="bg-gray-50/60">
@@ -85,8 +107,12 @@ export default function AdminProduitsPage() {
                 <tr key={prod.id} className="hover:bg-gray-50/50 transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-gray-50 rounded-lg overflow-hidden flex-shrink-0">
-                        <img src={prod.images[0]} alt={prod.name} className="w-full h-full object-contain p-1" />
+                      <div className="w-10 h-10 bg-gray-50 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center">
+                        {prod.images[0] ? (
+                          <img src={prod.images[0]} alt={prod.name} className="w-full h-full object-contain p-1" />
+                        ) : (
+                          <i className="ri-image-line text-[#00272B]/20"></i>
+                        )}
                       </div>
                       <div>
                         <p className="text-sm font-semibold text-[#00272B]">{prod.name}</p>
@@ -130,6 +156,7 @@ export default function AdminProduitsPage() {
             </tbody>
           </table>
         </div>
+        )}
       </div>
     </div>
   );

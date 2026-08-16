@@ -13,7 +13,7 @@ interface UseQuotesReturn {
   isLoading: boolean;
   error: string | null;
   updateStatus: (id: string, statut: QuoteStatus) => Promise<void>;
-  updateAmount: (id: string, montantPropose: number) => Promise<void>;
+  updateAmount: (id: string, montantPropose: number, statut?: QuoteStatus) => Promise<void>;
   refetch: () => void;
 }
 
@@ -50,13 +50,18 @@ export function useQuotes(params?: QuoteListParams): UseQuotesReturn {
     }
   }, []);
 
+  /**
+   * Chiffre un devis. Le backend n'expose que PATCH /quotes/:id/status, qui
+   * porte aussi le montant : proposer un montant fait donc passer le devis
+   * à « Devis envoyé », sauf statut explicite.
+   */
   const updateAmount = useCallback(
-    async (id: string, montantPropose: number) => {
+    async (id: string, montantPropose: number, statut: QuoteStatus = 'Devis envoyé') => {
       setQuotes(prev =>
-        prev.map(q => (q.id === id ? { ...q, montantPropose } : q)),
+        prev.map(q => (q.id === id ? { ...q, montantPropose, statut } : q)),
       );
       try {
-        await quotesService.updateAmount(id, montantPropose);
+        await quotesService.updateAmount(id, montantPropose, statut);
       } catch (e) {
         setTick(t => t + 1);
         throw e;

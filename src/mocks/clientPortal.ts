@@ -169,7 +169,7 @@ export const clientQuotes: ClientQuote[] = [
   {
     id: 'DEV-2024-0046',
     date: '2024-03-18',
-    machine: 'SMA Café Pro 200',
+    machine: 'TCN Machine à Café Commerciale',
     machineImage: 'https://readdy.ai/api/search-image?query=modern%20professional%20coffee%20vending%20machine%20sleek%20black%20design%20digital%20touchscreen%20display%20premium%20quality%20corporate%20environment%20standing%20unit&width=200&height=260&seq=client-machine-q1&orientation=portrait',
     employes: '200-500',
     message: 'Besoin de 3 machines café pour nos showrooms Dakar et Thiès.',
@@ -179,7 +179,7 @@ export const clientQuotes: ClientQuote[] = [
   {
     id: 'DEV-2024-0031',
     date: '2024-02-10',
-    machine: 'SMA Combo Pro 500',
+    machine: 'TCN Distributeur Combiné Snack + Boissons + Café',
     machineImage: 'https://readdy.ai/api/search-image?query=large%20premium%20combination%20vending%20machine%20modern%20design%20multiple%20sections%20professional%20quality%20sophisticated%20corporate%20environment&width=200&height=260&seq=client-machine-q2&orientation=portrait',
     employes: '500+',
     message: 'Souhaitons équiper notre siège avec une solution complète café + snacks.',
@@ -194,7 +194,7 @@ export const clientQuotes: ClientQuote[] = [
 export const clientMachines: ClientMachine[] = [
   {
     id: 'INST-001',
-    nom: 'SMA Café Pro 200',
+    nom: 'TCN Machine à Café Commerciale',
     type: 'Distributeur de Café',
     image: 'https://readdy.ai/api/search-image?query=modern%20professional%20coffee%20vending%20machine%20sleek%20black%20design%20digital%20touchscreen%20display%20premium%20quality%20corporate%20environment%20standing%20unit&width=400&height=520&seq=client-inst-001&orientation=portrait',
     dateInstallation: '2024-03-01',
@@ -206,7 +206,7 @@ export const clientMachines: ClientMachine[] = [
   },
   {
     id: 'INST-002',
-    nom: 'SMA Snack Master 300',
+    nom: 'TCN Distributeur Snack & Boissons Standard',
     type: 'Distributeur de Snacks',
     image: 'https://readdy.ai/api/search-image?query=modern%20snack%20vending%20machine%20glass%20front%20illuminated%20interior%20displaying%20variety%20snacks%20food%20items%20sleek%20contemporary%20design%20professional%20quality%20standing%20unit&width=400&height=520&seq=client-inst-002&orientation=portrait',
     dateInstallation: '2023-11-15',
@@ -218,7 +218,7 @@ export const clientMachines: ClientMachine[] = [
   },
   {
     id: 'INST-003',
-    nom: 'SMA Fresh Drink 250',
+    nom: 'TCN Smart Fridge Réfrigérée 24h',
     type: 'Distributeur de Boissons',
     image: 'https://readdy.ai/api/search-image?query=modern%20refrigerated%20beverage%20vending%20machine%20glass%20door%20illuminated%20interior%20showing%20cold%20drinks%20bottles%20sleek%20professional%20design%20contemporary%20energy%20efficient&width=400&height=520&seq=client-inst-003&orientation=portrait',
     dateInstallation: '2023-11-15',
@@ -299,7 +299,7 @@ export const clientTickets: SupportTicket[] = [
     id: 'TKT-2024-0023',
     date: '2024-03-18',
     sujet: 'Machine boissons ne refroidit plus',
-    description: 'La machine SMA Fresh Drink au niveau 2 ne refroidit plus les boissons depuis ce matin. Température ambiante.',
+    description: 'La machine TCN Smart Fridge au niveau 2 ne refroidit plus les boissons depuis ce matin. Température ambiante.',
     categorie: 'Panne',
     priorite: 'Haute',
     statut: 'En cours',

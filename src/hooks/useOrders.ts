@@ -61,3 +61,44 @@ export function useOrders(params?: OrderListParams): UseOrdersReturn {
 
   return { orders, isLoading, error, updateStatus, refetch };
 }
+
+// ── Détail ─────────────────────────────────────────────────────────────────
+
+interface UseOrderReturn {
+  order: Order | null;
+  isLoading: boolean;
+  error: string | null;
+}
+
+/**
+ * Charge le détail d'une commande (lignes incluses), que la liste ne porte pas.
+ * Passer `null` remet l'état à vide sans déclencher de requête.
+ */
+export function useOrder(id: string | null): UseOrderReturn {
+  const [order, setOrder] = useState<Order | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!id) {
+      setOrder(null);
+      setError(null);
+      setIsLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+    setIsLoading(true);
+    setError(null);
+
+    ordersService
+      .getById(id)
+      .then(data => { if (!cancelled) setOrder(data); })
+      .catch(e => { if (!cancelled) setError(e instanceof Error ? e.message : 'Erreur'); })
+      .finally(() => { if (!cancelled) setIsLoading(false); });
+
+    return () => { cancelled = true; };
+  }, [id]);
+
+  return { order, isLoading, error };
+}

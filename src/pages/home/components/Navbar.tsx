@@ -47,7 +47,7 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <Link to="/" className="flex items-center flex-shrink-0">
-            <img src="https://static.readdy.ai/image/1aadd1df13f4328f806374f408610489/60a62dc5b844546eccd3f93680ad2ab4.png" alt="SMALIM" className="h-12 w-auto" />
+            <img src="https://storage.readdy-site.link/project_files/aa6dbb4c-c575-457d-a3a9-db6ddc27815b/3d74ca1f-a6cc-43e7-855a-99e3c8431740_WhatsApp-Image-2026-03-27-at-15.12.28.jpeg?v=53fcf85bfc568db6576ce1dc1e8a0b9f" alt="SMALIM" className="h-12 w-auto object-contain" />
           </Link>
 
           {/* Nav links desktop */}
@@ -55,8 +55,8 @@ export default function Navbar() {
             {navLinks.map(link => (
               <Link key={link.to} to={link.to} className={`px-3 py-2 text-sm font-medium rounded-md transition-colors whitespace-nowrap ${
                 location.pathname === link.to
-                  ? showSolid ? 'text-[#1AAA3F] bg-[#1AAA3F]/8' : 'text-[#1AAA3F]'
-                  : showSolid ? 'text-[#00272B] hover:text-[#1AAA3F] hover:bg-gray-50' : 'text-white/90 hover:text-white hover:bg-white/10'
+                  ? showSolid ? 'text-[#0D8C2E] bg-[#0D8C2E]/8' : 'text-[#0D8C2E]'
+                  : showSolid ? 'text-[#00272B] hover:text-[#0D8C2E] hover:bg-gray-50' : 'text-white/90 hover:text-white hover:bg-white/10'
               }`}>{link.label}</Link>
             ))}
           </div>
@@ -69,7 +69,7 @@ export default function Navbar() {
                 onClick={() => setShowAccountMenu(v => !v)}
                 className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border transition-all whitespace-nowrap ${
                   showSolid
-                    ? 'text-[#00272B] border-gray-200 hover:border-[#1AAA3F] hover:text-[#1AAA3F] bg-white'
+                    ? 'text-[#00272B] border-gray-200 hover:border-[#0D8C2E] hover:text-[#0D8C2E] bg-white'
                     : 'text-white border-white/30 hover:border-white hover:bg-white/10'
                 }`}
               >
@@ -90,8 +90,8 @@ export default function Navbar() {
                     onClick={() => setShowAccountMenu(false)}
                     className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer"
                   >
-                    <div className="w-8 h-8 bg-[#1AAA3F]/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <i className="ri-user-line text-[#1AAA3F] text-sm"></i>
+                    <div className="w-8 h-8 bg-[#0D8C2E]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <i className="ri-user-line text-[#0D8C2E] text-sm"></i>
                     </div>
                     <div>
                       <p className="text-sm font-semibold text-[#00272B]">Espace Client</p>
@@ -121,12 +121,12 @@ export default function Navbar() {
             }`}>
               <i className="ri-shopping-cart-line text-lg"></i>
               {cartItemsCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#1AAA3F] text-white text-xs font-bold rounded-full flex items-center justify-center">{cartItemsCount}</span>
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#0D8C2E] text-white text-xs font-bold rounded-full flex items-center justify-center">{cartItemsCount}</span>
               )}
             </Link>
 
             {/* CTA */}
-            <Link to="/produits" className="hidden md:block px-5 py-2 bg-[#1AAA3F] text-white text-sm font-semibold rounded-lg hover:bg-[#158f35] transition-colors whitespace-nowrap">
+            <Link to="/produits" className="hidden md:block px-5 py-2 bg-[#0D8C2E] text-white text-sm font-semibold rounded-lg hover:bg-[#0a7025] transition-colors whitespace-nowrap">
               Boutique
             </Link>
 
@@ -145,21 +145,21 @@ export default function Navbar() {
           <div className="md:hidden bg-white border-t border-gray-100 py-4 space-y-1">
             {navLinks.map(link => (
               <Link key={link.to} to={link.to} onClick={() => setIsMobileMenuOpen(false)}
-                className={`block px-4 py-2.5 text-sm font-medium rounded-md mx-2 transition-colors ${location.pathname === link.to ? 'text-[#1AAA3F] bg-[#1AAA3F]/8' : 'text-[#00272B] hover:text-[#1AAA3F] hover:bg-gray-50'}`}>
+                className={`block px-4 py-2.5 text-sm font-medium rounded-md mx-2 transition-colors ${location.pathname === link.to ? 'text-[#0D8C2E] bg-[#0D8C2E]/8' : 'text-[#00272B] hover:text-[#0D8C2E] hover:bg-gray-50'}`}>
                 {link.label}
               </Link>
             ))}
             <div className="px-2 pt-2 flex flex-col gap-2">
               <Link to="/espace-client/connexion" onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-[#1AAA3F] border border-[#1AAA3F]/30 rounded-lg hover:bg-[#1AAA3F]/5">
+                className="flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-[#0D8C2E] border border-[#0D8C2E]/30 rounded-lg hover:bg-[#0D8C2E]/5">
                 <i className="ri-user-line"></i>Espace Client
               </Link>
               <Link to="/connexion" onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-[#00272B] border border-gray-200 rounded-lg hover:border-[#1AAA3F] hover:text-[#1AAA3F]">
+                className="flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-[#00272B] border border-gray-200 rounded-lg hover:border-[#0D8C2E] hover:text-[#0D8C2E]">
                 <i className="ri-shield-user-line"></i>Administration
               </Link>
               <Link to="/produits" onClick={() => setIsMobileMenuOpen(false)}
-                className="block text-center py-2.5 bg-[#1AAA3F] text-white text-sm font-semibold rounded-lg hover:bg-[#158f35]">
+                className="block text-center py-2.5 bg-[#0D8C2E] text-white text-sm font-semibold rounded-lg hover:bg-[#0a7025]">
                 Boutique
               </Link>
             </div>

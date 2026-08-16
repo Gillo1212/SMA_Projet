@@ -38,7 +38,10 @@ export interface Machine {
   name: string;
   slug: string;
   type: 'cafe' | 'snacks' | 'boissons' | 'combine';
+  /** Libellé de la catégorie */
   category: string;
+  /** ID de la catégorie — requis par POST/PUT /machines */
+  categoryId?: string;
   price: number;
   priceDisplay: string;
   badge?: string;
@@ -53,7 +56,10 @@ export interface Machine {
   idealFor: string[];
   maintenanceIncluded: boolean;
   deliveryTime: string;
+  /** Libellé dérivé de la quantité réelle */
   stock: 'En stock' | 'Stock limité' | 'Rupture de stock';
+  /** Quantité réelle en base — conservée pour ne pas la perdre à l'édition */
+  stockQuantity?: number;
 }
 
 // ── Produit ────────────────────────────────────────────────────────────────
@@ -62,7 +68,10 @@ export interface Product {
   id: string;
   sku: string;
   name: string;
-  category: 'Café & Poudres' | 'Snacks' | 'Boissons';
+  /** Libellé de la catégorie (pilotée par la BDD, pas une liste figée) */
+  category: string;
+  /** Slug de la catégorie — sert de filtre côté API */
+  categorySlug?: string;
   brand: string;
   price: number;
   format: string;
@@ -88,25 +97,41 @@ export interface VolumeDiscount {
 
 // ── Commande ───────────────────────────────────────────────────────────────
 
+/** Reflète l'ENUM `orders.status` du backend (7 valeurs) */
 export type OrderStatus =
   | 'En attente'
   | 'Confirmée'
-  | 'En livraison'
+  | 'En préparation'
+  | 'Expédiée'
   | 'Livrée'
-  | 'Annulée';
+  | 'Annulée'
+  | 'Remboursée';
 
-export type PaymentMethod = 'Wave' | 'Orange Money' | 'Carte bancaire' | 'Espèces';
+export type PaymentMethod =
+  | 'Wave'
+  | 'Orange Money'
+  | 'Virement bancaire'
+  | 'Carte bancaire'
+  | 'Espèces'
+  | 'Non renseigné';
+
+export type PaymentStatus = 'En attente' | 'Payée' | 'Échouée' | 'Remboursée';
 
 export interface Order {
+  /** ID numérique — c'est lui qu'attendent les routes /orders/:id */
   id: string;
+  /** Numéro lisible affiché à l'écran (CMD-2024-00042) */
+  reference: string;
   client: string;
   email: string;
   phone?: string;
+  /** Résumé texte des articles — vide tant que le détail n'est pas chargé */
   produits: string;
   items?: OrderItem[];
   montant: number;
   statut: OrderStatus;
   paiement: PaymentMethod;
+  paiementStatut?: PaymentStatus;
   date: string;
   adresseLivraison?: string;
   note?: string;
@@ -121,25 +146,34 @@ export interface OrderItem {
 
 // ── Devis ──────────────────────────────────────────────────────────────────
 
+/** Reflète l'ENUM `quotes.status` du backend (6 valeurs) */
 export type QuoteStatus =
   | 'Nouveau'
   | 'En cours'
   | 'Devis envoyé'
   | 'Accepté'
-  | 'Refusé';
+  | 'Refusé'
+  | 'Expiré';
 
 export interface Quote {
+  /** ID numérique — attendu par les routes /quotes/:id */
   id: string;
+  /** Numéro lisible affiché à l'écran (DEV-2024-00042) */
+  reference: string;
   entreprise: string;
   contact: string;
   email: string;
   phone?: string;
   machine: string;
   machineId?: string;
-  employes: string;
+  /** Nombre d'unités demandées (colonne `quantity`) */
+  quantite: number;
+  /** @deprecated champ hérité des mocks — utiliser `quantite` */
+  employes?: string;
   message: string;
   statut: QuoteStatus;
   date: string;
+  budget?: number;
   montantPropose?: number;
   notes?: string;
 }
@@ -161,13 +195,20 @@ export interface Client {
   statut: ClientStatus;
 }
 
+/** Catégorie renvoyée par /machines/categories, /products/categories, /blog/categories */
+export interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  articlesCount?: number;
+}
+
 // ── Blog ───────────────────────────────────────────────────────────────────
 
-export type BlogCategory =
-  | 'actualites'
-  | 'conseils'
-  | 'innovations'
-  | 'temoignages';
+/** Les catégories réelles viennent de /blog/categories — ce type reste un alias souple */
+export type BlogCategory = string;
+
+export type BlogStatus = 'draft' | 'published' | 'archived';
 
 export interface BlogPost {
   id: string;
@@ -175,12 +216,17 @@ export interface BlogPost {
   title: string;
   excerpt: string;
   content: string;
+  /** Slug de la catégorie */
   category: BlogCategory;
+  /** Libellé affichable de la catégorie */
+  categoryName?: string;
+  categoryId?: string;
   date: string;
   author: string;
   authorRole: string;
   readTime: string;
   image: string;
+  status?: BlogStatus;
   published?: boolean;
 }
 
@@ -189,18 +235,26 @@ export interface BlogPost {
 export interface DashboardStats {
   totalCommandes: number;
   commandesMoisActuel: number;
-  commandesEvolution: number;
+  /** % vs mois précédent — absent si l'historique est trop court */
+  commandesEvolution?: number;
+  revenusTotal: number;
   revenusMoisActuel: number;
-  revenusEvolution: number;
+  revenusEvolution?: number;
   machinesActives: number;
   devisEnAttente: number;
+  ticketsOuverts: number;
   clientsTotal: number;
-  clientsNouveaux: number;
 }
 
 export interface RevenueDataPoint {
   month: string;
   value: number;
+}
+
+/** Répartition des commandes par statut (30 derniers jours) */
+export interface StatusBreakdownItem {
+  statut: OrderStatus;
+  count: number;
 }
 
 // ── Pagination ─────────────────────────────────────────────────────────────
@@ -236,6 +290,7 @@ export interface MachineListParams extends ListParams {
 }
 
 export interface ProductListParams extends ListParams {
+  /** Slug de catégorie tel qu'attendu par le backend */
   category?: string;
   available?: boolean;
 }
@@ -246,4 +301,9 @@ export interface OrderListParams extends ListParams {
 
 export interface QuoteListParams extends ListParams {
   statut?: QuoteStatus;
+}
+
+export interface BlogListParams extends ListParams {
+  category?: string;
+  status?: BlogStatus;
 }

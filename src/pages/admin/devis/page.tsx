@@ -1,48 +1,80 @@
 import { useState } from 'react';
-import { adminDevis, DevisStatus, AdminDevis } from '../../../mocks/admin';
+import { useQuotes } from '../../../hooks/useQuotes';
+import { LoadingState, ErrorState, EmptyState } from '../../../components/feature/AsyncState';
+import type { QuoteStatus } from '../../../types/models';
 
-const ALL_STATUTS: DevisStatus[] = ['Nouveau', 'En cours', 'Devis envoyé', 'Accepté', 'Refusé'];
+const ALL_STATUTS: QuoteStatus[] = ['Nouveau', 'En cours', 'Devis envoyé', 'Accepté', 'Refusé', 'Expiré'];
 
-const statusColors: Record<DevisStatus, string> = {
+const statusColors: Record<QuoteStatus, string> = {
   'Nouveau': 'bg-amber-50 text-amber-700 border-amber-200',
   'En cours': 'bg-sky-50 text-sky-700 border-sky-200',
   'Devis envoyé': 'bg-indigo-50 text-indigo-700 border-indigo-200',
   'Accepté': 'bg-emerald-50 text-emerald-700 border-emerald-200',
   'Refusé': 'bg-red-50 text-red-700 border-red-200',
+  'Expiré': 'bg-gray-50 text-gray-600 border-gray-200',
 };
 
 export default function AdminDevisPage() {
-  const [devisList, setDevisList] = useState<AdminDevis[]>(adminDevis);
+  const { quotes, isLoading, error, updateStatus, updateAmount, refetch } = useQuotes();
   const [search, setSearch] = useState('');
   const [filterStatut, setFilterStatut] = useState<string>('Tous');
-  const [selected, setSelected] = useState<AdminDevis | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [montantInput, setMontantInput] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
 
-  const filtered = devisList.filter(d => {
-    const matchSearch = d.entreprise.toLowerCase().includes(search.toLowerCase()) || d.contact.toLowerCase().includes(search.toLowerCase());
+  if (isLoading) return <LoadingState label="Chargement des devis…" />;
+  if (error) return <ErrorState message={error} onRetry={refetch} />;
+
+  const filtered = quotes.filter(d => {
+    const q = search.toLowerCase();
+    const matchSearch =
+      d.entreprise.toLowerCase().includes(q) ||
+      d.contact.toLowerCase().includes(q) ||
+      d.email.toLowerCase().includes(q);
     const matchStatut = filterStatut === 'Tous' || d.statut === filterStatut;
     return matchSearch && matchStatut;
   });
 
-  const updateStatut = (id: string, statut: DevisStatus) => {
-    setDevisList(prev => prev.map(d => d.id === id ? { ...d, statut } : d));
-    if (selected?.id === id) setSelected(prev => prev ? { ...prev, statut } : prev);
+  const selected = quotes.find(q => q.id === selectedId) ?? null;
+
+  const updateStatut = async (id: string, statut: QuoteStatus) => {
+    setSaving(true);
+    setActionError(null);
+    try {
+      await updateStatus(id, statut);
+    } catch (e) {
+      setActionError(e instanceof Error ? e.message : 'Mise à jour impossible');
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const saveMontant = () => {
+  const saveMontant = async () => {
     if (!selected || !montantInput) return;
     const val = parseInt(montantInput.replace(/\s/g, ''), 10);
-    if (isNaN(val)) return;
-    setDevisList(prev => prev.map(d => d.id === selected.id ? { ...d, montantPropose: val } : d));
-    setSelected(prev => prev ? { ...prev, montantPropose: val } : prev);
-    setMontantInput('');
+    if (isNaN(val)) {
+      setActionError('Montant invalide');
+      return;
+    }
+    setSaving(true);
+    setActionError(null);
+    try {
+      // Chiffrer un devis le fait passer à « Devis envoyé » côté backend.
+      await updateAmount(selected.id, val);
+      setMontantInput('');
+    } catch (e) {
+      setActionError(e instanceof Error ? e.message : 'Enregistrement impossible');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const stats = {
-    total: devisList.length,
-    nouveau: devisList.filter(d => d.statut === 'Nouveau').length,
-    accepte: devisList.filter(d => d.statut === 'Accepté').length,
-    totalValeur: devisList.filter(d => d.montantPropose).reduce((s, d) => s + (d.montantPropose ?? 0), 0),
+    total: quotes.length,
+    nouveau: quotes.filter(d => d.statut === 'Nouveau').length,
+    accepte: quotes.filter(d => d.statut === 'Accepté').length,
+    totalValeur: quotes.reduce((s, d) => s + (d.montantPropose ?? 0), 0),
   };
 
   return (
@@ -93,32 +125,46 @@ export default function AdminDevisPage() {
             </select>
           </div>
 
-          <div className="divide-y divide-gray-50">
-            {filtered.map(devis => (
-              <div
-                key={devis.id}
-                onClick={() => { setSelected(devis); setMontantInput(''); }}
-                className={`p-5 cursor-pointer hover:bg-gray-50/60 transition-colors ${selected?.id === devis.id ? 'bg-[#1AAA3F]/5' : ''}`}
-              >
-                <div className="flex items-start justify-between mb-2">
-                  <div>
-                    <p className="text-sm font-bold text-[#00272B]">{devis.entreprise}</p>
-                    <p className="text-xs text-[#00272B]/50">{devis.contact} · {devis.email}</p>
+          {filtered.length === 0 ? (
+            <EmptyState
+              icon="ri-file-list-3-line"
+              title={quotes.length === 0 ? 'Aucun devis' : 'Aucun résultat'}
+              description={
+                quotes.length === 0
+                  ? 'Les demandes de devis apparaîtront ici.'
+                  : 'Aucun devis ne correspond à votre recherche.'
+              }
+            />
+          ) : (
+            <div className="divide-y divide-gray-50">
+              {filtered.map(devis => (
+                <div
+                  key={devis.id}
+                  onClick={() => { setSelectedId(devis.id); setMontantInput(''); setActionError(null); }}
+                  className={`p-5 cursor-pointer hover:bg-gray-50/60 transition-colors ${selectedId === devis.id ? 'bg-[#1AAA3F]/5' : ''}`}
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <div>
+                      <p className="text-sm font-bold text-[#00272B]">{devis.entreprise}</p>
+                      <p className="text-xs text-[#00272B]/50">{devis.contact} · {devis.email}</p>
+                    </div>
+                    <span className={`text-xs font-medium px-2.5 py-1 rounded-full border flex-shrink-0 ml-2 ${statusColors[devis.statut]}`}>
+                      {devis.statut}
+                    </span>
                   </div>
-                  <span className={`text-xs font-medium px-2.5 py-1 rounded-full border flex-shrink-0 ml-2 ${statusColors[devis.statut]}`}>
-                    {devis.statut}
-                  </span>
+                  <p className="text-xs text-[#00272B]/60 mb-2">
+                    {devis.machine} · {devis.quantite} unité(s)
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-[#00272B]/35">{devis.reference} · {devis.date}</span>
+                    {devis.montantPropose ? (
+                      <span className="text-xs font-bold text-[#1AAA3F]">{devis.montantPropose.toLocaleString('fr-FR')} FCFA</span>
+                    ) : null}
+                  </div>
                 </div>
-                <p className="text-xs text-[#00272B]/60 mb-2">{devis.machine} · {devis.employes} employés</p>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-[#00272B]/35">{devis.id} · {devis.date}</span>
-                  {devis.montantPropose && (
-                    <span className="text-xs font-bold text-[#1AAA3F]">{devis.montantPropose.toLocaleString('fr-FR')} FCFA</span>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Detail */}
@@ -126,7 +172,7 @@ export default function AdminDevisPage() {
           <div className="w-80 flex-shrink-0 bg-white rounded-2xl border border-gray-100 p-6">
             <div className="flex items-center justify-between mb-5">
               <h3 className="text-sm font-bold text-[#00272B]">Détail du devis</h3>
-              <button onClick={() => setSelected(null)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 cursor-pointer text-[#00272B]/40">
+              <button onClick={() => setSelectedId(null)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 cursor-pointer text-[#00272B]/40">
                 <i className="ri-close-line"></i>
               </button>
             </div>
@@ -144,7 +190,10 @@ export default function AdminDevisPage() {
               <div className="p-3 bg-gray-50 rounded-xl">
                 <p className="text-xs text-[#00272B]/40 mb-0.5">Machine demandée</p>
                 <p className="text-sm font-medium text-[#00272B]">{selected.machine}</p>
-                <p className="text-xs text-[#00272B]/40">{selected.employes} employés</p>
+                <p className="text-xs text-[#00272B]/40">
+                  {selected.quantite} unité(s)
+                  {selected.budget ? ` · budget ${selected.budget.toLocaleString('fr-FR')} FCFA` : ''}
+                </p>
               </div>
               <div className="p-3 bg-gray-50 rounded-xl">
                 <p className="text-xs text-[#00272B]/40 mb-1">Message</p>
@@ -170,11 +219,18 @@ export default function AdminDevisPage() {
                 />
                 <button
                   onClick={saveMontant}
-                  className="px-3 h-9 bg-[#1AAA3F] text-white text-xs font-semibold rounded-lg hover:bg-[#158f35] cursor-pointer whitespace-nowrap"
+                  disabled={saving}
+                  className="px-3 h-9 bg-[#1AAA3F] text-white text-xs font-semibold rounded-lg hover:bg-[#158f35] disabled:opacity-50 cursor-pointer whitespace-nowrap"
                 >
                   Sauver
                 </button>
               </div>
+
+              {actionError && (
+                <div className="p-3 bg-red-50 border border-red-100 rounded-xl">
+                  <p className="text-xs text-red-600">{actionError}</p>
+                </div>
+              )}
             </div>
 
             <div>
@@ -183,8 +239,9 @@ export default function AdminDevisPage() {
                 {ALL_STATUTS.map(s => (
                   <button
                     key={s}
+                    disabled={saving}
                     onClick={() => updateStatut(selected.id, s)}
-                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer text-left border ${
+                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer text-left border disabled:opacity-50 ${
                       selected.statut === s
                         ? statusColors[s] + ' border-current'
                         : 'text-[#00272B]/50 border-gray-100 hover:bg-gray-50'

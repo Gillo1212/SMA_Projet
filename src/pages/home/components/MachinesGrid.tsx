@@ -12,46 +12,41 @@ export default function MachinesGrid() {
             Nos Distributeurs<br />Automatiques
           </h2>
           <p className="text-sm sm:text-base text-[#666666] max-w-md leading-relaxed">
-            Découvrez notre gamme complète de machines adaptées à tous les environnements 
-            professionnels et besoins spécifiques.
+            Découvrez notre gamme complète de machines adaptées à tous les environnements professionnels et besoins spécifiques.
           </p>
         </div>
-
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {featured.map((machine) => (
             <div key={machine.id} className="bg-white rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group">
               <div className="relative h-64 sm:h-80 overflow-hidden">
-                <img 
+                <img
                   src={machine.image}
                   alt={machine.name}
                   className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
                 />
-                <div className="absolute top-4 right-4 bg-[#1AAA3F] text-white px-3 py-1 rounded-xl text-xs font-semibold">
+                <div className="absolute top-4 right-4 bg-[#0D8C2E] text-white px-3 py-1 rounded-xl text-xs font-semibold">
                   À partir de {machine.priceDisplay}
                 </div>
               </div>
-              
               <div className="p-4 sm:p-6">
                 <h3 className="text-xl sm:text-2xl font-semibold text-black mb-3 sm:mb-4">{machine.name}</h3>
-                
                 <div className="space-y-2 mb-4 sm:mb-6">
                   <div className="flex items-start text-xs sm:text-sm text-[#666666]">
-                    <i className="ri-checkbox-circle-fill text-[#1AAA3F] mr-2 mt-0.5"></i>
+                    <i className="ri-checkbox-circle-fill text-[#0D8C2E] mr-2 mt-0.5"></i>
                     <span>{machine.category}</span>
                   </div>
                   <div className="flex items-start text-xs sm:text-sm text-[#666666]">
-                    <i className="ri-checkbox-circle-fill text-[#1AAA3F] mr-2 mt-0.5"></i>
+                    <i className="ri-checkbox-circle-fill text-[#0D8C2E] mr-2 mt-0.5"></i>
                     <span>Livraison : {machine.deliveryTime}</span>
                   </div>
                   <div className="flex items-start text-xs sm:text-sm text-[#666666]">
-                    <i className="ri-checkbox-circle-fill text-[#1AAA3F] mr-2 mt-0.5"></i>
+                    <i className="ri-checkbox-circle-fill text-[#0D8C2E] mr-2 mt-0.5"></i>
                     <span>{machine.stock}</span>
                   </div>
                 </div>
-
-                <Link 
+                <Link
                   to={`/machines/${machine.slug}`}
-                  className="block w-full py-2.5 sm:py-3 text-center border-2 border-[#1AAA3F] text-[#1AAA3F] font-semibold rounded-lg hover:bg-[#1AAA3F] hover:text-white transition-colors text-sm whitespace-nowrap"
+                  className="block w-full py-2.5 sm:py-3 text-center border-2 border-[#0D8C2E] text-[#0D8C2E] font-semibold rounded-lg hover:bg-[#0D8C2E] hover:text-white transition-colors text-sm whitespace-nowrap"
                 >
                   Voir détails
                 </Link>
@@ -59,7 +54,6 @@ export default function MachinesGrid() {
             </div>
           ))}
         </div>
-
         <div className="text-center mt-8 sm:mt-12">
           <Link to="/machines" className="inline-block px-8 py-3 bg-[#00272B] text-white font-semibold rounded-lg hover:bg-[#003840] transition-colors whitespace-nowrap">
             Voir Toutes les Machines

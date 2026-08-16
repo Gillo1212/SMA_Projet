@@ -12,13 +12,20 @@ import { API_URL, AUTH_TOKEN_KEY } from '../config/api';
 // ── Types internes ─────────────────────────────────────────────────────────
 
 export class ApiError extends Error {
+  // Champs déclarés explicitement : les paramètres-propriétés du constructeur
+  // ne sont pas autorisés sous `erasableSyntaxOnly`.
+  status: number;
+  errors?: Record<string, string[]>;
+
   constructor(
-    public status: number,
-    public message: string,
-    public errors?: Record<string, string[]>,
+    status: number,
+    message: string,
+    errors?: Record<string, string[]>,
   ) {
     super(message);
     this.name = 'ApiError';
+    this.status = status;
+    this.errors = errors;
   }
 }
 

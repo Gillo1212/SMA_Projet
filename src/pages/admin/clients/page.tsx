@@ -1,28 +1,34 @@
 import { useState } from 'react';
-import { adminClients } from '../../../mocks/admin';
+import { useClients } from '../../../hooks/useClients';
+import { LoadingState, ErrorState, EmptyState } from '../../../components/feature/AsyncState';
 
 export default function AdminClientsPage() {
+  const { clients, isLoading, error, refetch } = useClients();
   const [search, setSearch] = useState('');
   const [filterStatut, setFilterStatut] = useState<'Tous' | 'Actif' | 'Inactif'>('Tous');
 
-  const filtered = adminClients.filter(c => {
-    const matchSearch = c.nom.toLowerCase().includes(search.toLowerCase()) ||
-      c.entreprise.toLowerCase().includes(search.toLowerCase()) ||
-      c.email.toLowerCase().includes(search.toLowerCase());
+  if (isLoading) return <LoadingState label="Chargement des clients…" />;
+  if (error) return <ErrorState message={error} onRetry={refetch} />;
+
+  const filtered = clients.filter(c => {
+    const q = search.toLowerCase();
+    const matchSearch = c.nom.toLowerCase().includes(q) ||
+      c.entreprise.toLowerCase().includes(q) ||
+      c.email.toLowerCase().includes(q);
     const matchStatut = filterStatut === 'Tous' || c.statut === filterStatut;
     return matchSearch && matchStatut;
   });
 
-  const totalRevenu = adminClients.reduce((s, c) => s + c.totalDepenses, 0);
-  const totalCommandes = adminClients.reduce((s, c) => s + c.totalCommandes, 0);
+  const totalRevenu = clients.reduce((s, c) => s + c.totalDepenses, 0);
+  const totalCommandes = clients.reduce((s, c) => s + c.totalCommandes, 0);
 
   return (
     <div className="space-y-6">
       {/* Stats */}
       <div className="grid grid-cols-4 gap-4">
         {[
-          { label: 'Total clients', value: adminClients.length, icon: 'ri-group-line', color: 'text-[#1AAA3F]', bg: 'bg-[#1AAA3F]/10' },
-          { label: 'Clients actifs', value: adminClients.filter(c => c.statut === 'Actif').length, icon: 'ri-user-follow-line', color: 'text-emerald-600', bg: 'bg-emerald-50' },
+          { label: 'Total clients', value: clients.length, icon: 'ri-group-line', color: 'text-[#1AAA3F]', bg: 'bg-[#1AAA3F]/10' },
+          { label: 'Clients actifs', value: clients.filter(c => c.statut === 'Actif').length, icon: 'ri-user-follow-line', color: 'text-emerald-600', bg: 'bg-emerald-50' },
           { label: 'Commandes totales', value: totalCommandes, icon: 'ri-shopping-bag-line', color: 'text-sky-600', bg: 'bg-sky-50' },
           { label: 'Revenu clients', value: `${(totalRevenu / 1000000).toFixed(1)}M FCFA`, icon: 'ri-money-dollar-circle-line', color: 'text-indigo-600', bg: 'bg-indigo-50' },
         ].map((s, i) => (
@@ -71,6 +77,17 @@ export default function AdminClientsPage() {
           <p className="text-xs text-[#00272B]/40">{filtered.length} client(s)</p>
         </div>
 
+        {filtered.length === 0 ? (
+          <EmptyState
+            icon="ri-group-line"
+            title={clients.length === 0 ? 'Aucun client' : 'Aucun résultat'}
+            description={
+              clients.length === 0
+                ? 'Les comptes clients créés apparaîtront ici.'
+                : 'Aucun client ne correspond à votre recherche.'
+            }
+          />
+        ) : (
         <div className="overflow-x-auto">
           <table className="w-full min-w-[900px]">
             <thead className="bg-gray-50/60">
@@ -131,6 +148,7 @@ export default function AdminClientsPage() {
             </tbody>
           </table>
         </div>
+        )}
       </div>
     </div>
   );

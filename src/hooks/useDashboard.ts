@@ -46,6 +46,7 @@ export function useDashboard(): UseDashboardReturn {
   return {
     stats: data?.stats,
     revenue: data?.revenue,
+    statusBreakdown: data?.statusBreakdown,
     recentOrders: data?.recentOrders,
     pendingQuotes: data?.pendingQuotes,
     isLoading,

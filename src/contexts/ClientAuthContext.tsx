@@ -52,7 +52,7 @@ export function ClientAuthProvider({ children }: { children: ReactNode }) {
         setIsLoading(false);
       } else {
         // Vérifier le token côté API
-        // Backend retourne { success, user: {...} } — on extrait user
+        // Backend retourne { success, user: {...} } - on extrait user
         apiClient
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           .get<Record<string, any>>(ENDPOINTS.AUTH.ME)

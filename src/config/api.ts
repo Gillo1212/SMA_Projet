@@ -26,6 +26,10 @@ export const ENDPOINTS = {
     REFRESH:        '/auth/refresh',
     ME:             '/auth/me',
     CHANGE_PASSWORD:'/auth/change-password',
+    FORGOT_PASSWORD:    '/auth/forgot-password',
+    RESET_PASSWORD:     '/auth/reset-password',
+    VERIFY_EMAIL:       '/auth/verify-email',
+    RESEND_VERIFICATION:'/auth/resend-verification',
   },
 
   // ── Machines ──────────────────────────────────────────────
@@ -60,6 +64,8 @@ export const ENDPOINTS = {
   },
 
   // ── Devis ─────────────────────────────────────────────────
+  // Le backend n'expose qu'une seule route de mise à jour : PATCH /quotes/:id/status
+  // Elle accepte aussi `proposed_amount` — il n'existe pas de route /amount séparée.
   QUOTES: {
     LIST:          '/quotes',
     DETAIL:        (id: string) => `/quotes/${id}`,
@@ -69,6 +75,7 @@ export const ENDPOINTS = {
   },
 
   // ── Clients ───────────────────────────────────────────────
+  // Pas de DELETE côté backend : la désactivation passe par TOGGLE_ACTIVE.
   CLIENTS: {
     LIST:                    '/clients',
     DETAIL:                  (id: string) => `/clients/${id}`,

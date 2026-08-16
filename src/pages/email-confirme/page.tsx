@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { authService } from '../../services/auth.service';
 
 export default function EmailConfirmePage() {
   const navigate = useNavigate();
@@ -9,16 +10,18 @@ export default function EmailConfirmePage() {
   const [countdown, setCountdown] = useState(5);
 
   useEffect(() => {
-    const verify = async () => {
-      // TODO: call GET /api/auth/verify-email?token=...
-      await new Promise(r => setTimeout(r, 1500));
-      if (token) {
-        setStatus('success');
-      } else {
-        setStatus('error');
-      }
-    };
-    verify();
+    if (!token) {
+      setStatus('error');
+      return;
+    }
+
+    let cancelled = false;
+    authService
+      .verifyEmail(token)
+      .then(() => { if (!cancelled) setStatus('success'); })
+      .catch(() => { if (!cancelled) setStatus('error'); });
+
+    return () => { cancelled = true; };
   }, [token]);
 
   useEffect(() => {
