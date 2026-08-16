@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Confirmation de commande - SMALIM</title>
+</head>
+<body style="margin:0;padding:0;background:#f5f9f6;font-family:'Helvetica Neue',Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f9f6;padding:40px 20px;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
+        <!-- Header -->
+        <tr>
+          <td style="background:#00272B;border-radius:16px 16px 0 0;padding:32px 40px;text-align:center;">
+            <img src="https://static.readdy.ai/image/1aadd1df13f4328f806374f408610489/60a62dc5b844546eccd3f93680ad2ab4.png" alt="SMALIM" height="40" style="display:block;margin:0 auto;" />
+          </td>
+        </tr>
+        <!-- Green banner -->
+        <tr>
+          <td style="background:#1AAA3F;padding:24px 40px;text-align:center;">
+            <p style="color:#fff;font-size:13px;font-weight:600;letter-spacing:1px;margin:0 0 6px;text-transform:uppercase;">Commande confirmée</p>
+            <h1 style="color:#fff;font-size:22px;font-weight:700;margin:0;">Commande #{{orderNumber}}</h1>
+          </td>
+        </tr>
+        <!-- Body -->
+        <tr>
+          <td style="background:#ffffff;padding:40px;">
+            <p style="color:rgba(0,39,43,0.7);font-size:15px;line-height:1.6;margin:0 0 24px;">
+              Bonjour {{firstName}},<br/><br/>
+              Merci pour votre commande ! Nous avons bien reçu votre paiement et préparons votre commande du <strong>{{orderDate}}</strong>.
+            </p>
+
+            <!-- Items -->
+            <h3 style="color:#00272B;font-size:15px;font-weight:700;margin:0 0 12px;">Récapitulatif</h3>
+            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
+              <thead>
+                <tr style="background:#f8fafb;">
+                  <th style="padding:10px 12px;text-align:left;color:#00272B;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;border-radius:6px 0 0 6px;">Article</th>
+                  <th style="padding:10px 12px;text-align:center;color:#00272B;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Qté</th>
+                  <th style="padding:10px 12px;text-align:right;color:#00272B;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;border-radius:0 6px 6px 0;">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                {{itemsHtml}}
+              </tbody>
+            </table>
+
+            <!-- Totals -->
+            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:28px;">
+              <tr><td style="padding:6px 0;color:rgba(0,39,43,0.6);font-size:13px;">Sous-total</td><td style="padding:6px 0;text-align:right;color:#00272B;font-size:13px;">{{subtotal}} FCFA</td></tr>
+              <tr><td style="padding:6px 0;color:rgba(0,39,43,0.6);font-size:13px;">Livraison</td><td style="padding:6px 0;text-align:right;color:#00272B;font-size:13px;">{{shipping}} FCFA</td></tr>
+              <tr><td style="padding:6px 0;color:rgba(0,39,43,0.6);font-size:13px;">TVA (18%)</td><td style="padding:6px 0;text-align:right;color:#00272B;font-size:13px;">{{tva}} FCFA</td></tr>
+              <tr style="border-top:2px solid #e8f5ee;">
+                <td style="padding:10px 0 0;color:#00272B;font-size:16px;font-weight:700;">Total</td>
+                <td style="padding:10px 0 0;text-align:right;color:#1AAA3F;font-size:18px;font-weight:700;">{{total}} FCFA</td>
+              </tr>
+            </table>
+
+            <!-- Delivery address -->
+            <div style="background:#f8fafb;border-radius:10px;padding:16px;margin-bottom:28px;">
+              <p style="color:#00272B;font-size:13px;font-weight:600;margin:0 0 6px;">Adresse de livraison</p>
+              <p style="color:rgba(0,39,43,0.6);font-size:13px;margin:0;line-height:1.5;">{{deliveryAddress}}</p>
+            </div>
+
+            <div style="text-align:center;">
+              <a href="{{trackingUrl}}" style="display:inline-block;background:#1AAA3F;color:#ffffff;text-decoration:none;font-size:14px;font-weight:600;padding:12px 28px;border-radius:10px;">
+                Suivre ma commande
+              </a>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td style="background:#f0f9f4;border-radius:0 0 16px 16px;padding:24px 40px;text-align:center;border-top:1px solid #e8f5ee;">
+            <p style="color:rgba(0,39,43,0.4);font-size:12px;margin:0;">
+              © {{year}} SMALIM - Dakar, Sénégal<br/>
+              Des questions ? <a href="mailto:contact@smalim.sn" style="color:#1AAA3F;">contact@smalim.sn</a>
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mise à jour de votre devis - SMALIM</title>
+</head>
+<body style="margin:0;padding:0;background:#f5f9f6;font-family:'Helvetica Neue',Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f9f6;padding:40px 20px;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
+        <tr>
+          <td style="background:#00272B;border-radius:16px 16px 0 0;padding:32px 40px;text-align:center;">
+            <img src="https://static.readdy.ai/image/1aadd1df13f4328f806374f408610489/60a62dc5b844546eccd3f93680ad2ab4.png" alt="SMALIM" height="40" style="display:block;margin:0 auto;" />
+          </td>
+        </tr>
+        <tr>
+          <td style="background:#ffffff;padding:48px 40px;">
+            <div style="text-align:center;margin-bottom:32px;">
+              <div style="width:72px;height:72px;background:#EEFFF2;border-radius:50%;margin:0 auto 16px;line-height:72px;font-size:32px;"></div>
+              <h1 style="color:#00272B;font-size:22px;font-weight:700;margin:0 0 6px;">Votre devis est {{status}}</h1>
+              <p style="color:rgba(0,39,43,0.5);font-size:14px;margin:0;">Référence : {{quoteNumber}}</p>
+            </div>
+            <p style="color:rgba(0,39,43,0.7);font-size:15px;line-height:1.6;margin:0 0 24px;">
+              Bonjour {{firstName}},<br/><br/>
+              Votre devis <strong>{{quoteNumber}}</strong> d'un montant de <strong>{{amount}} FCFA</strong> a été {{status}}.
+              Il est valable jusqu'au <strong>{{validUntil}}</strong>.
+            </p>
+            <div style="text-align:center;margin:32px 0;">
+              <a href="{{quoteUrl}}" style="display:inline-block;background:#1AAA3F;color:#ffffff;text-decoration:none;font-size:14px;font-weight:600;padding:13px 30px;border-radius:10px;">
+                Consulter mon devis
+              </a>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td style="background:#f0f9f4;border-radius:0 0 16px 16px;padding:24px 40px;text-align:center;border-top:1px solid #e8f5ee;">
+            <p style="color:rgba(0,39,43,0.4);font-size:12px;margin:0;">© {{year}} SMALIM - <a href="mailto:contact@smalim.sn" style="color:#1AAA3F;">contact@smalim.sn</a></p>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>

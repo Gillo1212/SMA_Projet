@@ -1,0 +1,54 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Environment
+.env
+.env.local
+.env.*.local
+*.env
+!.env.example
+
+# Build output
+dist/
+build/
+.vite/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+logs/
+
+# Tests / coverage
+coverage/
+.nyc_output/
+
+# Uploads (fichiers utilisateurs)
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# Éditeurs
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Le frontend est versionné dans son propre dépôt (voir frontend/.git)
+frontend/
+
+# Divers
+*.tsbuildinfo
+.eslintcache
+*.mp4
+*.mov

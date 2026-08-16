@@ -1,0 +1,2207 @@
+{
+  "source": "https://www.tcnvend.com/fr/",
+  "extraction_date": "2026-04-10",
+  "total_categories": 14,
+  "notes": "Some pages returned HTTP 429 rate-limit errors during extraction. All successfully fetched product pages are included below.",
+  "categories": [
+    {
+      "id": "snack_drink",
+      "name": "Snack & Drink Vending Machine",
+      "url": "https://www.tcnvend.com/fr/snack--drink-vending-machine-32.html",
+      "products": [
+        {
+          "name": "Snack and Drink Vending Machine",
+          "model": "TCN-CSC-10G(V10)",
+          "url": "https://www.tcnvend.com/fr/tcn-csc-gv-snack-and-drink-vending-machine-552.html",
+          "category": "Snack & Drink",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {},
+          "features": [],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Snack and Drink Vending Machine",
+          "model": "TCN-CSC-10G(H5)",
+          "url": "https://www.tcnvend.com/fr/tcn-csc-gh-snack-and-drink-vending-machine-181.html",
+          "category": "Snack & Drink",
+          "description": "High-resistance powder-coated cabinet with complete insulation for energy efficiency. Features triple-glazed viewing window, dual spirals on chip shelves, and adjustable partitions. Excellent capacity and size ratio with flexible arrangement for snacks, fresh food, cans, and bottles.",
+          "specifications": {
+            "dimensions_mm": "H: 1940, W: 1036, D: 790",
+            "weight_kg": 261,
+            "slots": 60,
+            "capacity_beverages": 300,
+            "dispense_type": "Spiral/conveyor/pusher",
+            "display": "5-inch LED screen",
+            "power_supply": "AC 110V-120V / 220V-240V, 50/60Hz",
+            "power_consumption_refrigerated_W": 422,
+            "power_consumption_normal_W": 24,
+            "temperature_range": "2-25°C adjustable",
+            "refrigerant": "R134a / R290"
+          },
+          "features": [
+            "Drop sensor and guaranteed delivery system",
+            "Remote GPRS monitoring with real-time data",
+            "Multiple payment options (card, coin, mobile, QR code)",
+            "Integrated glass heater prevents condensation",
+            "Energy-efficient compressor"
+          ],
+          "images": [
+            "https://www.tcnvend.com/img/tcn-csc-10gh5-snack-and-drink-vending-machine-15.jpg"
+          ],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Automatic Snack and Drink Vending Machine",
+          "model": "TCN-CSC-6G(H5)",
+          "url": "https://www.tcnvend.com/fr/tcn-csc-gh-automatic-snack-drink-vending-machine-47.html",
+          "category": "Snack & Drink",
+          "description": "A dual-purpose automated retail unit designed for beverages, snacks, and combo items capable of serving diverse environments from transit hubs to healthcare facilities.",
+          "specifications": {
+            "dimensions_mm": "H: 1940, W: 732, D: 790",
+            "weight_kg": 261,
+            "slots": 36,
+            "capacity_beverages": 180,
+            "dispense_type": "Spiral coil / conveyor belt / pusher",
+            "display": "5-inch LED screen",
+            "power_supply": "AC 110-120V / 220-240V, 50-60Hz",
+            "power_consumption_refrigerated_W": 422,
+            "power_consumption_normal_W": 24,
+            "temperature_range": "2-25°C adjustable",
+            "refrigerant": "R134a, R290, R513A, R1234YF"
+          },
+          "features": [
+            "Global foam insulation technology with enhanced thermal efficiency",
+            "Dual spirals on snack shelves",
+            "Triple-glazed viewing window with integrated heater",
+            "45-degree tilted trays for convenient restocking",
+            "Adjustable partitions and shelf heights",
+            "Remote management system (GPRS) with real-time monitoring",
+            "Multiple payment methods: cards, coins, mobile wallets (Alipay, WeChat, Apple Pay, Google Pay)",
+            "Drop sensor and guaranteed delivery system"
+          ],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Snack and Drink Vending Machine",
+          "model": "TCN-CSC-12G(H5)",
+          "url": "https://www.tcnvend.com/fr/tcn-csc-gh-snack-and-drink-vending-machine-555.html",
+          "category": "Snack & Drink",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {},
+          "features": [],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Snack Drink Vending Machine",
+          "model": "TCN-CSC-8G(H5)",
+          "url": "https://www.tcnvend.com/fr/tcn-csc-gh-snack-drink-vending-machine-for-sale-551.html",
+          "category": "Snack & Drink",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {},
+          "features": [],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Touch Screen / Advertising Vending Machine",
+          "model": "TCN-CSC-8C(V49)",
+          "url": "https://www.tcnvend.com/fr/tcn-csc-cvsmart-touch-screenadvertising-vending-machine-514.html",
+          "category": "Snack & Drink",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {},
+          "features": [],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Snack and Drink Vending Machine",
+          "model": "TCN-CSC-10C(V22)",
+          "url": "https://www.tcnvend.com/fr/tcn-csc-cv-snack-and-drink-vending-machine-273.html",
+          "category": "Snack & Drink",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {},
+          "features": [],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Snack and Drink Vending Machine (Scan Code Payment)",
+          "model": "TCN-CSC-10N(AA01)",
+          "url": "https://www.tcnvend.com/fr/tcn-csc-naasnack-and-drink-vending-machine-scan-code-payment-496.html",
+          "category": "Snack & Drink",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {},
+          "features": [],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Snack and Drink Vending Machine",
+          "model": "TCN-CSC-10N(H5)",
+          "url": "https://www.tcnvend.com/fr/tcn-csc-nhsnack-and-drink-vending-machine-550.html",
+          "category": "Snack & Drink",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {},
+          "features": [],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Snack and Drink Vending Machine",
+          "model": "TCN-CSC-10C(32V)",
+          "url": "https://www.tcnvend.com/fr/tcn-csc-cv-snack-and-drink-vending-machine-592.html",
+          "category": "Snack & Drink",
+          "description": "A commercial vending solution offering 60 slots with multi-payment capabilities. Suitable for schools, shopping centers, parks, zoos, pharmacies, offices, hotels, and transit stations.",
+          "specifications": {
+            "dimensions_mm": "H: 1945, W: 1430, D: 790",
+            "weight_kg": 300,
+            "slots": 60,
+            "capacity_beverages": 300,
+            "dispense_type": "Spiral/conveyor/pusher",
+            "display": "32-inch screen",
+            "power_supply": "AC 110V-120V / 220V-240V, 50/60Hz",
+            "power_consumption_refrigerated_W": 422,
+            "power_consumption_normal_W": 24,
+            "temperature_range": "2-25°C adjustable"
+          },
+          "features": [
+            "Banknote, coin, cashless payment (Visa, Mastercard, Amex, Alipay, WeChat Pay, Apple Pay, Google Pay, Samsung Pay)",
+            "Optional DC heating module"
+          ],
+          "images": [
+            "https://www.tcnvend.com/img/tcn-csc-10c32v-snack-and-drink-vending-machine.jpg"
+          ],
+          "price": "Contact for pricing",
+          "moq": 3,
+          "lead_time_days": 15
+        },
+        {
+          "name": "Drink Vending Machine (UL Certified)",
+          "model": "TCN-CSC-10C(H5)",
+          "url": "https://www.tcnvend.com/fr/tcn-csc-chamerican-ul-certification-drink-vending-machine-600.html",
+          "category": "Snack & Drink",
+          "description": "UL certified unit designed for dispensing beverages and snacks across commercial venues including banks, supermarkets, airports, hospitals, and shopping centers.",
+          "specifications": {
+            "dimensions_mm": "H: 1985, W: 1160, D: 870",
+            "weight_kg": 330,
+            "slots": 60,
+            "capacity_beverages": 360,
+            "dispense_type": "Spiral/conveyor/pusher",
+            "display": "5-inch LED",
+            "power_supply": "AC 110V-120V / 220V-240V, 50/60Hz",
+            "power_consumption_refrigerated_W": 520,
+            "power_consumption_normal_W": 40,
+            "temperature_range": "4-25°C adjustable"
+          },
+          "features": [
+            "UL Certification (USA)",
+            "Adjustable temperature settings",
+            "Multi-payment options including digital scan codes",
+            "Optional heating module available"
+          ],
+          "images": [],
+          "price": "Contact for pricing",
+          "moq": 3,
+          "lead_time_days": 15
+        },
+        {
+          "name": "Drink Vending Machines with Elevator System",
+          "model": "N/A",
+          "url": "https://www.tcnvend.com/fr/drink-vending-machines-with-elevator-system-698.html",
+          "category": "Snack & Drink / Micro-Market",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {},
+          "features": [],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Cup Noodle Ramen Vending Machine",
+          "model": "N/A",
+          "url": "https://www.tcnvend.com/fr/cup-noodle-ramen-vending-machine-663.html",
+          "category": "Snack & Drink",
+          "description": "Provides hot water for instant noodle preparation. Very convenient for cup noodle dispensing in public spaces.",
+          "specifications": {},
+          "features": ["Hot water supply for instant noodles"],
+          "images": [
+            "https://www.tcnvend.com/img/cup-noodle-ramen-vending-machine-46.jpg",
+            "https://www.tcnvend.com/upfile/2025/03/06/20250306173027_913.jpg"
+          ],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Outdoor Snack and Drink Vending Machine",
+          "model": "TCN-CSC-10C(V22)",
+          "url": "https://www.tcnvend.com/fr/tcn-csc-cv-outdoor-snack-and-drink-vending-machines-661.html",
+          "category": "Snack & Drink (Outdoor)",
+          "description": "High-capacity outdoor vending unit with advanced foam insulation technology with 40mm formed walls and modular cooling systems. Supports multiple payment methods and cloud-based remote management.",
+          "specifications": {
+            "dimensions_mm": "H: 1940, W: 1275, D: 790",
+            "weight_kg": 275,
+            "slots": 60,
+            "capacity_beverages": 300,
+            "dispense_type": "Spiral/conveyor/pusher",
+            "display": "21.5-inch LCD",
+            "power_supply": "AC 110V-120V / 220V-240V, 50/60Hz",
+            "temperature_range": "4-25°C adjustable",
+            "refrigerant": "R134a, R290, R513A, R1234Y"
+          },
+          "features": [
+            "Triple-glazed viewing window with integrated glass heater",
+            "Dual spirals on snack shelves",
+            "Drop sensors and guaranteed delivery system",
+            "GPRS remote monitoring with real-time data",
+            "Multiple payment: cards, coins, mobile, QR codes"
+          ],
+          "images": [],
+          "price": "Contact for pricing",
+          "moq": 3
+        },
+        {
+          "name": "Outdoor Snack and Drink Vending Machine",
+          "model": "TCN-CSC-10G(H5)",
+          "url": "https://www.tcnvend.com/fr/tcn-csc-gh-outdoor-snack-and-drink-vending-machines-616.html",
+          "category": "Snack & Drink (Outdoor)",
+          "description": "Outdoor-capable unit designed to dispense beverages and snacks with advanced cooling technology and multiple payment systems. Features global foaming technology with 40mm insulation.",
+          "specifications": {
+            "dimensions_mm": "H: 1940, W: 1036, D: 790",
+            "weight_kg": 265,
+            "slots": 60,
+            "capacity_beverages": 300,
+            "dispense_type": "Spiral/conveyor/pusher",
+            "display": "10-inch LCD",
+            "power_supply": "AC 110V-120V / 220V-240V, 50/60Hz",
+            "power_consumption_refrigerated_W": 422,
+            "power_consumption_normal_W": 24,
+            "temperature_range": "2-25°C adjustable",
+            "refrigerant": "R134a, R290, R513A, R1234Y"
+          },
+          "features": [
+            "Triple-glazed viewing window with integrated glass heater",
+            "Adjustable shelving and partitions",
+            "Dual spiral dispensers on snack shelves",
+            "Drop sensors with guaranteed delivery system",
+            "GPRS remote management (no annual fees)",
+            "MDB/DEX international standards",
+            "Secure lockable cash box"
+          ],
+          "images": [
+            "https://www.tcnvend.com/img/tcn-csc-10gv10-outdoor-snack-and-drink-vending-machines.jpg"
+          ],
+          "price": "Contact for pricing",
+          "moq": 3
+        },
+        {
+          "name": "Large Capacity Snack and Beverage Vending Machine",
+          "model": "TCN-CSC-10C(V22)+10R",
+          "url": "https://www.tcnvend.com/fr/tcn-csc-cvr-large-capacity-snack-and-drink-vending-machine-593.html",
+          "category": "Snack & Drink (Large Capacity)",
+          "description": "A large-capacity combined unit for snack and drink dispensing designed for high-volume environments.",
+          "specifications": {
+            "dimensions_mm": "H: 1940, W: 2157, D: 790",
+            "weight_kg": 410,
+            "slots": 60,
+            "capacity_beverages": 600,
+            "dispense_type": "Spiral/conveyor/pusher",
+            "display": "5-inch LCD",
+            "power_supply": "AC 110V-120V / 220V-240V, 50/60Hz",
+            "power_consumption_refrigerated_W": 422,
+            "power_consumption_normal_W": 24,
+            "temperature_range": "2-25°C adjustable"
+          },
+          "features": [
+            "Multiple payment options: cash, card, mobile wallets",
+            "Refrigeration capability",
+            "Optional heating module"
+          ],
+          "images": [],
+          "price": "Contact for pricing",
+          "moq": 3,
+          "lead_time_days": 15
+        },
+        {
+          "name": "Large Capacity Snack and Beverage Vending Machine",
+          "model": "TCN-CSC-10G(H5)+10RS",
+          "url": "https://www.tcnvend.com/fr/tcn-csc-ghrs-large-capacity-snack-and-beverage-vending-machine-591.html",
+          "category": "Snack & Drink (Large Capacity)",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {},
+          "features": [],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Touch Screen / Advertising Vending Machine",
+          "model": "TCN-CSC-8C(50SP)",
+          "url": "https://www.tcnvend.com/fr/tcn-csc-csp-tcn-touch-screenads-vending-machine-489.html",
+          "category": "Snack & Drink",
+          "description": "Commercial-grade automated vending system featuring a 49-inch touchscreen display with advertising capabilities, designed for high-traffic retail environments.",
+          "specifications": {
+            "dimensions_mm": "H: 1960, W: 1042, D: 890",
+            "weight_kg": 320,
+            "slots": 48,
+            "capacity_beverages": 240,
+            "dispense_type": "Spiral/conveyor/pusher",
+            "display": "49-inch touchscreen",
+            "power_supply": "AC 110-120V or 220-240V, 50/60Hz",
+            "power_consumption_refrigerated_W": 458,
+            "power_consumption_normal_W": 60,
+            "temperature_range": "4-25°C adjustable"
+          },
+          "features": [
+            "49-inch advertising touchscreen",
+            "Credit/debit cards: VISA, Mastercard, AMEX",
+            "E-wallets: Alipay, Apple Pay, Google Pay, Samsung Pay",
+            "Traditional coin acceptance"
+          ],
+          "images": [],
+          "price": "Contact for pricing",
+          "moq": 1,
+          "annual_capacity": 150000,
+          "lead_time_days": 15
+        },
+        {
+          "name": "Cashless Payment Combo Vending Machine",
+          "model": "N/A",
+          "url": "https://www.tcnvend.com/fr/tcn-hot-sale-cashless-payment-combo-vending-machine-665.html",
+          "category": "Snack & Drink",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {},
+          "features": [],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Cashless Payment Vending Machine",
+          "model": "N/A",
+          "url": "https://www.tcnvend.com/fr/tcn-hot-sale-cashless-payment-vending-machine-664.html",
+          "category": "Snack & Drink",
+          "description": "An economical refrigerated vending unit offering diverse product selection with intelligent cooling technology to maintain freshness. Features touchscreen interface and multiple payment options.",
+          "specifications": {
+            "dimensions_mm": "H: 1928, W: 1274, D: 790",
+            "weight_kg": 320,
+            "slots": 60,
+            "capacity_beverages": 420,
+            "dispense_type": "Spiral/Conveyor/Pusher",
+            "power_supply": "AC 100V/240V, 50/60Hz",
+            "power_consumption_refrigerated_W": 520,
+            "power_consumption_normal_W": 40,
+            "temperature_range": "4-25°C adjustable"
+          },
+          "features": [
+            "High-capacity design reducing restocking frequency",
+            "Real-time inventory monitoring system",
+            "User-friendly touchscreen interface",
+            "Optional heating module",
+            "Cash, coins, cashless (Visa, Mastercard, AMEX, AliPay, WeChat, Apple Pay, Google Pay, Samsung Pay)"
+          ],
+          "images": [],
+          "price": "Contact for pricing"
+        }
+      ]
+    },
+    {
+      "id": "healthy_food",
+      "name": "Healthy Food Vending Machine",
+      "url": "https://www.tcnvend.com/fr/healthy-food-vending-machine-36.html",
+      "products": [
+        {
+          "name": "Fruit Salad Vending Machine",
+          "model": "TCN-CEL-11G(H5)",
+          "url": "https://www.tcnvend.com/fr/tcn-cel-ghsalad-fruit-vending-machine-589.html",
+          "category": "Healthy Food",
+          "description": "An automated dispenser designed to provide fresh fruit salads and beverages. Features a touchscreen interface and multiple payment options.",
+          "specifications": {
+            "dimensions_mm": "H: 1940, W: 1222, D: 850",
+            "weight_kg": 340,
+            "slots": 60,
+            "capacity_beverages": "270-300",
+            "dispense_type": "Spiral/Conveyor/Pusher",
+            "display": "10.1-inch touchscreen",
+            "power_supply": "AC 110V-120V / 220V-240V, 50/60Hz",
+            "power_consumption_refrigerated_W": 520,
+            "power_consumption_normal_W": 40,
+            "temperature_range": "4-25°C adjustable"
+          },
+          "features": [
+            "Multiple payment methods: cash, card, e-wallets",
+            "Optional DC heating module"
+          ],
+          "images": [],
+          "price": "Contact for pricing",
+          "moq": 3,
+          "lead_time_days": 15
+        },
+        {
+          "name": "Fruit Salad Vending Machine",
+          "model": "TCN-CEL-11G(V22)",
+          "url": "https://www.tcnvend.com/fr/tcn-cel-gvsalad-fruit-vending-machine-495.html",
+          "category": "Healthy Food",
+          "description": "Fresh fruit salad vending machine designed for fresh, healthy food distribution in public spaces.",
+          "specifications": {
+            "dimensions_mm": "H: 1940, W: 1453, D: 850",
+            "weight_kg": 370,
+            "slots": 60,
+            "capacity_beverages": "270-300",
+            "dispense_type": "Spiral/Conveyor/Pusher",
+            "display": "21.5-inch touchscreen",
+            "power_supply": "AC 100V-240V, 50/60Hz",
+            "power_consumption_refrigerated_W": 520,
+            "power_consumption_normal_W": 40,
+            "temperature_range": "4-8°C adjustable"
+          },
+          "features": [
+            "Multiple payment: cash, card, e-wallets (Alipay, WeChat Pay, Apple Pay, Google Pay, Samsung Pay)"
+          ],
+          "images": [],
+          "price": "Contact for pricing",
+          "moq": 3,
+          "lead_time_days": 15
+        },
+        {
+          "name": "Healthy Food Elevator Vending Machine",
+          "model": "TCN-CEL-10C(V10.1)",
+          "url": "https://www.tcnvend.com/fr/tcn-cel-cv-healthy-food-elevator-vending-machine-590.html",
+          "category": "Healthy Food",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {},
+          "features": [],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Healthy Food Elevator Vending Machine",
+          "model": "TCN-CEL-10C(V22)",
+          "url": "https://www.tcnvend.com/fr/tcn-cel-cv-healthy-food-elevator-vending-machine-395.html",
+          "category": "Healthy Food",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {},
+          "features": [],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Fruit Salad Vending Machine",
+          "model": "TCN-CEL-9G(H5)",
+          "url": "https://www.tcnvend.com/fr/tcn-cel-ghsalad-fruit-vending-machine-690.html",
+          "category": "Healthy Food",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {},
+          "features": [],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "24-Hour Self-Service Healthy Food Vending Machine",
+          "model": "TCN-CEL-9C(V55)",
+          "url": "https://www.tcnvend.com/fr/tcn-cel-cv--hours-self-service-healthy-food-vending-machine-261.html",
+          "category": "Healthy Food",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {},
+          "features": [],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Fresh Vegetables & Fruit Vending Machine",
+          "model": "TCN-CFS-11G(V22)",
+          "url": "https://www.tcnvend.com/fr/tcn-cfs-gv-tcn-healthy-fresh-vegetables-salad-fruit-vending-machine-with-touch-screen-229.html",
+          "category": "Healthy Food",
+          "description": "Refrigerated unit with detachable independent refrigeration module for convenient transport. Keeps food fresh with patented isolation door, automatic non-stick door, and automatic detection of item retrieval.",
+          "specifications": {
+            "dimensions_mm": "H: 1960, W: 1538, D: 975",
+            "weight_kg": 400,
+            "slots": 70,
+            "capacity": "420-560 pieces",
+            "dispense_type": "Conveyor/spiral pusher",
+            "display": "21.5-inch touchscreen",
+            "power_supply": "AC 110V-120V / 220V-240V, 50/60Hz",
+            "power_consumption_refrigerated_W": 800,
+            "power_consumption_normal_W": 80,
+            "temperature_range": "4-25°C adjustable"
+          },
+          "features": [
+            "Removable refrigeration module",
+            "Large viewing window",
+            "Automatic anti-stick door",
+            "Digital price display",
+            "Right-side item retrieval",
+            "Multiple payment options"
+          ],
+          "images": [],
+          "price": "Contact for pricing",
+          "moq": 3
+        },
+        {
+          "name": "Healthy Fruit & Vegetables Vending Machine",
+          "model": "TCN-CFS-8V(V22)",
+          "url": "https://www.tcnvend.com/fr/tcn-cfs-vv-tcn-popular-healthy-fruit--fresh-vegetables-salad-vending-machine-with-touch-screen-225.html",
+          "category": "Healthy Food",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {},
+          "features": [],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Elevator Healthy Food Vending Machine with Microwave Heating",
+          "model": "TCN-CEL-10C(V22)-WB",
+          "url": "https://www.tcnvend.com/fr/tcn-cel-cv-wb-elevator-healthy-food-vending-machine-microwave-heating-667.html",
+          "category": "Healthy Food / Hot Food",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {},
+          "features": ["Microwave heating capability"],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Food Elevator Vending Machine with Microwave Heating",
+          "model": "TCN-CEL-11G(V22)-WB",
+          "url": "https://www.tcnvend.com/fr/tcn-cel-gv-wb-food-elevator-vending-machine-microwave-heating-666.html",
+          "category": "Healthy Food / Hot Food",
+          "description": "Food elevator vending machine equipped with microwave heating capability, designed for distributing healthy food items in various commercial settings.",
+          "specifications": {
+            "dimensions_mm": "H: 1940, W: 1453, D: 850",
+            "weight_kg": 480,
+            "drawers": 6,
+            "capacity": "270-300 pieces",
+            "display": "21.5-inch touchscreen",
+            "power_supply": "AC 110V-120V / 220V-240V, 50/60Hz",
+            "power_consumption_refrigerated_W": 520,
+            "power_consumption_normal_W": 40,
+            "temperature_range": "4-25°C adjustable"
+          },
+          "features": [
+            "Microwave heating capability",
+            "Multiple payment: bill, coin, cashless",
+            "Card payments: Visa, Mastercard, Amex",
+            "E-wallet support: Alipay, WeChat Pay, Apple Pay, Google Pay, Samsung Pay"
+          ],
+          "images": [],
+          "price": "Contact for pricing",
+          "moq": 3,
+          "lead_time_days": 15
+        },
+        {
+          "name": "Healthy Fresh Vegetables Salad Fruit Vending Machine",
+          "model": "TCN-CFS-11G(V22) + 11V-R",
+          "url": "https://www.tcnvend.com/fr/tcn-cfs-gvv-r-tcn-healthy-fresh-vegetables-salad-fruit-vending-machine-with-touch-screen-230.html",
+          "category": "Healthy Food",
+          "description": "A refrigerated vending system designed for fresh produce and salad combinations.",
+          "specifications": {
+            "dimensions_mm": "H: 1960, W: 2660, D: 975",
+            "weight_kg": 710,
+            "slots": 140,
+            "capacity": "840-1120 pieces",
+            "dispense_type": "Conveyor/Spiral Pusher",
+            "display": "21.5-inch touchscreen",
+            "power_supply": "AC 110-120V / 220-240V, 50/60Hz",
+            "power_consumption_refrigerated_W": 1400,
+            "power_consumption_normal_W": 80,
+            "temperature_range": "4-25°C adjustable"
+          },
+          "features": [
+            "Touchscreen interface",
+            "Adjustable temperature control",
+            "Multiple payment options"
+          ],
+          "images": [],
+          "price": "Contact for pricing",
+          "moq": 3
+        },
+        {
+          "name": "UL Certification Drink and Snack Vending Machine",
+          "model": "TCN-CEL-10C(V10)UL",
+          "url": "https://www.tcnvend.com/fr/tcn-cel-cvul-certificationdrink-and-snack-vending-machine-601.html",
+          "category": "Healthy Food / Snack & Drink",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {},
+          "features": ["UL Certification"],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "UL Certification Drink and Snack Vending Machine",
+          "model": "TCN-CEL-10C(V10)-H5 UL",
+          "url": "https://www.tcnvend.com/fr/tcn-cel-cv-h-ul-certificationdrink-and-snack-vending-machine-602.html",
+          "category": "Healthy Food / Snack & Drink",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {},
+          "features": ["UL Certification"],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Healthy Food Elevator + Locker Vending Machine",
+          "model": "TCN-CEL-10C(V22)+10N",
+          "url": "https://www.tcnvend.com/fr/tcn-cel-cvn-670.html",
+          "category": "Healthy Food",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {},
+          "features": [],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Elevator Vending Machine + Fruit Salad Vending Machine",
+          "model": "TCN-D900V-11L + D900-ZK(32SP)",
+          "url": "https://www.tcnvend.com/fr/tcn-dv-ld-zksp-elevator-vending-machinefruit-salad-vending-machine-686.html",
+          "category": "Healthy Food",
+          "description": "An elevator-style vending system designed for dispensing fresh salads and fruit products with refrigeration capabilities and optional microwave heating functionality.",
+          "specifications": {
+            "dimensions_mm": "H: 1940, W: 1624, D: 850",
+            "weight_kg": 420,
+            "drawers": 6,
+            "capacity": "240-300 pieces",
+            "display": "32-inch touchscreen",
+            "power_supply": "AC 100V-240V, 50/60Hz",
+            "power_consumption_refrigerated_W": 520,
+            "power_consumption_normal_W": 40,
+            "temperature_range": "4-8°C adjustable"
+          },
+          "features": [
+            "Optional microwave heating module",
+            "Multiple payment options",
+            "32-inch interactive touchscreen"
+          ],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Fresh Vegetables Salad Fruit Vending Machine (Left/Right)",
+          "model": "TCN-CFS-8V-L/R(V22)",
+          "url": "https://www.tcnvend.com/fr/tcn-cfs-v-lrv-tcn-healthy-fresh-vegetables-salad-fruit-vending-machine-with-touch-screen-228.html",
+          "category": "Healthy Food",
+          "description": "A refrigerated vending system with electronic XY lift distribution mechanism for fresh produce.",
+          "specifications": {
+            "dimensions_mm": "H: 1992.8, W: 1747, D: 990",
+            "weight_kg": 1000,
+            "slots": "84-112",
+            "display": "22-inch touchscreen",
+            "power_supply": "AC 220V, 1000W",
+            "temperature_range": "4-25°C adjustable",
+            "distribution_system": "Electronic XY lift"
+          },
+          "features": [
+            "Detachable independent refrigeration module",
+            "Large glass door for product visibility",
+            "Patented isolation door",
+            "Automatic non-stick door mechanism",
+            "Automatic customer pickup detection"
+          ],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Meat Vending Machine",
+          "model": "TCN-CEL-9C(V55)",
+          "url": "https://www.tcnvend.com/fr/tcn-cel-cv-meat-vending-machine-423.html",
+          "category": "Healthy Food",
+          "description": "Designed uniquely for meat and able to respond to customer orders. Offers a new sales model for convenience retail with enhanced accessibility.",
+          "specifications": {
+            "dimensions_mm": "H: 1858, W: 905, D: 1188",
+            "weight_kg": 500,
+            "slots": "54 (6 layers × 9 positions)",
+            "capacity": "240-270 units",
+            "dispense_type": "Spiral/conveyor",
+            "display": "55-inch touchscreen",
+            "power_supply": "AC 110V-120V / 220V-240V, 50/60Hz",
+            "temperature_range": "4-25°C adjustable",
+            "refrigerant": "R134a/R290/R513A/R1234YF"
+          },
+          "features": [
+            "Automatic lifting system with dual spirals",
+            "Triple-glazed viewing window with integrated glass heater",
+            "Adjustable shelving with 45-degree tilt",
+            "Drop detection / Vend Assure delivery guarantee",
+            "GPRS remote monitoring",
+            "RoHS compliant refrigerants"
+          ],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Farm Fresh Egg Vending Machine",
+          "model": "TCN-CEL-11L(32SP)",
+          "url": "https://www.tcnvend.com/fr/tcn-cel-lsp-farm-egg-vending-machine-fresh-egg-vending-machine-for-sale-256.html",
+          "category": "Healthy Food",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {},
+          "features": [],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Healthy Fresh Food Vegetables Fruits Salads Supermarket Vending Machine",
+          "model": "TCN-CFS-8V(V32)",
+          "url": "https://www.tcnvend.com/fr/tcn-cfs-vv-healthy-fresh-food-vegetables-fruits-salads-supermarket-vending-machine-140.html",
+          "category": "Healthy Food",
+          "description": "A refrigerated vending machine designed to dispense fresh produce including meats, seafood, salads, vegetables. Features independent detachable cooling modules.",
+          "specifications": {
+            "dimensions_mm": "H: 1992, W: 1854, D: 1000",
+            "weight_kg": 650,
+            "slots": "28-56",
+            "capacity": "84-336 units",
+            "dispense_type": "Electronic XY elevator conveyor",
+            "display": "32-inch touchscreen",
+            "power_supply": "AC 110V-120V / 220V-240V, 50/60Hz",
+            "power_consumption_refrigerated_W": 1000,
+            "power_consumption_normal_W": 100,
+            "temperature_range": "4-25°C adjustable"
+          },
+          "features": [
+            "Detachable refrigeration module",
+            "Large glass door visibility",
+            "Patent-pending isolation door",
+            "Automatic item detection"
+          ],
+          "images": [
+            "https://www.tcnvend.com/img/tcn-sx-32sp-healthy-fresh-food-vegetables-fruits-salads-supermarket.jpg"
+          ],
+          "price": "Contact for pricing",
+          "moq": 3
+        },
+        {
+          "name": "Healthy Fresh Food Supermarket Vending Machine + R",
+          "model": "TCN-CFS-8V(V32)+R",
+          "url": "https://www.tcnvend.com/fr/tcn-cfs-vvr-healthy-fresh-food-vegetables-fruits-salads-supermarket-vending-machine-270.html",
+          "category": "Healthy Food",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {},
+          "features": [],
+          "images": [],
+          "price": "Contact for pricing"
+        }
+      ]
+    },
+    {
+      "id": "frozen_food",
+      "name": "Frozen Food Vending Machine",
+      "url": "https://www.tcnvend.com/fr/frozen-food--vending-machine-43.html",
+      "products": [
+        {
+          "name": "Frozen Food Vending Machine",
+          "model": "TCN-FMX-9C(V22)",
+          "url": "https://www.tcnvend.com/fr/tcn-fmx-cv-frozen-food-vending-machine-401.html",
+          "category": "Frozen Food",
+          "description": "Dispenses frozen foods including ice cream, seafood, and meat products. Features three layers of thick vacuum glass door technology and no-fluorine environmental protection refrigeration with independent cooling modules.",
+          "specifications": {
+            "dimensions_mm": "H: 1960, W: 1420, D: 950",
+            "weight_kg": 450,
+            "slots": 54,
+            "capacity": "270-594 pieces",
+            "dispense_type": "Spiral/conveyor",
+            "display": "21.5-inch touchscreen",
+            "power_supply": "AC 110V-120V / 220V-240V, 50/60Hz",
+            "power_consumption_refrigerated_W": 1320,
+            "power_consumption_normal_W": 45,
+            "temperature_range": "-18°C adjustable",
+            "certifications": "CE, CB, ISO9001, GV"
+          },
+          "features": [
+            "Cloud-based remote management system",
+            "Intelligent data queries, statistics, accounting, and fault diagnostics",
+            "International MDB standard with DEX protocol",
+            "Environmental leak protection",
+            "Fast freezing with thick insulation layer",
+            "Three-layer vacuum glass doors"
+          ],
+          "images": [
+            "https://www.tcnvend.com/img/tcn-fmx-9cv22-frozen-food-vending-machine.jpg",
+            "https://www.tcnvend.com/upfile/2023/06/26/20230626174309_608.jpg",
+            "https://www.tcnvend.com/upfile/2023/06/26/20230626174321_371.jpg"
+          ],
+          "price": "Contact for pricing",
+          "warranty": "1 year",
+          "moq": 3,
+          "lead_time_days": 15
+        },
+        {
+          "name": "Fresh Frozen Food Vending Machine",
+          "model": "TCN-FSC-9C(V22)",
+          "url": "https://www.tcnvend.com/fr/tcn-fsc-cv-frozen-vending-machine-fresh-food-vending-488.html",
+          "category": "Frozen Food",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {},
+          "features": [],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Mini Frozen Vending Machine -25°C",
+          "model": "TCN-FEL-6G(V10)",
+          "url": "https://www.tcnvend.com/fr/tcn-fel-gv-cmini-frozen-vending-machine-539.html",
+          "category": "Frozen Food",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {
+            "temperature_range": "-25°C"
+          },
+          "features": ["Mini size frozen vending"],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Soft Ice Cream Vending Machine",
+          "model": "TCN-ICE-D2-133(22SP)",
+          "url": "https://www.tcnvend.com/fr/tcn-soft-ice-cream-vending-machine-335.html",
+          "category": "Frozen Food",
+          "description": "Intelligent cold chain management using precise temperature control technology to maintain optimal storage and serving conditions. Accommodates various ice cream brands and flavors.",
+          "specifications": {
+            "dimensions_mm": "H: 1800, W: 858, D: 1005",
+            "weight_kg": 300,
+            "capacity_cups": 100,
+            "display": "21.5-inch touchscreen",
+            "power_supply": "AC 220V-240V",
+            "power_consumption_standby_W": 200,
+            "power_consumption_distribution_W": 2000
+          },
+          "features": [
+            "Multiple payment methods (WeChat, Alipay, bank cards, Apple Pay, Google Pay, Samsung Pay)",
+            "HD touchscreen with advertising capabilities",
+            "Efficient inventory management with low-stock warnings",
+            "Smart inventory alerts"
+          ],
+          "images": [
+            "https://www.tcnvend.com/img/tcn-soft-ice-cream-vending-machine-23.jpg"
+          ],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Cone Ice Cream Vending Machine",
+          "model": "TCN-FEL-9G(V49)",
+          "url": "https://www.tcnvend.com/fr/tcn-fel-gv-cone-ice-cream-vending-machine-frozen-food-vending-machine-259.html",
+          "category": "Frozen Food",
+          "description": "Features a 49-inch LCD touchscreen supporting various video and image formats. Complies with international MDB standards and DEX protocol. Includes micro-computer control with intelligent data queries, statistics, accounting, and malfunction diagnostics.",
+          "specifications": {
+            "dimensions_mm": "H: 1960, W: 1163, D: 944",
+            "weight_kg": 470,
+            "shelves": 5,
+            "capacity": "270-500 items",
+            "dispense_type": "Spiral/conveyor",
+            "display": "49-inch touchscreen",
+            "power_supply": "AC 110V-120V / 220V-240V, 50/60Hz",
+            "power_consumption_refrigerated_W": 1200,
+            "power_consumption_normal_W": 150,
+            "temperature_range": "-25°C adjustable"
+          },
+          "features": [
+            "Three-layer vacuum glass doors preventing fogging",
+            "Patented single-cell door auto-locking technology",
+            "Environmentally-friendly fluorine-free refrigeration",
+            "Independent cooling modules",
+            "Leak protection and delivery inspection system"
+          ],
+          "images": [
+            "https://www.tcnvend.com/img/tcn-fel-9gv49-cone-ice-cream-vending-machine-frozen-food-vending-machine-99.jpg"
+          ],
+          "price": "$3,285 (promotional price, August 1-30)"
+        },
+        {
+          "name": "Ice Cream / Frozen Food Vending Machine (OEM/ODM)",
+          "model": "TCN-FEL-9C(V22)-LD",
+          "url": "https://www.tcnvend.com/fr/tcn-fel-cv-ld-oemodm-ice-cream-frozen-food-vending-machine-for-supermarket-61.html",
+          "category": "Frozen Food",
+          "description": "Features a 22-inch LCD screen with international standard MDB design. Supports various payment methods and includes cloud-based remote management for real-time monitoring.",
+          "specifications": {
+            "dimensions_mm": "H: 1960, W: 1375, D: 875",
+            "weight_kg": 450,
+            "capacity": "270-500 items",
+            "dispense_type": "Spiral/conveyor",
+            "display": "21.5-inch touchscreen",
+            "power_supply": "AC 110V-120V / 220V-240V, 50/60Hz",
+            "power_consumption_refrigerated_W": 1200,
+            "power_consumption_normal_W": 45,
+            "temperature_range": "-18°C adjustable"
+          },
+          "features": [
+            "Three-layer vacuum glass doors prevent fogging",
+            "CFC-free environmental refrigeration",
+            "Independent cooling modules",
+            "Leak protection system"
+          ],
+          "images": [
+            "https://www.tcnvend.com/img/tcn-fel-9cv22-ld-oem-odm-ice-cream-frozen-food-vending-machine-for-supermarket-13.jpg"
+          ],
+          "price": "Contact for pricing",
+          "moq": 3
+        }
+      ]
+    },
+    {
+      "id": "hot_food",
+      "name": "Hot Food Vending Machine",
+      "url": "https://www.tcnvend.com/fr/hot-food-vending-machine-44.html",
+      "products": [
+        {
+          "name": "Hot Food Vending Machine - Convenient Lunch and Dinner Service",
+          "model": "N/A",
+          "url": "https://www.tcnvend.com/fr/hot-food-vending-machineconvenient-lunch-and-dinner-service-604.html",
+          "category": "Hot Food",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {},
+          "features": [],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Mini Hot Food Vending Machine",
+          "model": "N/A",
+          "url": "https://www.tcnvend.com/fr/mini-hot-food-vending-machine-603.html",
+          "category": "Hot Food",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {},
+          "features": ["Mini size hot food vending"],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Smart Fridge Frozen Vending Machine",
+          "model": "TCN-FFM-ZV / TCN-FFZ-468(VAV8)",
+          "url": "https://www.tcnvend.com/fr/tcn-ffm-zv-tcn-ffz-vav-smart-fridge-frozen-vending-machine-692.html",
+          "category": "Hot Food / Smart Fridge",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {},
+          "features": [],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Hot Food Meals Vending Machine",
+          "model": "TCN-CFM-8V",
+          "url": "https://www.tcnvend.com/fr/tcn-cfm-v-hot-food-meals-vending-machine-with-inch-touch-screen-148.html",
+          "category": "Hot Food",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {
+            "display": "21.5-inch touch screen"
+          },
+          "features": [],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Hamburger Vending Machine",
+          "model": "TCN-FFM-ZV-HB",
+          "url": "https://www.tcnvend.com/fr/tcn-ffm-zv-hb-hamburger-vending-machine-397.html",
+          "category": "Hot Food",
+          "description": "Dispenses heated items including pizzas, burgers, sandwiches, prepared dishes and other baking products. Features adjustable heating times based on product type.",
+          "specifications": {
+            "dimensions_mm": "H: 1940, W: 1370, D: 1280",
+            "weight_kg": 400,
+            "capacity": "90-170 items",
+            "display": "21.5-inch touchscreen",
+            "temperature_range": "-26°C to 10°C adjustable",
+            "power_microwave_W": 3800,
+            "power_additional_W": 3000,
+            "power_supply": "AC 110V-120V / 220V-240V, 50/60Hz",
+            "freezing_capacity_kg_per_12h": 10,
+            "energy_consumption_kWh_per_24h": 0.55
+          },
+          "features": [
+            "Rapid heating (60 seconds)",
+            "Continuous heating capability",
+            "Ozone sterilization system",
+            "Electronic price labels",
+            "Expiration timer function",
+            "Anti-vandalism keyboard",
+            "Cash, card (VISA, Mastercard, AMEX), digital wallets"
+          ],
+          "images": [
+            "https://www.tcnvend.com/img/tcn-ffm-zv-hb-hamburger-vending-machine-46.jpg"
+          ],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Hot Food Vending Machine (Refrigerate at -8°C)",
+          "model": "TCN-FFM-8V(V55) + TCN-FFM-ZV(V22)",
+          "url": "https://www.tcnvend.com/fr/tcn-ffm-vvtcn-ffm-zvv-hot-food-vending-machine-refrigerate-at---c-483.html",
+          "category": "Hot Food",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {},
+          "features": [],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "24-Hour Pizza Vending Machine",
+          "model": "TCN-CMX-4C(V32)-PA",
+          "url": "https://www.tcnvend.com/fr/pizza-vending-machine-hours-511.html",
+          "category": "Hot Food",
+          "description": "The ideal solution for pizza lovers - no waiting, no queues. Delivers convenient pizza access 24/7.",
+          "specifications": {
+            "dimensions_mm": "H: 2000, W: 1950, D: 1100",
+            "power_consumption_W": 6000,
+            "capacity_pizza_boxes": 80,
+            "dispensing_time_min": "2-3",
+            "refrigeration_temp_C": "2-4",
+            "heating_range_C": "220-350",
+            "display": "32-inch touchscreen"
+          },
+          "features": [
+            "24/7 availability",
+            "No queues or waiting",
+            "Guaranteed food quality per serving"
+          ],
+          "images": [
+            "https://www.tcnvend.com/img/pizza-vending-machine-24hours.jpg"
+          ],
+          "price": "Contact for pricing",
+          "moq": 3,
+          "lead_time_days": 45
+        },
+        {
+          "name": "Double Microwave Hot Food Vending Machine",
+          "model": "N/A",
+          "url": "https://www.tcnvend.com/fr/double-microwave-hot-food-vending-machine-481.html",
+          "category": "Hot Food",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {},
+          "features": ["Double microwave heating"],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "TCN Breakfast Vending Machine",
+          "model": "N/A",
+          "url": "https://www.tcnvend.com/fr/tcn-breakfast-vending-machine-422.html",
+          "category": "Hot Food",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {},
+          "features": [],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Warm Food / Hot Meal / Fast Food Vending Machine (OEM/ODM)",
+          "model": "N/A",
+          "url": "https://www.tcnvend.com/fr/tcn-oem-odm-warm-food-hot-meal-fast-food-vending-machine-127.html",
+          "category": "Hot Food",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {},
+          "features": ["OEM/ODM available"],
+          "images": [],
+          "price": "Contact for pricing"
+        }
+      ]
+    },
+    {
+      "id": "coffee",
+      "name": "Coffee Vending Machine",
+      "url": "https://www.tcnvend.com/fr/coffee-vending-machine-46.html",
+      "products": [
+        {
+          "name": "Commercial Coffee Vending Machine",
+          "model": "TCN-NCF-7N(V22)",
+          "url": "https://www.tcnvend.com/fr/tcn-ncf-nv-commercial-coffee-vending-machine-419.html",
+          "category": "Coffee",
+          "description": "Integrates advanced brewing technology with modern electronics. Features freshly ground coffee beans with adjustable grinding, a glass display window, and automatic mechanical operation with robotic arm delivery.",
+          "specifications": {
+            "dimensions_mm": "H: 1940, W: 735, D: 790",
+            "weight_kg": 220,
+            "coffee_bean_capacity_kg": 1.5,
+            "drink_varieties": 20,
+            "water_supply": "Bottled or tap water",
+            "brew_temperature_C": 92,
+            "cartridges": 6,
+            "display": "22-inch touchscreen LCD",
+            "power_supply": "AC 100V-240V, 50/60Hz",
+            "cup_capacity": "160 cups (4 buckets)"
+          },
+          "features": [
+            "Freshly ground coffee",
+            "Anti-pinch safety door",
+            "High-precision weight sensors",
+            "Anti-theft electronic lock",
+            "Smartphone payment options",
+            "Remote machine management",
+            "Anti-clogging powder material passages"
+          ],
+          "images": [
+            "https://www.tcnvend.com/img/tcn-ncf-7nv22-commercial-coffee-vending-machine.jpg"
+          ],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Freshly Ground Iced Coffee Vending Machine with Ice Cubes",
+          "model": "TCN-NCF-8N(V22)",
+          "url": "https://www.tcnvend.com/fr/freshly-ground-iced-coffee-vending-machine-with-ice-cubes-480.html",
+          "category": "Coffee",
+          "description": "An automated dispensing system that grinds coffee beans fresh and serves iced coffee with ice cubes.",
+          "specifications": {},
+          "features": [
+            "Fresh grinding capability",
+            "Ice cube dispensing",
+            "Iced coffee production"
+          ],
+          "images": [
+            "https://www.tcnvend.com/upfile/2023/05/29/20230529085651_499.jpg",
+            "https://www.tcnvend.com/upfile/2023/05/29/20230529085955_412.jpg"
+          ],
+          "price": "Contact for pricing",
+          "moq": 3,
+          "lead_time_days": 15,
+          "certifications": "CE, CB, ISO9001, GV"
+        },
+        {
+          "name": "Mini Coffee Vending Machine (Fresh Ground)",
+          "model": "TCN-NCF-4N(V10.1)",
+          "url": "https://www.tcnvend.com/fr/tcn-ncf-nv-fresh-ground-coffee-machine-mini-coffee-vending-machine-373.html",
+          "category": "Coffee",
+          "description": "Combines the best coffee brewing technology with latest electronic performance. Features freshly ground coffee beans with adjustable grinding, high-temperature extraction technology, and a robotic arm delivery system.",
+          "specifications": {
+            "dimensions_mm": "H: 810, W: 500, D: 450",
+            "weight_kg": 220,
+            "coffee_bean_hopper_kg": 1.2,
+            "instant_powder_containers_L": "4L×2 / 2L×1",
+            "brewing_system_powder_g": "7-16g",
+            "display": "10.1-inch touchscreen",
+            "power_supply": "AC 110V-120V / 220V-240V, 50/60Hz",
+            "peak_power_W": 3000,
+            "backup_power_W": "<30",
+            "brewing_time_sec": "~60",
+            "brew_temperature_C": 92
+          },
+          "features": [
+            "Freshly ground coffee beans with adjustable grinding",
+            "Glass window showcasing operation",
+            "Multiple ingredient options (milk, coconut powder, sugar, tea powder, lemon powder)",
+            "Anti-pinch safety door",
+            "Touchscreen visualization"
+          ],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Snack, Drink and Coffee Combination Vending Machine",
+          "model": "TCN-60G-C4",
+          "url": "https://www.tcnvend.com/fr/tcn-g-c-snack-drink-and-coffee-combination-vending-machine-211.html",
+          "category": "Coffee / Snack & Drink",
+          "description": "Hybrid unit combining 4 cold beverage dispensers with 4 hot instant beverage slots. Features powder-coated cabinet with full insulation materials and energy-efficient operation.",
+          "specifications": {
+            "dimensions_mm": "H: 1940, W: 1400, D: 790",
+            "weight_kg": 920,
+            "slots": 60,
+            "capacity_beverages": 300,
+            "capacity_cups": 130,
+            "dispense_type": "Spring slots / Conveyor",
+            "display": "19-inch advertising screen",
+            "power_supply": "AC 110V-120V / 220V-240V, 50/60Hz",
+            "power_consumption_heating_W": 1800,
+            "power_consumption_cooling_W": 505,
+            "power_consumption_normal_W": 85,
+            "temperature_range": "4-25°C adjustable",
+            "refrigerant": "R134a"
+          },
+          "features": [
+            "Triple-glazed viewing window with integrated glass heater",
+            "Dual spirals on snack trays, each tray tilts at 45 degrees",
+            "Adjustable partitions and shelf heights",
+            "Drop sensors and temperature monitoring",
+            "Remote GPRS surveillance system",
+            "Energy-efficient compressor"
+          ],
+          "images": [],
+          "price": "Contact for pricing",
+          "moq": 3
+        }
+      ]
+    },
+    {
+      "id": "book",
+      "name": "Book Vending Machine",
+      "url": "https://www.tcnvend.com/fr/book-vending-machine-74.html",
+      "products": [
+        {
+          "name": "TCN Book Vending Machine",
+          "model": "N/A",
+          "url": "https://www.tcnvend.com/fr/tcn-book-vending-machine-399.html",
+          "category": "Book",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {},
+          "features": [],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Magazines, Library, School Books, Notebook, Newspaper Vending Machine",
+          "model": "TCN-NSC-10C",
+          "url": "https://www.tcnvend.com/fr/tcn-nsc-c-magazines-library-school-books-notebook-newspaper-vending-machine-for-sale-238.html",
+          "category": "Book",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {},
+          "features": [],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Book Vending Machine (Customizable Capacity)",
+          "model": "N/A",
+          "url": "https://www.tcnvend.com/fr/book-vending-machine-capacity-can-be-customized-503.html",
+          "category": "Book",
+          "description": "Enables students to obtain books at any time, anywhere. Functions as a reward mechanism in schools, incentivizing children through recognition of good behavior, grades, and attendance.",
+          "specifications": {
+            "capacity": "Customizable"
+          },
+          "features": [
+            "Customizable capacity",
+            "Reward-based system for student behavior and achievement",
+            "Encourages literacy development",
+            "School library application focus"
+          ],
+          "images": [],
+          "price": "Contact for pricing"
+        }
+      ]
+    },
+    {
+      "id": "age_verification",
+      "name": "Age Verification Vending Machine",
+      "url": "https://www.tcnvend.com/fr/age-verification-vending-machine-75.html",
+      "products": [
+        {
+          "name": "Touch Screen CBD Vape Vending Machine with Age Verification",
+          "model": "TCN-D900-7C49SP",
+          "url": "https://www.tcnvend.com/fr/tcn-touch-screen-cbd-vape-vending-machine-404.html",
+          "category": "Age Verification",
+          "description": "Features an ID card reader that can verify customer age through identification cards, driver's licenses, or passports. Each slot can be configured with or without age verification.",
+          "specifications": {},
+          "features": [
+            "Card reader for age verification (ID, driver's license, passport)",
+            "Configurable per-slot age verification",
+            "Touch screen interface",
+            "Product dispensing after verification and payment"
+          ],
+          "images": [
+            "https://www.tcnvend.com/img/tcn-d900-7c49sp-tcn-touch-screen-e-cigarette-cbd-vape-vending-machine-with-age-verification.jpg",
+            "https://www.tcnvend.com/upfile/2022/05/09/20220509120921_442.jpg"
+          ],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Vape Vending Machine - Without Base",
+          "model": "N/A",
+          "url": "https://www.tcnvend.com/fr/vape-vending-machine---without-base-470.html",
+          "category": "Age Verification",
+          "description": "Age verification vending machine without base, featuring an ID card reader for customer age validation. Individual slots configurable with or without age verification.",
+          "specifications": {},
+          "features": [
+            "ID card reader for age verification",
+            "Customizable slot-level age verification",
+            "Automatic product dispensing"
+          ],
+          "images": [
+            "https://www.tcnvend.com/img/electronic-cigarette-vending-machine---without-base-10.jpg",
+            "https://www.tcnvend.com/upfile/2024/03/08/20240308161817_447.jpg"
+          ],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Tobacco Vending Machine with ID Scanner",
+          "model": "TCN-D900-9C(22SP)",
+          "url": "https://www.tcnvend.com/fr/tcn-tobacoo-vending-machine-with-id-scanner-424.html",
+          "category": "Age Verification",
+          "description": "Features an ID card reader for customer age verification via identification documents, driver's licenses, or passports. Slots configurable with or without age verification.",
+          "specifications": {
+            "dimensions_mm": "1940 × 1275 × 790",
+            "power_supply": "AC 100V-240V, 50/60Hz",
+            "slots": "54 varieties (6-layer push-button, 9 lanes)",
+            "capacity": "300-800 pieces"
+          },
+          "features": [
+            "Age verification via ID scanning",
+            "Non-spiral push-button slot mechanism",
+            "Multiple payment options (WeChat Pay, Alipay, QR code)"
+          ],
+          "images": [
+            "https://www.tcnvend.com/img/tcn-vape-cigarette-vending-machine.jpg",
+            "https://www.tcnvend.com/upfile/2022/06/23/20220623144149_983.jpg"
+          ],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Touch Screen CBD Vape Vending Machine with Age Verification",
+          "model": "TCN-D900-7C(49SP)",
+          "url": "https://www.tcnvend.com/fr/tcn-d-csp-tcn-touch-screen-cbd-vape-vending-machine-with-age-verification-252.html",
+          "category": "Age Verification",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {},
+          "features": ["Age verification", "49-inch touchscreen"],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "24-Hour Self-Service CBD Vending Machine with Age Verification",
+          "model": "N/A",
+          "url": "https://www.tcnvend.com/fr/tcn--hours-self-service-cbd-vending-machine-with-age-verification-248.html",
+          "category": "Age Verification",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {},
+          "features": ["Age verification", "24-hour self-service"],
+          "images": [],
+          "price": "Contact for pricing"
+        }
+      ]
+    },
+    {
+      "id": "smart_fridge",
+      "name": "Smart Fridge Vending Machine",
+      "url": "https://www.tcnvend.com/fr/smart-fridge-vending-machine-68.html",
+      "products": [
+        {
+          "name": "24h Smart Coolers Vending Machine",
+          "model": "TCN-CFZ-510L",
+          "url": "https://www.tcnvend.com/fr/tcn-cfz-l-h-smart-coolers-vending-machine-544.html",
+          "category": "Smart Fridge",
+          "description": "Intelligent self-service freezer with dynamic AI identification, supports sales of various merchandise types, features powerful refrigeration compressor, convenient restocking and loading.",
+          "specifications": {
+            "capacity_liters": 510,
+            "dimensions_mm": "H: 2100, W: 650, D: 690",
+            "weight_kg": 140,
+            "temperature_range": "0-10°C (optional heating: 4-25°C)",
+            "temperature_control": "Electronic temperature regulator",
+            "shelves": 5,
+            "door": "Two-layer tempered glass with aluminum frame",
+            "stock_capacity": "~200 bottles (500ml)",
+            "detection_technology": "Polynomial vision weight sensing"
+          },
+          "features": [
+            "AI-powered dynamic identification",
+            "Automatic glass door",
+            "Electronic temperature regulation",
+            "Multiple payment options (Visa, Mastercard, Amex, Apple Pay, Google Pay, Alipay, WeChat Pay)",
+            "Flexible merchandise compatibility"
+          ],
+          "images": [
+            "https://www.tcnvend.com/img/tcn-cfz-510l-24h-smart-coolers-vending-machine-96.jpg"
+          ],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Smart Fridge Frozen Vending Machine",
+          "model": "TCN-FFM-ZV / TCN-FFZ-468(VAV8)",
+          "url": "https://www.tcnvend.com/fr/tcn-ffm-zv-tcn-ffz-vav-smart-fridge-frozen-vending-machine-692.html",
+          "category": "Smart Fridge",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {},
+          "features": [],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Smart Cooler Vending Machine",
+          "model": "TCN-CFZ-1200(V10)",
+          "url": "https://www.tcnvend.com/fr/tcn-cfz-v-smart-cooler-vending-machine-541.html",
+          "category": "Smart Fridge",
+          "description": "Features visual weighing technology to increase recognition rates. Designed for commercial environments including shopping centers, offices, banks, and hospitals.",
+          "specifications": {
+            "dimensions_mm": "H: 2120, W: 1265, D: 715",
+            "weight_kg": 180,
+            "shelves": 5,
+            "trays": 30,
+            "temperature_range": "0-10°C (optional: 4-25°C)",
+            "cooling_system": "Frost-free refrigeration",
+            "daily_energy_kWh": 3.0,
+            "internet": "4G",
+            "recognition_technology": "Visual weighing"
+          },
+          "features": [
+            "Visual weighing technology",
+            "Frost-free refrigeration",
+            "Multiple payment options (Visa, Mastercard, AMEX, Alipay, Monyx, Apple Pay, Google Pay, Samsung Pay)"
+          ],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Multiple Systems AI Smart Fridge Vending Machine",
+          "model": "TCN-CFZ-1000(V10)",
+          "url": "https://www.tcnvend.com/fr/tcn-cfz-v-multiple-systems-ai-smart-fridge-vending-machine-553.html",
+          "category": "Smart Fridge",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {},
+          "features": ["AI-powered", "Multiple systems"],
+          "images": [],
+          "price": "Contact for pricing"
+        }
+      ]
+    },
+    {
+      "id": "vending_locker",
+      "name": "Vending Locker",
+      "url": "https://www.tcnvend.com/fr/vending-locker-72.html",
+      "products": [
+        {
+          "name": "Smart Vending Locker Machine (Maintains 55°C)",
+          "model": "TCN-ZK(22SP)+TCN-BLH-20",
+          "url": "https://www.tcnvend.com/fr/smart-vending-locker-machine-maintains-c-691.html",
+          "category": "Vending Locker",
+          "description": "Intelligent vending dispenser maintains 55°C temperature, designed for lunch boxes, breakfast, meals, and bento boxes.",
+          "specifications": {
+            "dimensions_mm": "H: 2080, W: 1600, D: 680",
+            "capacity": "20 boxes",
+            "temperature": "Maintains 55°C",
+            "display": "21.5-inch touchscreen",
+            "power_supply": "AC 100V/240V, 50Hz",
+            "warranty": "1 year"
+          },
+          "features": [
+            "Wall-mounted, space-saving design",
+            "MDB interface for cashless payments",
+            "Expandable with slave units",
+            "Customization available (color, decals, video display, door sizes)"
+          ],
+          "images": [
+            "https://www.tcnvend.com/upfile/2025/03/18/20250318184727_231.jpg"
+          ],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "TCN Locker Vending Machine",
+          "model": "TCN-ZK-(22SP) + TCN-BLH-80S",
+          "url": "https://www.tcnvend.com/fr/tcn-zk-sp-tcn-blh-s--tcn-locker-vending-machine-662.html",
+          "category": "Vending Locker",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {},
+          "features": [],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "TCN Locker Vending Machine",
+          "model": "TCN-ZK-(22SP) + TCN-BLH-40S",
+          "url": "https://www.tcnvend.com/fr/tcn-zk-sp-tcn-blh-s--tcn-locker-vending-machine-660.html",
+          "category": "Vending Locker",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {},
+          "features": [],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "TCN Locker Vending Machine",
+          "model": "TCN-ZK-(22SP) + TCN-BLH-64S",
+          "url": "https://www.tcnvend.com/fr/tcn-zk-sp-tcn-blh-s--tcn-locker-vending-machine-659.html",
+          "category": "Vending Locker",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {},
+          "features": [],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "TCN Locker Vending Machine",
+          "model": "TCN-ZK-(22SP) + TCN-BLH-19S",
+          "url": "https://www.tcnvend.com/fr/tcn-zk-sp-tcn-blh-s--tcn-locker-vending-machine-658.html",
+          "category": "Vending Locker",
+          "description": "Locker-style vending machine for snacks, beverages, daily products, pharmaceuticals. Features 21.5-inch touchscreen and wall-mounted installation.",
+          "specifications": {
+            "dimensions_mm": "H: 1940, W: 1080+397, D: 320",
+            "capacity": "19 units",
+            "display": "21.5-inch touchscreen",
+            "power_supply": "AC 100V/240V, 50Hz",
+            "warranty": "1 year"
+          },
+          "features": [
+            "MDB standard interface for multiple payment methods",
+            "Expandable capacity with various door options (19S/27S/40S/64S)",
+            "Space-saving wall-mounted design",
+            "Customization services available"
+          ],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "TCN Locker Vending Machine",
+          "model": "TCN-ZK-(22SP) + TCN-BLH-27S",
+          "url": "https://www.tcnvend.com/fr/tcn-zk-sp-tcn-blh-s--tcn-locker-vending-machine-657.html",
+          "category": "Vending Locker",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {},
+          "features": [],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Flower Vending Machine",
+          "model": "N/A",
+          "url": "https://www.tcnvend.com/fr/tcn-flower-vending-machine-533.html",
+          "category": "Vending Locker",
+          "description": "TCN Flower Vending Machine designed as a locker-style vending system for retail deployment.",
+          "specifications": {},
+          "features": [
+            "Suitable for supermarkets, airports, train stations, shopping centers, offices, hotels, metro stations"
+          ],
+          "images": [
+            "https://www.tcnvend.com/upfile/2024/02/28/20240228150257_458.jpg",
+            "https://www.tcnvend.com/upfile/2024/02/28/20240228150333_965.jpg"
+          ],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Refrigerated Locker Fresh Fruits Vending Machine",
+          "model": "TCN-ZK-22SP + TCN-CLC-20(Z)",
+          "url": "https://www.tcnvend.com/fr/refrigerated-locker-fresh-fruits-vending-machine-479.html",
+          "category": "Vending Locker",
+          "description": "Combining locker and vending systems for 24/7 operation. An excellent way to develop your business.",
+          "specifications": {
+            "dimensions_main_mm": "W: 1200, H: 2080, D: 680",
+            "dimensions_secondary_mm": "W: 400, H: 1930, D: 320",
+            "weight_kg": 350,
+            "capacity": "20 cells",
+            "temperature_range": "4-25°C",
+            "power_consumption_ambient_W": 42,
+            "power_consumption_refrigerated_W": 510,
+            "power_supply": "AC 100V/240V, 50Hz/60Hz",
+            "lock_type": "Electromagnetic unlock"
+          },
+          "features": [
+            "7 days / 24 hours operation",
+            "No personnel costs",
+            "Payment: Cash, facial recognition, QR code"
+          ],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "TCN Refrigerated Locker Vending Machine",
+          "model": "TCN-CLC-8(V22)",
+          "url": "https://www.tcnvend.com/fr/tcn-refrigerated-locker-vending-machine-429.html",
+          "category": "Vending Locker",
+          "description": "Temperature control adjustable by degree per module. Ability to disable cooling systems for energy optimization. Individual display tiles allow users to monitor product temperatures.",
+          "specifications": {
+            "dimensions_mm": "H: 1940, W: 2155, D: 790",
+            "weight_kg": 550,
+            "capacity": "16 items",
+            "temperature_range": "4-25°C",
+            "power_supply": "AC 100V/240V, 50Hz/60Hz",
+            "warranty": "1 year"
+          },
+          "features": [
+            "Per-module temperature control",
+            "Individual product temperature monitoring tiles",
+            "Accommodates boxes, flexible bags, cans, and bottles"
+          ],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "TCN Locker Vending Machine",
+          "model": "TCN-ZK(22SP)+BLH-19S",
+          "url": "https://www.tcnvend.com/fr/tcn-zkspblh-s-tcn-locker-vending-machine-387.html",
+          "category": "Vending Locker",
+          "description": "Smart locker vending machine designed for snacks, beverages, daily products, pharmaceuticals. Features 21.5-inch touchscreen for advertising and product selection.",
+          "specifications": {
+            "dimensions_mm": "H: 1940, W: 1477, D: 320",
+            "capacity": "19 units",
+            "weight_kg": 320,
+            "temperature": "Ambient/Normal",
+            "power_supply": "AC 100V/240V, 50Hz/60Hz",
+            "warranty": "1 year"
+          },
+          "features": [
+            "21.5-inch touchscreen",
+            "Cash and cashless payment (MDB standard)",
+            "Expandable with multiple door configurations (19S/27S/40S/64S)",
+            "Wall-mounted with neon lighting",
+            "Customization available"
+          ],
+          "images": [
+            "https://www.tcnvend.com/img/tcn-smart-locker-vending-machine.jpg"
+          ],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Multiple Vending Machine Locker",
+          "model": "TCN-ZK(22SP)+BLH-40S",
+          "url": "https://www.tcnvend.com/fr/tcn-zkspblh-s-multiple-vending-machine-locker-vending-machine-386.html",
+          "category": "Vending Locker",
+          "description": "Independent master unit with 21.5-inch display supporting cash/cashless payment. Operates in master + slave configuration with up to 6 slaves simultaneously.",
+          "specifications": {
+            "dimensions_mm": "H: 1940, W: 1477, D: 320",
+            "capacity": "40 compartments",
+            "weight_kg": 320,
+            "temperature": "Room temperature",
+            "power_supply": "AC 100V/240V, 50Hz/60Hz",
+            "warranty": "1 year"
+          },
+          "features": [
+            "Independent master with 21.5-inch display",
+            "Cash and cashless payment",
+            "Multiple slave configurations (19/27/40/64 compartments)",
+            "Master controls up to 6 slave units",
+            "Illuminated locker doors"
+          ],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "TCN Vending Locker / Snack Vending Machine",
+          "model": "TCN-ZK(22SP)+BLH-64S",
+          "url": "https://www.tcnvend.com/fr/tcn-zkspblh-s-tcn-vending-locker-snack-vending-machine-384.html",
+          "category": "Vending Locker",
+          "description": "Independent master unit with 21.5-inch screen supporting cash/cashless payment. Master + slave configuration with options for 19/27/40/64 compartment slaves.",
+          "specifications": {
+            "dimensions_mm": "H: 1940, W: 1477, D: 320",
+            "capacity": "64 units",
+            "weight_kg": 320,
+            "temperature": "Normal",
+            "power_supply": "AC 100V/240V, 50Hz/60Hz",
+            "warranty": "1 year"
+          },
+          "features": [
+            "Independent master with 21.5-inch display",
+            "Master + slave expandable (up to 6 slaves)",
+            "Flashing LED lighting in compartments"
+          ],
+          "images": [
+            "https://www.tcnvend.com/img/tcn-zk22spblh-64s-tcn-madical-vending-machine-facial-mask-vending-machine-pharmacy-shop-vending-machine.jpg"
+          ],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Healthy Vending Machine / Vending Locker",
+          "model": "TCN-ZK(22SP)+BLH-80S",
+          "url": "https://www.tcnvend.com/fr/tcn-zkspblh-s-healthy-vending-machine-vending-locker-385.html",
+          "category": "Vending Locker",
+          "description": "Independent master unit with 21.5-inch display supporting cash/cashless payment. Eye-catching blinking lights in lockers. Master operates up to 6 slaves simultaneously.",
+          "specifications": {
+            "dimensions_mm": "H: 1940, W: 1477, D: 320",
+            "capacity": "80 pieces",
+            "weight_kg": 320,
+            "temperature": "Normal/Ambient",
+            "power_supply": "AC 100V/240V, 50Hz/60Hz",
+            "warranty": "1 year"
+          },
+          "features": [
+            "21.5-inch touchscreen display",
+            "Master + slave configuration (up to 6 slaves)",
+            "Options: 19/27/40/64 compartment slaves",
+            "LED flashing lights"
+          ],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "TCN Locker Vending Machine",
+          "model": "TCN-NLC-37(V10)",
+          "url": "https://www.tcnvend.com/fr/tcn-nlc-v-tcn-locker-vending-machine-400.html",
+          "category": "Vending Locker",
+          "description": "Locker dispenser accommodating snacks, beverages, daily products, pharmacy items. Features 10.1-inch touchscreen, standard MDB interface, wall-mounted design.",
+          "specifications": {
+            "dimensions_mm": "H: 1940, W: 1080, D: 320",
+            "capacity": "37 units",
+            "weight_kg": 220,
+            "power_supply": "AC 100V/240V, 50Hz/60Hz",
+            "temperature": "Normal",
+            "warranty": "1 year"
+          },
+          "features": [
+            "Touchscreen display with advertising capability",
+            "Flexible product compatibility",
+            "Expandable with multiple slave units",
+            "Space-saving wall-mounted with neon lighting",
+            "Customizable (colors, decals, door sizes)"
+          ],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "TCN Locker Vending Machine",
+          "model": "TCN-NLC-58(V10)",
+          "url": "https://www.tcnvend.com/fr/tcn-nlc-v-tcn-locker-vending-machine-402.html",
+          "category": "Vending Locker",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {},
+          "features": [],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "TCN Smart Locker Vending Machine",
+          "model": "TCN-ZK(22SP)+BLH-19S",
+          "url": "https://www.tcnvend.com/fr/tcn-smart-locker-vending-machine-421.html",
+          "category": "Vending Locker",
+          "description": "Combines locker system with vending machine for 24/7 automated retail solution. Supports snacks, beverages, everyday products, and pharmacy items.",
+          "specifications": {
+            "dimensions_mm": "H: 1940, W: 1477, D: 320",
+            "capacity": "19 units",
+            "weight_kg": 320,
+            "power_supply": "AC 100V/240V, 50Hz/60Hz",
+            "temperature": "Normal",
+            "warranty": "1 year"
+          },
+          "features": [
+            "21.5-inch touchscreen display",
+            "Expandable with door sizes (19S/27S/40S/64S)",
+            "Wall-mounted, space-efficient design",
+            "Standard MDB interface for multiple payment methods"
+          ],
+          "images": [
+            "https://www.tcnvend.com/img/tcn-smart-locker-vending-machine.jpg"
+          ],
+          "price": "Contact for pricing"
+        }
+      ]
+    },
+    {
+      "id": "ppe",
+      "name": "PPE Vending Machine",
+      "url": "https://www.tcnvend.com/fr/ppe-vending-machine-21.html",
+      "products": [],
+      "note": "Category page returned 429 Too Many Requests - no product list could be retrieved"
+    },
+    {
+      "id": "pharmacy",
+      "name": "Pharmacy Vending Machine",
+      "url": "https://www.tcnvend.com/fr/pharmacy-vending-machine-45.html",
+      "products": [
+        {
+          "name": "24h Pharmacy / Narcan / Disinfection Supplies Vending Machine",
+          "model": "TCN-S800-10",
+          "url": "https://www.tcnvend.com/fr/tcn-s--h-narcan-pharmacy-online-shopping-hand-soap-disinfection-supplies-vending-machine-207.html",
+          "category": "Pharmacy",
+          "description": "Dispenses pharmaceuticals, hand soap, disinfection supplies, and other healthcare products in 24-hour automated settings.",
+          "specifications": {
+            "dimensions_mm": "H: 1940, W: 1273, D: 795",
+            "weight_kg": 225,
+            "product_types": "50-70 types",
+            "capacity": "300-800 pieces",
+            "interior_layout": "6 drawers",
+            "power_supply": "AC 100V/240V, 50Hz/60Hz",
+            "temperature_range": "4-25°C adjustable",
+            "refrigerant": "R134a",
+            "interfaces": "MDB/DEX"
+          },
+          "features": [
+            "Triple-glazed viewing window with integrated heater",
+            "High-resistance powder-coated cabinet with insulation",
+            "LED lighting and secure locking door",
+            "Adjustable shelving and partitions",
+            "Drop sensors and delivery assurance",
+            "Remote management via GPRS",
+            "Energy-efficient compressor",
+            "Supports bills, coins, IC cards, QR codes, NFC, mobile payment"
+          ],
+          "images": [
+            "https://www.tcnvend.com/img/tcn-s800-10-24h-pharmacy-online-shopping-hand-soap-disinfection-supplies-vending-machine.jpg"
+          ],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Medical Pharma Shop Locker Vending Machine Solutions",
+          "model": "TCN-D720-8C(50SP)",
+          "url": "https://www.tcnvend.com/fr/tcn-d-csp-madical-pharma-shop-locker-vending-machine-solutions-208.html",
+          "category": "Pharmacy",
+          "description": "Secure locker-style vending machine designed for pharmaceutical and medical products with refrigeration capabilities.",
+          "specifications": {
+            "dimensions_mm": "H: 1933, W: 1005, D: 893",
+            "weight_kg": 280,
+            "product_types": "50-70 types",
+            "capacity": "340-800 units",
+            "interior_layout": "6 drawers",
+            "temperature_range": "4-25°C adjustable",
+            "power_supply": "AC 100V/240V, 50Hz/60Hz",
+            "display": "49-inch LCD",
+            "interfaces": "MDB/DEX",
+            "certifications": "CE, ISO9001, SGS, CB"
+          },
+          "features": [
+            "Triple-glazed viewing window with integrated heater",
+            "Secure lockable door with LED lighting",
+            "Dual spiral dispensers on chip trays",
+            "45-degree tilted shelves for easy loading",
+            "Remote monitoring via GPRS",
+            "R134a refrigerant (RoHS compliant)"
+          ],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "24-Hour Self-Service Pharmacy Vending Machine",
+          "model": "TCN-D720-10C(22SP)",
+          "url": "https://www.tcnvend.com/fr/tcn-d-csp--hours-self-service-pharmacy-vending-machine-187.html",
+          "category": "Pharmacy",
+          "description": "Refrigerated pharmaceutical dispensing unit designed for hospitals, pharmacies, airports, and retail locations.",
+          "specifications": {
+            "dimensions_mm": "H: 1940, W: 1273, D: 795",
+            "weight_kg": 285,
+            "product_types": "50-70 types",
+            "capacity": "300-800 pieces",
+            "interior_layout": "6 drawers",
+            "temperature_range": "4-25°C adjustable",
+            "power_supply": "AC 100V/240V, 50Hz/60Hz",
+            "display": "22-inch LCD",
+            "interfaces": "MDB/DEX",
+            "certifications": "CE, ISO9001, SGS, CB"
+          },
+          "features": [
+            "Triple-glazed viewing window with integrated heater",
+            "Global foam technology with 40mm insulation",
+            "Modular cooling with R134a refrigerant",
+            "Drop/vend sensors",
+            "Remote management via GPRS/cloud",
+            "45-degree tilting shelves"
+          ],
+          "images": [],
+          "price": "Contact for pricing",
+          "moq": 1,
+          "lead_time_days": 15
+        },
+        {
+          "name": "Healthy Medical Public Health Pharmacy Vending Machine",
+          "model": "TCN-D720-8C(50SP)",
+          "url": "https://www.tcnvend.com/fr/tcn-d-csp-healthy-medical-public-healthpharmacy-vending-machine-186.html",
+          "category": "Pharmacy",
+          "description": "Medical and public health pharmaceutical dispensing unit for banks, supermarkets, airports, hospitals, and shopping malls.",
+          "specifications": {
+            "dimensions_mm": "H: 1933, W: 1005, D: 893",
+            "weight_kg": 280,
+            "product_types": "50-70 types",
+            "capacity": "340-800 units",
+            "interior_layout": "6 drawers",
+            "temperature_range": "4-25°C adjustable",
+            "power_supply": "AC 100V/240V, 50Hz/60Hz",
+            "display": "49-inch LCD",
+            "interfaces": "MDB/DEX"
+          },
+          "features": [
+            "Triple-glazed viewing window",
+            "High-resistance powder-coated cabinet with insulation",
+            "Secure/lockable cash box",
+            "Dual spirals on chip trays",
+            "Drop sensor, vend assurance",
+            "GPRS remote monitoring",
+            "Energy-efficient compressor, R134a refrigerant"
+          ],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Pharmacy Product / Medical Supplies / Surgical Mask Vending Machine",
+          "model": "TCN-ZK(22SP) + BLH-40S",
+          "url": "https://www.tcnvend.com/fr/tcn-zkspblh-s-pharmacy-product-vending-machine-medical-supplies-vending-machine-surgical-mask-vending-machine-214.html",
+          "category": "Pharmacy / Vending Locker",
+          "description": "Locker-style vending machine for pharmaceutical products, medical supplies, and surgical masks.",
+          "specifications": {
+            "dimensions_mm": "H: 1940, W: 1477, D: 320",
+            "capacity": "40 units",
+            "weight_kg": 320,
+            "temperature": "Normal",
+            "power_supply": "AC 100V/240V, 50Hz/60Hz"
+          },
+          "features": [
+            "Independent master with 21.5-inch display",
+            "Cash/cashless payment",
+            "Master-slave configuration (up to 6 slaves)",
+            "Illuminated compartments"
+          ],
+          "images": [
+            "https://www.tcnvend.com/img/tcn-pharmacy-product-vending-machine-medical-supplies-vending-machine-surgical-mask-vending-machine-.jpg"
+          ],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Healthy Vending Machine / 24h Pharmacy / Hand Sanitizer Vending Machine",
+          "model": "TCN-ZK(22SP) + BLH-80S",
+          "url": "https://www.tcnvend.com/fr/tcn-zkspblh-s-healthy-vending-machine-h-pharmacy-vending-machine-hand-sanitizer-vending-machine-216.html",
+          "category": "Pharmacy / Vending Locker",
+          "description": "Locker-style healthy vending machine for 24-hour pharmacy products and hand sanitizer dispensing.",
+          "specifications": {
+            "dimensions_mm": "H: 1940, W: 1477, D: 320",
+            "capacity": "80 units",
+            "weight_kg": 320,
+            "temperature": "Normal",
+            "power_supply": "AC 100V/240V, 50Hz/60Hz"
+          },
+          "features": [
+            "21.5-inch display",
+            "Cash/cashless payment",
+            "Up to 6 slaves",
+            "Flashing LED compartments"
+          ],
+          "images": [
+            "https://www.tcnvend.com/img/tcn-zk-blh-80s-healthy-vending-machine-24h-pharmacy-vending-machine-hand-sanitizer-vending-machine-.jpg"
+          ],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Healthy Medical Drug Medicine Pharmacy Vending Machine",
+          "model": "TCN-NLC-ZK(32SP) + 14S",
+          "url": "https://www.tcnvend.com/fr/tcn-nlc-zksps-healthy-medical-drug-medicine-pharmacy-vending-machine-209.html",
+          "category": "Pharmacy",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {},
+          "features": [],
+          "images": [],
+          "price": "Contact for pricing"
+        }
+      ]
+    },
+    {
+      "id": "oem_odm",
+      "name": "OEM/ODM Vending Machine",
+      "url": "https://www.tcnvend.com/fr/oem--odm-vending-machine-48.html",
+      "products": [
+        {
+          "name": "Perfume Vending Machine",
+          "model": "N/A",
+          "url": "https://www.tcnvend.com/fr/perfume-vending-machine-697.html",
+          "category": "OEM/ODM",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {},
+          "features": [],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Red Wine / Alcohol / Soup Vending Machine",
+          "model": "TCN-D900-9C(22SP)",
+          "url": "https://www.tcnvend.com/fr/tcn-d-csptcn-soup-alcohol-red-wine-vending-machine-with--inch-touch-screen-232.html",
+          "category": "OEM/ODM",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {},
+          "features": [],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Cup Noodle Ramen Vending Machine",
+          "model": "N/A",
+          "url": "https://www.tcnvend.com/fr/cup-noodle-ramen-vending-machine-500.html",
+          "category": "OEM/ODM",
+          "description": "TCN cup noodle vending machine provides hot water for convenient instant noodle preparation.",
+          "specifications": {},
+          "features": ["Hot water dispensing capability"],
+          "images": [
+            "https://www.tcnvend.com/img/cup-noodle-ramen-vending-machine-83.jpg",
+            "https://www.tcnvend.com/upfile/2024/10/23/20241023135937_495.jpg"
+          ],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Shoes / Flip-Flop Vending Machine",
+          "model": "TCN-S800-10C(22SP)",
+          "url": "https://www.tcnvend.com/fr/tcn-s-csp-shoes-vending-machine-flip-flop-vending-machine-264.html",
+          "category": "OEM/ODM",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {},
+          "features": [],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "School Pen / Stationery Vending Machine",
+          "model": "TCN-S800-10C(22SP)",
+          "url": "https://www.tcnvend.com/fr/tcn-school-pen-stationary-vending-machine-for-sale-263.html",
+          "category": "OEM/ODM",
+          "description": "Flexible placement for pens, notebooks, pencils, and stationery items with diverse payment systems.",
+          "specifications": {
+            "dimensions_mm": "H: 1940, W: 1261, D: 771",
+            "weight_kg": 220,
+            "slots": 60,
+            "capacity": "300-800 pieces",
+            "power_supply": "AC 100V/240V, 50Hz/60Hz",
+            "interfaces": "MDB/DEX"
+          },
+          "features": [
+            "Flexible product placement",
+            "Multiple payment systems (bills, coins, credit cards, QR payments)",
+            "Intelligent SaaS management system",
+            "Suitable for libraries, airports, schools"
+          ],
+          "images": [
+            "https://www.tcnvend.com/img/tcn-school-pen-stationary-vending-machine-for-sale.jpg",
+            "https://www.tcnvend.com/upfile/2021/04/29/20210429133824_562.jpg"
+          ],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Lucky Box Vending Machine / Micro-Market Vending Machine",
+          "model": "TCN-NSC-8N(V22)-DW(AA)",
+          "url": "https://www.tcnvend.com/fr/tcn-nsc-nv-dwaa-lucky-box-vending-machine-micro-market-vending-machine-349.html",
+          "category": "OEM/ODM",
+          "description": "A lucky box style vending machine designed for micro-market applications with dual door configuration.",
+          "specifications": {
+            "packaging": "Cardboard or plywood",
+            "lead_time_days": 15,
+            "annual_capacity": "150,000 units/year"
+          },
+          "features": [
+            "Micro-market vending solution",
+            "Lucky box dispensing mechanism",
+            "Dual-door system (DW/AA configuration)"
+          ],
+          "images": [],
+          "price": "Contact for pricing",
+          "moq": 3
+        },
+        {
+          "name": "Clothing Vending Machine (Stadium/Gym)",
+          "model": "TCN-CSC-8C(50SP)",
+          "url": "https://www.tcnvend.com/fr/tcn-csc-csptcn--clothing-vending-machine-for-stadium-and-gym-436.html",
+          "category": "OEM/ODM",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {},
+          "features": ["Designed for stadiums and gyms"],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Pizza Vending Machine",
+          "model": "N/A",
+          "url": "https://www.tcnvend.com/fr/pizza-vending-machine-509.html",
+          "category": "OEM/ODM",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {},
+          "features": [],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Cosmetics / Makeup / Skincare / Beauty Vending Machine",
+          "model": "TCN-S850-10C(22SP)",
+          "url": "https://www.tcnvend.com/fr/tcn-s-csp-tcn-cosmetics-makeup-skincare-beauty-vending-machine-321.html",
+          "category": "OEM/ODM",
+          "description": "Specialized cosmetics distributor designed for supermarkets, dormitories, malls, salons, hotels, and beauty establishments. Customizable OEM/ODM colors and functions.",
+          "specifications": {
+            "dimensions_mm": "H: 1940, W: 1008, D: 795",
+            "weight_kg": 235,
+            "product_types": "50-70 types",
+            "capacity": "300-800 units",
+            "interior_layout": "6 drawers",
+            "power_supply": "AC 100V/240V, 50Hz/60Hz",
+            "interfaces": "MDB/DEX"
+          },
+          "features": [
+            "Triple-layer glass window with integrated heating",
+            "45-degree tilted shelves for easy loading",
+            "Adjustable partitions",
+            "Secure lockable cash box with drop sensor",
+            "GPRS remote monitoring",
+            "Energy-efficient compressor",
+            "Vend Assure delivery guarantee"
+          ],
+          "images": [],
+          "price": "Contact for pricing",
+          "moq": 1,
+          "annual_capacity": 150000
+        },
+        {
+          "name": "Cosmetics / Makeup / Skincare / Beauty Vending Machine",
+          "model": "TCN-S800-10C(22SP)",
+          "url": "https://www.tcnvend.com/fr/tcn-s--tcn-cosmetics-makeup-skincare-beauty-vending-machine-235.html",
+          "category": "OEM/ODM",
+          "description": "Specialized cosmetics dispenser for supermarts, dorms, malls, beauty shops, salons, hotels. Supports customizable colors and functions.",
+          "specifications": {
+            "dimensions_mm": "H: 1940, W: 1008, D: 795",
+            "weight_kg": 235,
+            "product_types": "50-70 types",
+            "capacity": "300-800 pieces",
+            "interior_layout": "6 drawers",
+            "power_supply": "AC 100V/240V, 50Hz/60Hz",
+            "interfaces": "MDB/DEX",
+            "certifications": "CE, ISO9001, SGS, CB"
+          },
+          "features": [
+            "Triple-pane glass window with integrated defroster",
+            "LED lighting and secure locking door",
+            "45-degree tilted shelves",
+            "Adjustable partitions and heights",
+            "Drop sensor technology",
+            "Cloud-based remote management (free, no annual fees)",
+            "MDB/DEX protocol support"
+          ],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Cosmetics / Mask / Eye Lashes Vending Machine",
+          "model": "TCN-S800-10C(22SP)",
+          "url": "https://www.tcnvend.com/fr/tcn-s-csp-tcn-cosmetics-mask-panitos-desinfectantes-eye-lashes-vending-machine-231.html",
+          "category": "OEM/ODM",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {},
+          "features": [],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Trading Card / Card Game Vending Machine",
+          "model": "N/A",
+          "url": "https://www.tcnvend.com/fr/trading-card--vendingcard-game-vending-machine-492.html",
+          "category": "OEM/ODM",
+          "description": "Drop the shuffle, enter the game! Card game vending machine - your portable playground! Designed to dispense card games and trading card collections.",
+          "specifications": {},
+          "features": [
+            "Multiple application venues supported",
+            "Card dispensing capability"
+          ],
+          "images": [],
+          "price": "Contact for pricing"
+        }
+      ]
+    },
+    {
+      "id": "micro_market",
+      "name": "Micro-Market Vending Machine",
+      "url": "https://www.tcnvend.com/fr/micro-market-vending-machines-79.html",
+      "products": [
+        {
+          "name": "Drink Vending Machines with Elevator System",
+          "model": "N/A",
+          "url": "https://www.tcnvend.com/fr/drink-vending-machines-with-elevator-system-698.html",
+          "category": "Micro-Market",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {},
+          "features": ["Elevator delivery system"],
+          "images": [],
+          "price": "Contact for pricing"
+        },
+        {
+          "name": "Micro-Market Vending Machine",
+          "model": "N/A",
+          "url": "https://www.tcnvend.com/fr/micro-market-vending-machines-611.html",
+          "category": "Micro-Market",
+          "description": "One machine is a supermarket. Comprehensive vending solution capable of dispensing beverages, snacks, and combo items with maximum flexibility.",
+          "specifications": {
+            "dimensions_mm": "H: 1970, W: 1928, D: 980",
+            "weight_kg": 670,
+            "slots": 119,
+            "capacity_beverages": 1200,
+            "dispense_type": "Spiral/conveyor/pusher",
+            "display": "21.5-inch touchscreen",
+            "power_supply": "AC 110V-120V / 220V-240V, 50/60Hz",
+            "power_consumption_refrigerated_W": 520,
+            "power_consumption_normal_W": 40,
+            "temperature_range": "4-25°C adjustable"
+          },
+          "features": [
+            "Multiple payment: cash, card, e-wallets",
+            "Optional heating module",
+            "119 slot capacity"
+          ],
+          "images": [
+            "https://www.tcnvend.com/img/micro-market-vending-machines.jpg"
+          ],
+          "price": "Contact for pricing",
+          "moq": 3,
+          "lead_time_days": 15,
+          "annual_capacity": 150000
+        },
+        {
+          "name": "Mini Mart Vending Machine (Supports Almost All Product Sales)",
+          "model": "N/A",
+          "url": "https://www.tcnvend.com/fr/mini-mart-vending-machinesupports-almost-all-product-sales-610.html",
+          "category": "Micro-Market",
+          "description": "N/A (page returned 429 on extraction)",
+          "specifications": {},
+          "features": ["Supports almost all product sales"],
+          "images": [],
+          "price": "Contact for pricing"
+        }
+      ]
+    }
+  ]
+}
