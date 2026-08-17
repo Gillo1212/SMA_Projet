@@ -108,10 +108,43 @@ const machine = await machinesService.getBySlug('machine-a-cafe-pro');
 import { useTranslation } from 'react-i18next';
 
 const { t } = useTranslation();
-return <h1>{t('home.title')}</h1>;
+return <h1>{t('home.hero.titleLine1')}</h1>;
 ```
 
-Les fichiers de traduction sont dans `src/i18n/local/`. Toujours ajouter les clés dans les deux langues (FR + EN).
+**Français par défaut** et langue de repli. Le choix de l'utilisateur est persisté en localStorage (`smalim_language`) et prime sur la langue du navigateur.
+
+### Organisation des fichiers
+
+`src/i18n/local/<lang>/<domaine>.ts` — un module par domaine, fusionné en profondeur au chargement :
+
+| Fichier | Contenu |
+|---------|---------|
+| `common.ts` | navigation, pied de page, libellés partagés |
+| `home.ts` | page d'accueil |
+| `shop.ts` | catalogues, panier, blog |
+| `checkout.ts` | tunnel de commande et retour de paiement |
+
+Chaque module exporte un objet **imbriqué** dont la première clé est la section (`nav`, `cart`, `checkout`…).
+
+### Règles
+
+- Toute clé ajoutée dans `fr/` doit l'être dans `en/`, à l'identique.
+- Ne pas traduire les noms propres (Wave, Orange Money, Sénégal, SMALIM).
+- Pour un texte coupé par un `<br />`, découper en clés numérotées (`titleLine1`, `titleLine2`) plutôt que d'insérer du HTML dans la traduction.
+
+### Vérifier la cohérence
+
+Deux contrôles utiles avant de livrer : comparer les clés `fr/` et `en/` (aucune ne doit manquer d'un côté), et vérifier que chaque `t('…')` du code correspond à une clé définie.
+
+### État de la traduction
+
+Traduits : navbar, pied de page, accueil, catalogue machines, panier, blog, tunnel de commande, retour de paiement.
+
+**Encore en français en dur** : pages produits, contact, à-propos, pages de détail (machine, produit, article), comparateur, demande de devis — ainsi que le portail admin et l'espace client, qui sont des outils internes.
+
+## Sélecteur de langue
+
+`components/feature/LanguageSwitcher.tsx`, intégré à la navbar. La prop `variant` adapte les couleurs au fond (`light` sur la navbar transparente en haut de page).
 
 ## Panier
 

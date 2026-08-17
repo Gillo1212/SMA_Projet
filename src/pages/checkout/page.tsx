@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import Navbar from '../home/components/Navbar';
 import Footer from '../home/components/Footer';
 import { useCart } from '../../contexts/CartContext';
@@ -27,6 +28,7 @@ type DeliveryMode = 'pickup' | 'standard' | 'express';
 type PaymentMethod = 'wave' | 'orange_money';
 
 export default function CheckoutPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { items, getSubtotal, getDiscount, clearCart } = useCart();
 
@@ -59,9 +61,9 @@ export default function CheckoutPage() {
   const TVA_RATE = 0.18;
 
   const deliveryOptions = {
-    pickup: { label: 'Retrait en magasin', price: 0, delay: 'Disponible aujourd\'hui' },
-    standard: { label: 'Livraison standard', price: 2500, delay: '2-3 jours ouvrables' },
-    express: { label: 'Livraison express', price: 5000, delay: '24h' },
+    pickup: { label: t('checkout.delivery.pickup'), price: 0, delay: t('checkout.delivery.pickupDelay') },
+    standard: { label: t('checkout.delivery.standard'), price: 2500, delay: t('checkout.delivery.standardDelay') },
+    express: { label: t('checkout.delivery.express'), price: 5000, delay: t('checkout.delivery.expressDelay') },
   };
 
   const subtotal = getSubtotal();
@@ -74,11 +76,11 @@ export default function CheckoutPage() {
     setPwdError('');
     if (account.createAccount) {
       if (account.password.length < 8) {
-        setPwdError('Le mot de passe doit contenir au moins 8 caractères.');
+        setPwdError(t('checkout.account.errorTooShort'));
         return;
       }
       if (account.password !== account.confirmPassword) {
-        setPwdError('Les mots de passe ne correspondent pas.');
+        setPwdError(t('checkout.account.errorMismatch'));
         return;
       }
     }
@@ -133,7 +135,7 @@ export default function CheckoutPage() {
       setOrderError(
         err instanceof Error
           ? err.message
-          : "La commande n'a pas pu être enregistrée. Réessayez.",
+          : t('checkout.review.error'),
       );
       setPlacingOrder(false);
     }
@@ -145,10 +147,10 @@ export default function CheckoutPage() {
   }
 
   const steps = [
-    { number: 1, label: 'Adresse', icon: 'ri-map-pin-line' },
-    { number: 2, label: 'Livraison', icon: 'ri-truck-line' },
-    { number: 3, label: 'Paiement', icon: 'ri-bank-card-line' },
-    { number: 4, label: 'Confirmation', icon: 'ri-checkbox-circle-line' },
+    { number: 1, label: t('checkout.steps.address'), icon: 'ri-map-pin-line' },
+    { number: 2, label: t('checkout.steps.delivery'), icon: 'ri-truck-line' },
+    { number: 3, label: t('checkout.steps.payment'), icon: 'ri-bank-card-line' },
+    { number: 4, label: t('checkout.steps.confirmation'), icon: 'ri-checkbox-circle-line' },
   ];
 
   return (
@@ -158,7 +160,7 @@ export default function CheckoutPage() {
       {/* Header */}
       <section className="pt-24 sm:pt-32 pb-8 sm:pb-12 bg-[#EEFFF2]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-20">
-          <h1 className="text-3xl sm:text-5xl font-bold text-[#00272B] mb-6 sm:mb-8">Finaliser ma commande</h1>
+          <h1 className="text-3xl sm:text-5xl font-bold text-[#00272B] mb-6 sm:mb-8">{t('checkout.title')}</h1>
 
           {/* Progress Steps */}
           <div className="flex items-center justify-between max-w-3xl">
@@ -196,46 +198,46 @@ export default function CheckoutPage() {
               {/* Step 1: Shipping Address */}
               {currentStep === 1 && (
                 <div className="bg-white border border-gray-200 rounded-2xl p-6 sm:p-8">
-                  <h2 className="text-xl sm:text-2xl font-bold text-[#00272B] mb-6">Adresse de livraison</h2>
+                  <h2 className="text-xl sm:text-2xl font-bold text-[#00272B] mb-6">{t('checkout.address.title')}</h2>
                   <form onSubmit={handleAddressSubmit} className="space-y-5 sm:space-y-6">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                       <div>
-                        <label className="text-sm font-semibold text-[#00272B] mb-2 block">Prénom <span className="text-red-500">*</span></label>
-                        <input type="text" required value={shippingAddress.firstName} onChange={(e) => setShippingAddress({ ...shippingAddress, firstName: e.target.value })} className="w-full h-12 px-4 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-[#1AAA3F]" placeholder="Jean" />
+                        <label className="text-sm font-semibold text-[#00272B] mb-2 block">{t('checkout.address.firstName')} <span className="text-red-500">*</span></label>
+                        <input type="text" required value={shippingAddress.firstName} onChange={(e) => setShippingAddress({ ...shippingAddress, firstName: e.target.value })} className="w-full h-12 px-4 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-[#1AAA3F]" placeholder={t('checkout.address.firstNamePlaceholder')} />
                       </div>
                       <div>
-                        <label className="text-sm font-semibold text-[#00272B] mb-2 block">Nom <span className="text-red-500">*</span></label>
-                        <input type="text" required value={shippingAddress.lastName} onChange={(e) => setShippingAddress({ ...shippingAddress, lastName: e.target.value })} className="w-full h-12 px-4 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-[#1AAA3F]" placeholder="Diop" />
+                        <label className="text-sm font-semibold text-[#00272B] mb-2 block">{t('checkout.address.lastName')} <span className="text-red-500">*</span></label>
+                        <input type="text" required value={shippingAddress.lastName} onChange={(e) => setShippingAddress({ ...shippingAddress, lastName: e.target.value })} className="w-full h-12 px-4 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-[#1AAA3F]" placeholder={t('checkout.address.lastNamePlaceholder')} />
                       </div>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                       <div>
-                        <label className="text-sm font-semibold text-[#00272B] mb-2 block">Email <span className="text-red-500">*</span></label>
-                        <input type="email" required value={shippingAddress.email} onChange={(e) => setShippingAddress({ ...shippingAddress, email: e.target.value })} className="w-full h-12 px-4 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-[#1AAA3F]" placeholder="jean.diop@exemple.com" />
+                        <label className="text-sm font-semibold text-[#00272B] mb-2 block">{t('checkout.address.email')} <span className="text-red-500">*</span></label>
+                        <input type="email" required value={shippingAddress.email} onChange={(e) => setShippingAddress({ ...shippingAddress, email: e.target.value })} className="w-full h-12 px-4 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-[#1AAA3F]" placeholder={t('checkout.address.emailPlaceholder')} />
                       </div>
                       <div>
-                        <label className="text-sm font-semibold text-[#00272B] mb-2 block">Téléphone <span className="text-red-500">*</span></label>
-                        <input type="tel" required value={shippingAddress.phone} onChange={(e) => setShippingAddress({ ...shippingAddress, phone: e.target.value })} className="w-full h-12 px-4 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-[#1AAA3F]" placeholder="+221 77 123 45 67" />
+                        <label className="text-sm font-semibold text-[#00272B] mb-2 block">{t('checkout.address.phone')} <span className="text-red-500">*</span></label>
+                        <input type="tel" required value={shippingAddress.phone} onChange={(e) => setShippingAddress({ ...shippingAddress, phone: e.target.value })} className="w-full h-12 px-4 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-[#1AAA3F]" placeholder={t('checkout.address.phonePlaceholder')} />
                       </div>
                     </div>
 
                     <div>
-                      <label className="text-sm font-semibold text-[#00272B] mb-2 block">Adresse complète <span className="text-red-500">*</span></label>
-                      <input type="text" required value={shippingAddress.address} onChange={(e) => setShippingAddress({ ...shippingAddress, address: e.target.value })} className="w-full h-12 px-4 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-[#1AAA3F]" placeholder="123 Avenue Léopold Sédar Senghor" />
+                      <label className="text-sm font-semibold text-[#00272B] mb-2 block">{t('checkout.address.street')} <span className="text-red-500">*</span></label>
+                      <input type="text" required value={shippingAddress.address} onChange={(e) => setShippingAddress({ ...shippingAddress, address: e.target.value })} className="w-full h-12 px-4 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-[#1AAA3F]" placeholder={t('checkout.address.streetPlaceholder')} />
                     </div>
 
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-6">
                       <div className="col-span-2 sm:col-span-1">
-                        <label className="text-sm font-semibold text-[#00272B] mb-2 block">Ville <span className="text-red-500">*</span></label>
-                        <input type="text" required value={shippingAddress.city} onChange={(e) => setShippingAddress({ ...shippingAddress, city: e.target.value })} className="w-full h-12 px-4 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-[#1AAA3F]" placeholder="Dakar" />
+                        <label className="text-sm font-semibold text-[#00272B] mb-2 block">{t('checkout.address.city')} <span className="text-red-500">*</span></label>
+                        <input type="text" required value={shippingAddress.city} onChange={(e) => setShippingAddress({ ...shippingAddress, city: e.target.value })} className="w-full h-12 px-4 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-[#1AAA3F]" placeholder={t('checkout.address.cityPlaceholder')} />
                       </div>
                       <div>
-                        <label className="text-sm font-semibold text-[#00272B] mb-2 block">Code postal</label>
-                        <input type="text" value={shippingAddress.postalCode} onChange={(e) => setShippingAddress({ ...shippingAddress, postalCode: e.target.value })} className="w-full h-12 px-4 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-[#1AAA3F]" placeholder="12000" />
+                        <label className="text-sm font-semibold text-[#00272B] mb-2 block">{t('checkout.address.postalCode')}</label>
+                        <input type="text" value={shippingAddress.postalCode} onChange={(e) => setShippingAddress({ ...shippingAddress, postalCode: e.target.value })} className="w-full h-12 px-4 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-[#1AAA3F]" placeholder={t('checkout.address.postalCodePlaceholder')} />
                       </div>
                       <div>
-                        <label className="text-sm font-semibold text-[#00272B] mb-2 block">Pays <span className="text-red-500">*</span></label>
+                        <label className="text-sm font-semibold text-[#00272B] mb-2 block">{t('checkout.address.country')} <span className="text-red-500">*</span></label>
                         <select required value={shippingAddress.country} onChange={(e) => setShippingAddress({ ...shippingAddress, country: e.target.value })} className="w-full h-12 px-4 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-[#1AAA3F] cursor-pointer">
                           <option value="Sénégal">Sénégal</option>
                           <option value="Mali">Mali</option>
@@ -261,12 +263,12 @@ export default function CheckoutPage() {
                             {account.createAccount && <i className="ri-check-line text-white text-xs"></i>}
                           </div>
                           <div className="text-left">
-                            <p className="text-sm font-semibold text-[#00272B]">Créer un compte SMALIM</p>
-                            <p className="text-xs text-[#00272B]/50">Suivez vos commandes, accédez à vos factures et devis</p>
+                            <p className="text-sm font-semibold text-[#00272B]">{t('checkout.account.title')}</p>
+                            <p className="text-xs text-[#00272B]/50">{t('checkout.account.hint')}</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-1.5">
-                          <span className="text-xs text-[#1AAA3F] font-medium bg-[#1AAA3F]/10 px-2 py-0.5 rounded-full">Gratuit</span>
+                          <span className="text-xs text-[#1AAA3F] font-medium bg-[#1AAA3F]/10 px-2 py-0.5 rounded-full">{t('checkout.delivery.free')}</span>
                           <i className={`ri-arrow-down-s-line text-[#00272B]/40 transition-transform ${account.createAccount ? 'rotate-180' : ''}`}></i>
                         </div>
                       </button>
@@ -281,13 +283,13 @@ export default function CheckoutPage() {
                           )}
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                              <label className="text-sm font-semibold text-[#00272B] mb-2 block">Mot de passe <span className="text-red-500">*</span></label>
+                              <label className="text-sm font-semibold text-[#00272B] mb-2 block">{t('checkout.account.password')} <span className="text-red-500">*</span></label>
                               <div className="relative">
                                 <input
                                   type={showPwd ? 'text' : 'password'}
                                   value={account.password}
                                   onChange={e => setAccount(prev => ({ ...prev, password: e.target.value }))}
-                                  placeholder="Min. 8 caractères"
+                                  placeholder={t('checkout.account.passwordPlaceholder')}
                                   className="w-full h-11 px-4 pr-10 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-[#1AAA3F]"
                                 />
                                 <button type="button" onClick={() => setShowPwd(v => !v)}
@@ -297,12 +299,12 @@ export default function CheckoutPage() {
                               </div>
                             </div>
                             <div>
-                              <label className="text-sm font-semibold text-[#00272B] mb-2 block">Confirmer <span className="text-red-500">*</span></label>
+                              <label className="text-sm font-semibold text-[#00272B] mb-2 block">{t('checkout.account.confirm')} <span className="text-red-500">*</span></label>
                               <input
                                 type="password"
                                 value={account.confirmPassword}
                                 onChange={e => setAccount(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                                placeholder="Répétez le mot de passe"
+                                placeholder={t('checkout.account.confirmPlaceholder')}
                                 className={`w-full h-11 px-4 border rounded-lg text-sm focus:outline-none transition-all ${
                                   account.confirmPassword.length > 0
                                     ? account.password === account.confirmPassword ? 'border-[#1AAA3F]' : 'border-red-300'
@@ -320,7 +322,7 @@ export default function CheckoutPage() {
                     </div>
 
                     <button type="submit" className="w-full h-14 bg-[#1AAA3F] text-white text-base font-semibold rounded-xl hover:bg-[#158f35] transition-colors cursor-pointer flex items-center justify-center space-x-2 whitespace-nowrap">
-                      <span>Continuer vers la livraison</span>
+                      <span>{t('checkout.address.continue')}</span>
                       <i className="ri-arrow-right-line text-xl"></i>
                     </button>
                   </form>
@@ -330,7 +332,7 @@ export default function CheckoutPage() {
               {/* Step 2: Delivery Mode */}
               {currentStep === 2 && (
                 <div className="bg-white border border-gray-200 rounded-2xl p-8">
-                  <h2 className="text-2xl font-bold text-[#00272B] mb-6">Mode de livraison</h2>
+                  <h2 className="text-2xl font-bold text-[#00272B] mb-6">{t('checkout.delivery.title')}</h2>
                   <div className="space-y-4 mb-8">
                     {Object.entries(deliveryOptions).map(([key, option]) => (
                       <button
@@ -359,7 +361,7 @@ export default function CheckoutPage() {
                         </div>
                         <p className="text-xl font-bold text-[#00272B]">
                           {option.price === 0 ? (
-                            <span className="text-[#1AAA3F]">Gratuit</span>
+                            <span className="text-[#1AAA3F]">{t('checkout.delivery.free')}</span>
                           ) : (
                             `${option.price.toLocaleString('fr-FR')} FCFA`
                           )}
@@ -379,7 +381,7 @@ export default function CheckoutPage() {
                       onClick={handleDeliverySubmit}
                       className="flex-1 h-14 bg-[#1AAA3F] text-white text-base font-semibold rounded-xl hover:bg-[#158f35] transition-colors cursor-pointer flex items-center justify-center space-x-2 whitespace-nowrap"
                     >
-                      <span>Continuer vers le paiement</span>
+                      <span>{t('checkout.delivery.continue')}</span>
                       <i className="ri-arrow-right-line text-xl"></i>
                     </button>
                   </div>
@@ -389,7 +391,7 @@ export default function CheckoutPage() {
               {/* Step 3: Payment Method */}
               {currentStep === 3 && (
                 <div className="bg-white border border-gray-200 rounded-2xl p-8">
-                  <h2 className="text-2xl font-bold text-[#00272B] mb-6">Méthode de paiement</h2>
+                  <h2 className="text-2xl font-bold text-[#00272B] mb-6">{t('checkout.payment.title')}</h2>
                   
                   <div className="space-y-4 mb-8">
                     {/* Wave */}
@@ -414,7 +416,7 @@ export default function CheckoutPage() {
                           </div>
                           <div className="text-left">
                             <p className="text-base font-bold text-[#00272B]">Wave</p>
-                            <p className="text-sm text-gray-600">Paiement mobile sécurisé</p>
+                            <p className="text-sm text-gray-600">{t('checkout.payment.waveSubtitle')}</p>
                           </div>
                         </div>
                         <div className="w-20 h-14 flex items-center justify-center bg-white rounded-xl border border-gray-100 p-2">
@@ -432,7 +434,7 @@ export default function CheckoutPage() {
                           </p>
                           <div className="flex items-center space-x-2 text-sm text-gray-500">
                             <i className="ri-shield-check-line text-[#1AAA3F]"></i>
-                            <span>Paiement 100% sécurisé via Wave</span>
+                            <span>{t('checkout.payment.waveHint')}</span>
                           </div>
                         </div>
                       )}
@@ -460,7 +462,7 @@ export default function CheckoutPage() {
                           </div>
                           <div className="text-left">
                             <p className="text-base font-bold text-[#00272B]">Orange Money</p>
-                            <p className="text-sm text-gray-600">WebPay sécurisé</p>
+                            <p className="text-sm text-gray-600">{t('checkout.payment.orangeSubtitle')}</p>
                           </div>
                         </div>
                         <div className="w-20 h-14 flex items-center justify-center bg-white rounded-xl border border-gray-100 p-2">
@@ -478,7 +480,7 @@ export default function CheckoutPage() {
                           </p>
                           <div className="flex items-center space-x-2 text-sm text-gray-500">
                             <i className="ri-shield-check-line text-[#1AAA3F]"></i>
-                            <span>Transaction sécurisée Orange Money</span>
+                            <span>{t('checkout.payment.orangeHint')}</span>
                           </div>
                         </div>
                       )}
@@ -496,7 +498,7 @@ export default function CheckoutPage() {
                       onClick={handlePaymentSubmit}
                       className="flex-1 h-14 bg-[#1AAA3F] text-white text-base font-semibold rounded-xl hover:bg-[#158f35] transition-colors cursor-pointer flex items-center justify-center space-x-2 whitespace-nowrap"
                     >
-                      <span>Vérifier ma commande</span>
+                      <span>{t('checkout.payment.continue')}</span>
                       <i className="ri-arrow-right-line text-xl"></i>
                     </button>
                   </div>
@@ -506,12 +508,12 @@ export default function CheckoutPage() {
               {/* Step 4: Final Review */}
               {currentStep === 4 && (
                 <div className="bg-white border border-gray-200 rounded-2xl p-8">
-                  <h2 className="text-2xl font-bold text-[#00272B] mb-8">Vérification finale</h2>
+                  <h2 className="text-2xl font-bold text-[#00272B] mb-8">{t('checkout.review.title')}</h2>
 
                   {/* Shipping Address Review */}
                   <div className="mb-8 p-6 bg-gray-50 rounded-xl">
                     <div className="flex items-start justify-between mb-4">
-                      <h3 className="text-lg font-bold text-[#00272B]">Adresse de livraison</h3>
+                      <h3 className="text-lg font-bold text-[#00272B]">{t('checkout.address.title')}</h3>
                       <button
                         onClick={() => setCurrentStep(1)}
                         className="text-sm text-[#1AAA3F] hover:underline cursor-pointer"
@@ -532,7 +534,7 @@ export default function CheckoutPage() {
                   {/* Delivery Mode Review */}
                   <div className="mb-8 p-6 bg-gray-50 rounded-xl">
                     <div className="flex items-start justify-between mb-4">
-                      <h3 className="text-lg font-bold text-[#00272B]">Mode de livraison</h3>
+                      <h3 className="text-lg font-bold text-[#00272B]">{t('checkout.delivery.title')}</h3>
                       <button
                         onClick={() => setCurrentStep(2)}
                         className="text-sm text-[#1AAA3F] hover:underline cursor-pointer"
@@ -548,7 +550,7 @@ export default function CheckoutPage() {
                   {/* Payment Method Review */}
                   <div className="mb-8 p-6 bg-gray-50 rounded-xl">
                     <div className="flex items-start justify-between mb-4">
-                      <h3 className="text-lg font-bold text-[#00272B]">Méthode de paiement</h3>
+                      <h3 className="text-lg font-bold text-[#00272B]">{t('checkout.payment.title')}</h3>
                       <button
                         onClick={() => setCurrentStep(3)}
                         className="text-sm text-[#1AAA3F] hover:underline cursor-pointer"
@@ -582,7 +584,7 @@ export default function CheckoutPage() {
                       className="flex-1 h-14 bg-[#1AAA3F] text-white text-base font-semibold rounded-xl hover:bg-[#158f35] disabled:opacity-60 transition-colors cursor-pointer flex items-center justify-center space-x-2 whitespace-nowrap"
                     >
                       <i className={placingOrder ? 'ri-loader-4-line animate-spin text-xl' : 'ri-checkbox-circle-line text-xl'}></i>
-                      <span>{placingOrder ? 'Redirection vers le paiement…' : 'Confirmer et payer'}</span>
+                      <span>{placingOrder ? t('checkout.review.submitting') : t('checkout.review.submit')}</span>
                     </button>
                   </div>
                 </div>
@@ -592,7 +594,7 @@ export default function CheckoutPage() {
             {/* Order Summary Sidebar */}
             <div>
               <div className="bg-gray-50 rounded-2xl p-6 sm:p-8 lg:sticky lg:top-32">
-                <h2 className="text-2xl font-bold text-[#00272B] mb-6">Récapitulatif</h2>
+                <h2 className="text-2xl font-bold text-[#00272B] mb-6">{t('checkout.summary.title')}</h2>
 
                 {/* Items */}
                 <div className="space-y-4 mb-6 pb-6 border-b border-gray-300">
@@ -627,23 +629,23 @@ export default function CheckoutPage() {
                 {/* Price Breakdown */}
                 <div className="space-y-4 mb-6 pb-6 border-b border-gray-300">
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-700">Sous-total</span>
+                    <span className="text-gray-700">{t('checkout.summary.subtotal')}</span>
                     <span className="font-semibold text-[#00272B]">
                       {subtotal.toLocaleString('fr-FR')} FCFA
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-700">Livraison</span>
+                    <span className="text-gray-700">{t('checkout.summary.shipping')}</span>
                     <span className="font-semibold text-[#00272B]">
                       {shippingCost === 0 ? (
-                        <span className="text-[#1AAA3F]">Gratuite</span>
+                        <span className="text-[#1AAA3F]">{t('checkout.summary.free')}</span>
                       ) : (
                         `${shippingCost.toLocaleString('fr-FR')} FCFA`
                       )}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-700">TVA (18%)</span>
+                    <span className="text-gray-700">{t('checkout.summary.vat')} (18%)</span>
                     <span className="font-semibold text-[#00272B]">
                       {tva.toLocaleString('fr-FR')} FCFA
                     </span>
@@ -652,7 +654,7 @@ export default function CheckoutPage() {
 
                 {/* Total */}
                 <div className="flex justify-between mb-6">
-                  <span className="text-xl font-bold text-[#00272B]">Total</span>
+                  <span className="text-xl font-bold text-[#00272B]">{t('checkout.summary.total')}</span>
                   <span className="text-3xl font-bold text-[#00272B]">
                     {total.toLocaleString('fr-FR')} <span className="text-lg">FCFA</span>
                   </span>
@@ -661,7 +663,7 @@ export default function CheckoutPage() {
                 {/* Security Badge */}
                 <div className="flex items-center justify-center space-x-2 text-sm text-gray-600">
                   <i className="ri-shield-check-line text-[#1AAA3F]"></i>
-                  <span>Paiement 100% sécurisé</span>
+                  <span>{t('checkout.summary.secure')}</span>
                 </div>
               </div>
             </div>

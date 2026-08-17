@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import Navbar from '../../home/components/Navbar';
 import Footer from '../../home/components/Footer';
 import { paymentsService, type PaymentStatusResult } from '../../../services/payments.service';
@@ -18,6 +19,7 @@ const MAX_ATTEMPTS = 15; // ~30 secondes
 type View = 'pending' | 'succeeded' | 'failed' | 'timeout' | 'error';
 
 export default function PaiementRetourPage() {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const reference = searchParams.get('reference');
   const declaredFailure = searchParams.get('echec') === '1';
@@ -40,7 +42,7 @@ export default function PaiementRetourPage() {
   useEffect(() => {
     if (!reference) {
       setView('error');
-      setMessage('Référence de paiement absente.');
+      setMessage(t('paymentReturn.missingReference'));
       return;
     }
 
@@ -69,7 +71,7 @@ export default function PaiementRetourPage() {
       } catch (err) {
         if (cancelled) return;
         setView('error');
-        setMessage(err instanceof Error ? err.message : 'Statut du paiement indisponible.');
+        setMessage(err instanceof Error ? err.message : t('paymentReturn.statusUnavailable'));
       }
     };
 
@@ -77,7 +79,7 @@ export default function PaiementRetourPage() {
     return () => { cancelled = true; clearTimeout(timer); };
   }, [reference, finalize]);
 
-  const orderLabel = status?.orderNumber ? `Commande ${status.orderNumber}` : null;
+  const orderLabel = status?.orderNumber ? `${t('checkout.orderLabel')} ${status.orderNumber}` : null;
 
   return (
     <div className="min-h-screen bg-white font-['Inter']">
@@ -91,10 +93,9 @@ export default function PaiementRetourPage() {
               <div className="w-20 h-20 bg-[#EEFFF2] rounded-full flex items-center justify-center mx-auto mb-6">
                 <i className="ri-loader-4-line text-[#1AAA3F] text-4xl animate-spin"></i>
               </div>
-              <h1 className="text-2xl font-bold text-[#00272B] mb-3">Vérification du paiement…</h1>
+              <h1 className="text-2xl font-bold text-[#00272B] mb-3">{t('paymentReturn.checking')}</h1>
               <p className="text-[#00272B]/60 text-sm leading-relaxed">
-                Nous attendons la confirmation de votre prestataire. Cela prend
-                généralement quelques secondes — ne fermez pas cette page.
+                {t('paymentReturn.checkingHint')}
               </p>
               {orderLabel && <p className="text-sm text-[#00272B]/40 mt-4">{orderLabel}</p>}
             </>
@@ -105,9 +106,9 @@ export default function PaiementRetourPage() {
               <div className="w-20 h-20 bg-[#EEFFF2] rounded-full flex items-center justify-center mx-auto mb-6">
                 <i className="ri-checkbox-circle-line text-[#1AAA3F] text-5xl"></i>
               </div>
-              <h1 className="text-2xl font-bold text-[#00272B] mb-3">Paiement confirmé</h1>
+              <h1 className="text-2xl font-bold text-[#00272B] mb-3">{t('paymentReturn.successTitle')}</h1>
               <p className="text-[#00272B]/60 text-sm leading-relaxed mb-2">
-                Merci ! Votre commande est confirmée et sa préparation va commencer.
+                {t('paymentReturn.successHint')}
               </p>
               {status && (
                 <p className="text-[#00272B] font-semibold mb-6">
@@ -119,10 +120,10 @@ export default function PaiementRetourPage() {
                   to="/espace-client/commandes"
                   className="w-full py-3 bg-[#1AAA3F] text-white text-sm font-semibold rounded-xl hover:bg-[#158f35] transition-all whitespace-nowrap"
                 >
-                  Suivre ma commande
+                  {t('paymentReturn.trackOrder')}
                 </Link>
                 <Link to="/produits" className="text-sm text-[#00272B]/50 hover:text-[#1AAA3F] transition-colors">
-                  Continuer mes achats
+                  {t('paymentReturn.continueShopping')}
                 </Link>
               </div>
             </>
@@ -133,22 +134,22 @@ export default function PaiementRetourPage() {
               <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
                 <i className="ri-close-circle-line text-red-500 text-5xl"></i>
               </div>
-              <h1 className="text-2xl font-bold text-[#00272B] mb-3">Paiement non abouti</h1>
+              <h1 className="text-2xl font-bold text-[#00272B] mb-3">{t('paymentReturn.failedTitle')}</h1>
               <p className="text-[#00272B]/60 text-sm leading-relaxed mb-6">
                 {message ?? (declaredFailure
-                  ? 'Le paiement a été interrompu ou refusé.'
-                  : 'Votre paiement n’a pas pu être confirmé.')}
-                {' '}Votre commande est conservée : vous pouvez relancer le règlement.
+                  ? t('paymentReturn.failedInterrupted')
+                  : t('paymentReturn.failedUnconfirmed'))}
+                {' '}{t('paymentReturn.failedKept')}
               </p>
               <div className="flex flex-col gap-3">
                 <Link
                   to="/espace-client/commandes"
                   className="w-full py-3 bg-[#1AAA3F] text-white text-sm font-semibold rounded-xl hover:bg-[#158f35] transition-all whitespace-nowrap"
                 >
-                  Voir mes commandes
+                  {t('paymentReturn.seeOrders')}
                 </Link>
                 <Link to="/panier" className="text-sm text-[#00272B]/50 hover:text-[#1AAA3F] transition-colors">
-                  Retour au panier
+                  {t('paymentReturn.backToCart')}
                 </Link>
               </div>
             </>
@@ -159,18 +160,16 @@ export default function PaiementRetourPage() {
               <div className="w-20 h-20 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-6">
                 <i className="ri-time-line text-amber-500 text-5xl"></i>
               </div>
-              <h1 className="text-2xl font-bold text-[#00272B] mb-3">Confirmation en attente</h1>
+              <h1 className="text-2xl font-bold text-[#00272B] mb-3">{t('paymentReturn.timeoutTitle')}</h1>
               <p className="text-[#00272B]/60 text-sm leading-relaxed mb-6">
-                Votre paiement est toujours en cours de traitement chez le
-                prestataire. Aucun débit n’est perdu : dès réception, votre
-                commande passera automatiquement en confirmée.
+                {t('paymentReturn.timeoutHint')}
               </p>
               <div className="flex flex-col gap-3">
                 <Link
                   to="/espace-client/commandes"
                   className="w-full py-3 bg-[#1AAA3F] text-white text-sm font-semibold rounded-xl hover:bg-[#158f35] transition-all whitespace-nowrap"
                 >
-                  Suivre ma commande
+                  {t('paymentReturn.trackOrder')}
                 </Link>
               </div>
             </>
@@ -181,13 +180,13 @@ export default function PaiementRetourPage() {
               <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
                 <i className="ri-error-warning-line text-red-500 text-5xl"></i>
               </div>
-              <h1 className="text-2xl font-bold text-[#00272B] mb-3">Statut indisponible</h1>
+              <h1 className="text-2xl font-bold text-[#00272B] mb-3">{t('paymentReturn.errorTitle')}</h1>
               <p className="text-[#00272B]/60 text-sm leading-relaxed mb-6">{message}</p>
               <Link
                 to="/espace-client/commandes"
                 className="inline-block px-6 py-3 bg-[#1AAA3F] text-white text-sm font-semibold rounded-xl hover:bg-[#158f35] transition-all whitespace-nowrap"
               >
-                Voir mes commandes
+                {t('paymentReturn.seeOrders')}
               </Link>
             </>
           )}
