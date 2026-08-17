@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../home/components/Navbar';
 import Footer from '../home/components/Footer';
 import { useCart } from '../../contexts/CartContext';
 
 export default function PanierPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { items, updateQuantity, removeFromCart, getSubtotal, getDiscount } = useCart();
   const [promoCode, setPromoCode] = useState('');
@@ -62,7 +64,7 @@ export default function PanierPage() {
             <div className="w-32 h-32 mx-auto mb-8 flex items-center justify-center">
               <i className="ri-shopping-cart-line text-9xl text-gray-200"></i>
             </div>
-            <h1 className="text-4xl font-bold text-[#00272B] mb-4">Votre panier est vide</h1>
+            <h1 className="text-4xl font-bold text-[#00272B] mb-4">{t('cart.empty')}</h1>
             <p className="text-base text-gray-600 mb-8 max-w-md mx-auto">
               Découvrez notre catalogue de produits de qualité pour remplir votre panier.
             </p>
@@ -71,7 +73,7 @@ export default function PanierPage() {
               className="inline-flex items-center space-x-2 px-8 py-4 bg-[#1AAA3F] text-white text-base font-semibold rounded-xl hover:bg-[#158f35] transition-colors whitespace-nowrap"
             >
               <i className="ri-store-2-line text-xl"></i>
-              <span>Découvrir la boutique</span>
+              <span>{t('cart.browseShop')}</span>
             </Link>
           </div>
         </section>
@@ -87,7 +89,7 @@ export default function PanierPage() {
       {/* Header */}
       <section className="pt-24 sm:pt-32 pb-8 sm:pb-12 bg-[#EEFFF2]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-20">
-          <h1 className="text-3xl sm:text-5xl font-bold text-[#00272B] mb-3 sm:mb-4">Mon Panier</h1>
+          <h1 className="text-3xl sm:text-5xl font-bold text-[#00272B] mb-3 sm:mb-4">{t('cart.title')}</h1>
           <p className="text-sm sm:text-base text-gray-600">
             {items.length} article{items.length > 1 ? 's' : ''} dans votre panier
           </p>
@@ -173,7 +175,7 @@ export default function PanierPage() {
                               className="flex items-center gap-1 text-red-500 hover:text-red-600 transition-colors cursor-pointer"
                             >
                               <i className="ri-delete-bin-line text-lg"></i>
-                              <span className="text-xs sm:text-sm font-medium hidden sm:inline">Retirer</span>
+                              <span className="text-xs sm:text-sm font-medium hidden sm:inline">{t('cart.remove')}</span>
                             </button>
                           </div>
 
@@ -211,7 +213,7 @@ export default function PanierPage() {
                   className="inline-flex items-center space-x-2 text-[#1AAA3F] hover:text-[#158f35] transition-colors"
                 >
                   <i className="ri-arrow-left-line"></i>
-                  <span className="text-sm font-medium">Continuer mes achats</span>
+                  <span className="text-sm font-medium">{t('cart.continueShopping')}</span>
                 </Link>
               </div>
             </div>
@@ -219,17 +221,17 @@ export default function PanierPage() {
             {/* Order Summary */}
             <div>
               <div className="bg-gray-50 rounded-2xl p-6 sm:p-8 lg:sticky lg:top-32">
-                <h2 className="text-2xl font-bold text-[#00272B] mb-6">Récapitulatif</h2>
+                <h2 className="text-2xl font-bold text-[#00272B] mb-6">{t('cart.summary')}</h2>
 
                 {/* Promo Code */}
                 <div className="mb-6">
-                  <label className="text-sm font-semibold text-[#00272B] mb-3 block">Code promo</label>
+                  <label className="text-sm font-semibold text-[#00272B] mb-3 block">{t('cart.promoCode')}</label>
                   <div className="flex space-x-2">
                     <input
                       type="text"
                       value={promoCode}
                       onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
-                      placeholder="Entrez votre code"
+                      placeholder={t('cart.promoPlaceholder')}
                       className="flex-1 h-12 px-4 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-[#1AAA3F]"
                     />
                     <button
@@ -267,7 +269,7 @@ export default function PanierPage() {
                 {/* Price Breakdown */}
                 <div className="space-y-4 mb-6 pb-6 border-b border-gray-300">
                   <div className="flex justify-between text-base">
-                    <span className="text-gray-700">Sous-total</span>
+                    <span className="text-gray-700">{t('cart.subtotal')}</span>
                     <span className="font-semibold text-[#00272B]">
                       {subtotal.toLocaleString('fr-FR')} FCFA
                     </span>
@@ -275,7 +277,7 @@ export default function PanierPage() {
 
                   {appliedPromo && (
                     <div className="flex justify-between text-base">
-                      <span className="text-gray-700">Réduction promo</span>
+                      <span className="text-gray-700">{t('cart.promoDiscount')}</span>
                       <span className="font-semibold text-[#1AAA3F]">
                         -{promoDiscount.toLocaleString('fr-FR')} FCFA
                       </span>
@@ -283,10 +285,10 @@ export default function PanierPage() {
                   )}
 
                   <div className="flex justify-between text-base">
-                    <span className="text-gray-700">Livraison</span>
+                    <span className="text-gray-700">{t('cart.shipping')}</span>
                     <span className="font-semibold text-[#00272B]">
                       {shippingCost === 0 ? (
-                        <span className="text-[#1AAA3F]">Gratuite</span>
+                        <span className="text-[#1AAA3F]">{t('cart.free')}</span>
                       ) : (
                         `${shippingCost.toLocaleString('fr-FR')} FCFA`
                       )}
@@ -315,7 +317,7 @@ export default function PanierPage() {
 
                 {/* Total */}
                 <div className="flex justify-between mb-8">
-                  <span className="text-xl font-bold text-[#00272B]">Total</span>
+                  <span className="text-xl font-bold text-[#00272B]">{t('cart.total')}</span>
                   <span className="text-3xl font-bold text-[#00272B]">
                     {total.toLocaleString('fr-FR')} <span className="text-lg">FCFA</span>
                   </span>
@@ -326,14 +328,14 @@ export default function PanierPage() {
                   onClick={handleCheckout}
                   className="w-full h-14 bg-[#1AAA3F] text-white text-base font-semibold rounded-xl hover:bg-[#158f35] transition-colors cursor-pointer flex items-center justify-center space-x-3 whitespace-nowrap mb-4"
                 >
-                  <span>Passer la commande</span>
+                  <span>{t('cart.checkout')}</span>
                   <i className="ri-arrow-right-line text-xl"></i>
                 </button>
 
                 {/* Security Badge */}
                 <div className="flex items-center justify-center space-x-2 text-sm text-gray-600">
                   <i className="ri-shield-check-line text-[#1AAA3F]"></i>
-                  <span>Paiement 100% sécurisé</span>
+                  <span>{t('cart.securePayment')}</span>
                 </div>
               </div>
             </div>

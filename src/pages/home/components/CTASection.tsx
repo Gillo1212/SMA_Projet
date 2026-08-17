@@ -1,6 +1,8 @@
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
 export default function CTASection() {
+  const { t } = useTranslation();
   return (
     <section className="relative py-36 overflow-hidden">
       <div className="absolute inset-0">
@@ -13,7 +15,7 @@ export default function CTASection() {
       </div>
       <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-20 text-center">
         <h2 className="text-6xl md:text-7xl font-extrabold text-white mb-6 tracking-wide" style={{ letterSpacing: '2px' }}>
-          COMMANDEZ VOS PRODUITS<br />EN LIGNE FACILEMENT<br />PAIEMENT MOBILE INTÉGRÉ
+          {t('home.cta.line1')}<br />{t('home.cta.line2')}<br />{t('home.cta.line3')}
         </h2>
         <p className="text-xl md:text-2xl text-white font-light mb-14 max-w-3xl mx-auto leading-relaxed">
           Café, snacks, boissons et bien plus encore. Livraison rapide partout au Sénégal.<br />
@@ -23,7 +25,7 @@ export default function CTASection() {
           <div className="w-16 h-16 bg-[#0D8C2E] flex items-center justify-center">
             <i className="ri-shopping-cart-line text-white text-2xl"></i>
           </div>
-          <span className="px-8">ACCÉDER À LA BOUTIQUE</span>
+          <span className="px-8">{t('home.cta.button')}</span>
           <i className="ri-arrow-right-up-line text-2xl mr-6"></i>
         </Link>
       </div>

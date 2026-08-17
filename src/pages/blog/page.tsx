@@ -1,17 +1,19 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import Navbar from '../home/components/Navbar';
 import Footer from '../home/components/Footer';
 import { useBlogPosts } from '../../hooks/useBlog';
-import { LoadingState, ErrorState, EmptyState } from '../../components/feature/AsyncState';
+import { LoadingState, ErrorState } from '../../components/feature/AsyncState';
 
 export default function BlogPage() {
+  const { t } = useTranslation();
   // Le site public ne montre que les articles publiés
   const { posts, isLoading, error, refetch } = useBlogPosts({ status: 'published' });
   const [selectedCategory, setSelectedCategory] = useState('all');
 
   const blogCategories = [
-    { id: 'all', name: 'Tous' },
+    { id: 'all', name: t('blogPage.allCategories') },
     ...Array.from(
       new Map(
         posts.map(a => [a.category, { id: a.category, name: a.categoryName ?? a.category }]),
@@ -29,7 +31,7 @@ export default function BlogPage() {
         <Navbar />
         <div className="pt-32 pb-20">
           {isLoading
-            ? <LoadingState label="Chargement des articles…" />
+            ? <LoadingState label={t('common.loading')} />
             : <ErrorState message={error!} onRetry={refetch} />}
         </div>
         <Footer />
@@ -46,13 +48,13 @@ export default function BlogPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-20">
           <div className="text-center max-w-4xl mx-auto">
             <div className="inline-block px-5 py-2 bg-[#FFF4F0] text-[#1AAA3F] text-sm font-semibold rounded-full mb-5 sm:mb-6">
-              BLOG SMA
+              {t('blogPage.eyebrow')}
             </div>
             <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold text-[#00272B] mb-4 sm:mb-6 leading-tight">
-              Actualités &amp; Conseils
+              {t('blogPage.title')}
             </h1>
             <p className="text-base sm:text-xl text-[#4A4A4A] leading-relaxed">
-              Découvrez nos dernières actualités, conseils d'experts et témoignages clients
+              {t('blogPage.subtitle')}
             </p>
           </div>
         </div>
@@ -82,13 +84,6 @@ export default function BlogPage() {
       {/* Articles Grid */}
       <section className="py-12 sm:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-20">
-          {filteredArticles.length === 0 && (
-            <EmptyState
-              icon="ri-article-line"
-              title="Aucun article publié"
-              description="Revenez bientôt, de nouveaux contenus arrivent."
-            />
-          )}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8">
             {filteredArticles.map((article) => (
               <Link 
@@ -148,7 +143,7 @@ export default function BlogPage() {
           {filteredArticles.length === 0 && (
             <div className="text-center py-20">
               <i className="ri-article-line text-6xl text-gray-300 mb-4"></i>
-              <p className="text-xl text-[#4A4A4A]">Aucun article dans cette catégorie</p>
+              <p className="text-xl text-[#4A4A4A]">{t('blogPage.emptyCategory')}</p>
             </div>
           )}
         </div>

@@ -1,8 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useCart } from '../../../contexts/CartContext';
+import LanguageSwitcher from '../../../components/feature/LanguageSwitcher';
 
 export default function Navbar() {
+  const { t } = useTranslation();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showAccountMenu, setShowAccountMenu] = useState(false);
@@ -31,12 +34,12 @@ export default function Navbar() {
   const showSolid = isScrolled || !isHome;
 
   const navLinks = [
-    { to: '/', label: 'Accueil' },
-    { to: '/machines', label: 'Machines' },
-    { to: '/produits', label: 'Produits' },
-    { to: '/blog', label: 'Blog' },
-    { to: '/a-propos', label: 'À Propos' },
-    { to: '/contact', label: 'Contact' },
+    { to: '/', label: t('nav.home') },
+    { to: '/machines', label: t('nav.machines') },
+    { to: '/produits', label: t('nav.products') },
+    { to: '/blog', label: t('nav.blog') },
+    { to: '/a-propos', label: t('nav.about') },
+    { to: '/contact', label: t('nav.contact') },
   ];
 
   return (
@@ -63,6 +66,8 @@ export default function Navbar() {
 
           {/* Right actions */}
           <div className="flex items-center space-x-2">
+            <LanguageSwitcher variant={showSolid ? 'dark' : 'light'} className="hidden sm:block" />
+
             {/* Account dropdown */}
             <div className="hidden md:block relative" ref={menuRef}>
               <button
@@ -76,14 +81,14 @@ export default function Navbar() {
                 <span className="w-4 h-4 flex items-center justify-center">
                   <i className="ri-user-line text-sm"></i>
                 </span>
-                Mon compte
+                {t('nav.myAccount')}
                 <i className={`ri-arrow-down-s-line text-xs transition-transform ${showAccountMenu ? 'rotate-180' : ''}`}></i>
               </button>
 
               {showAccountMenu && (
                 <div className="absolute right-0 top-full mt-2 w-52 bg-white rounded-2xl border border-gray-100 py-2 z-50">
                   <div className="px-4 py-2 border-b border-gray-50 mb-1">
-                    <p className="text-xs font-semibold text-[#00272B]/40 uppercase tracking-wide">Se connecter en tant que</p>
+                    <p className="text-xs font-semibold text-[#00272B]/40 uppercase tracking-wide">{t('nav.loginAs')}</p>
                   </div>
                   <Link
                     to="/espace-client/connexion"
@@ -94,8 +99,8 @@ export default function Navbar() {
                       <i className="ri-user-line text-[#0D8C2E] text-sm"></i>
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-[#00272B]">Espace Client</p>
-                      <p className="text-xs text-[#00272B]/40">Suivi commandes & devis</p>
+                      <p className="text-sm font-semibold text-[#00272B]">{t('nav.clientArea')}</p>
+                      <p className="text-xs text-[#00272B]/40">{t('nav.clientAreaHint')}</p>
                     </div>
                   </Link>
                   <Link
@@ -107,8 +112,8 @@ export default function Navbar() {
                       <i className="ri-shield-user-line text-[#00272B]/60 text-sm"></i>
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-[#00272B]">Administration</p>
-                      <p className="text-xs text-[#00272B]/40">Accès backoffice</p>
+                      <p className="text-sm font-semibold text-[#00272B]">{t('nav.administration')}</p>
+                      <p className="text-xs text-[#00272B]/40">{t('nav.administrationHint')}</p>
                     </div>
                   </Link>
                 </div>
@@ -127,7 +132,7 @@ export default function Navbar() {
 
             {/* CTA */}
             <Link to="/produits" className="hidden md:block px-5 py-2 bg-[#0D8C2E] text-white text-sm font-semibold rounded-lg hover:bg-[#0a7025] transition-colors whitespace-nowrap">
-              Boutique
+              {t('nav.shop')}
             </Link>
 
             {/* Mobile hamburger */}
@@ -152,15 +157,15 @@ export default function Navbar() {
             <div className="px-2 pt-2 flex flex-col gap-2">
               <Link to="/espace-client/connexion" onClick={() => setIsMobileMenuOpen(false)}
                 className="flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-[#0D8C2E] border border-[#0D8C2E]/30 rounded-lg hover:bg-[#0D8C2E]/5">
-                <i className="ri-user-line"></i>Espace Client
+                <i className="ri-user-line"></i>{t('nav.clientArea')}
               </Link>
               <Link to="/connexion" onClick={() => setIsMobileMenuOpen(false)}
                 className="flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-[#00272B] border border-gray-200 rounded-lg hover:border-[#0D8C2E] hover:text-[#0D8C2E]">
-                <i className="ri-shield-user-line"></i>Administration
+                <i className="ri-shield-user-line"></i>{t('nav.administration')}
               </Link>
               <Link to="/produits" onClick={() => setIsMobileMenuOpen(false)}
                 className="block text-center py-2.5 bg-[#0D8C2E] text-white text-sm font-semibold rounded-lg hover:bg-[#0a7025]">
-                Boutique
+                {t('nav.shop')}
               </Link>
             </div>
           </div>

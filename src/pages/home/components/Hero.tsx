@@ -1,6 +1,9 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 export default function Hero() {
+  const { t } = useTranslation();
+
   return (
     <section className="relative h-screen min-h-[600px] flex items-center justify-center overflow-hidden">
       <div className="absolute inset-0">
@@ -18,19 +21,19 @@ export default function Hero() {
       </div>
       <div className="relative z-10 text-center px-4 sm:px-6 w-full max-w-5xl mx-auto">
         <h1 className="text-3xl sm:text-5xl md:text-7xl font-bold text-white leading-tight mb-6 sm:mb-8" style={{ textShadow: '0 2px 20px rgba(0,0,0,0.3)' }}>
-          Mettre la Technologie<br className="hidden sm:block" />
-          au Service d'une Alimentation<br className="hidden sm:block" />
-          Saine et Accessible
+          {t('home.hero.titleLine1')}<br className="hidden sm:block" />
+          {' '}{t('home.hero.titleLine2')}<br className="hidden sm:block" />
+          {' '}{t('home.hero.titleLine3')}
         </h1>
         <p className="text-base sm:text-lg md:text-xl text-white/90 mb-8 sm:mb-12 max-w-3xl mx-auto leading-relaxed">
-          Découvrez comment nos distributeurs automatiques intelligents révolutionnent l'accès à une alimentation saine
+          {t('home.hero.subtitle')}
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
           <Link to="/machines" className="w-full sm:w-auto px-8 sm:px-10 py-4 bg-[#0D8C2E] text-white text-base font-semibold rounded-lg hover:bg-[#0a7025] transition-all hover:scale-105 whitespace-nowrap">
-            Découvrir nos Machines
+            {t('home.hero.ctaMachines')}
           </Link>
           <Link to="/produits" className="w-full sm:w-auto px-8 sm:px-10 py-4 bg-transparent border-2 border-white text-white text-base font-semibold rounded-lg hover:bg-white hover:text-[#00272B] transition-all whitespace-nowrap">
-            Catalogue Produits
+            {t('home.hero.ctaProducts')}
           </Link>
         </div>
         <div className="absolute bottom-8 sm:bottom-12 left-1/2 transform -translate-x-1/2 animate-bounce">

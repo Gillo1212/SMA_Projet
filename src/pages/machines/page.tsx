@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import Navbar from '../home/components/Navbar';
 import Footer from '../home/components/Footer';
@@ -7,6 +8,7 @@ import { machineTypes, paymentMethods, capacityFilters } from '../../mocks/machi
 import { useMachines } from '../../hooks/useMachines';
 
 export default function MachinesPage() {
+  const { t } = useTranslation();
   const [selectedType, setSelectedType] = useState('all');
   const [selectedPayment, setSelectedPayment] = useState('all');
   const [selectedCapacity, setSelectedCapacity] = useState('all');
@@ -60,19 +62,19 @@ export default function MachinesPage() {
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-6">
             {/* Search */}
             <div className="flex-1">
-              <label className="block text-xs sm:text-sm font-semibold text-[#00272B] mb-1 sm:mb-2">Recherche</label>
+              <label className="block text-xs sm:text-sm font-semibold text-[#00272B] mb-1 sm:mb-2">{t('machines.search')}</label>
               <input
                 type="text"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                placeholder="Nom, modèle..."
+                placeholder={t('machines.searchPlaceholder')}
                 className="w-full h-10 sm:h-12 bg-[#EEFFF2] border border-gray-200 rounded-lg px-3 sm:px-4 text-sm text-[#00272B] focus:outline-none focus:border-[#1AAA3F] transition-colors"
               />
             </div>
 
             {/* Type Filter */}
             <div className="flex-1">
-              <label className="block text-xs sm:text-sm font-semibold text-[#00272B] mb-1 sm:mb-2">Type de machine</label>
+              <label className="block text-xs sm:text-sm font-semibold text-[#00272B] mb-1 sm:mb-2">{t('machines.machineType')}</label>
               <select
                 value={selectedType}
                 onChange={(e) => setSelectedType(e.target.value)}
@@ -86,7 +88,7 @@ export default function MachinesPage() {
 
             {/* Payment Filter */}
             <div className="flex-1">
-              <label className="block text-xs sm:text-sm font-semibold text-[#00272B] mb-1 sm:mb-2">Mode de paiement</label>
+              <label className="block text-xs sm:text-sm font-semibold text-[#00272B] mb-1 sm:mb-2">{t('machines.paymentMode')}</label>
               <select
                 value={selectedPayment}
                 onChange={(e) => setSelectedPayment(e.target.value)}
@@ -100,7 +102,7 @@ export default function MachinesPage() {
 
             {/* Capacity Filter */}
             <div className="flex-1">
-              <label className="block text-xs sm:text-sm font-semibold text-[#00272B] mb-1 sm:mb-2">Capacité</label>
+              <label className="block text-xs sm:text-sm font-semibold text-[#00272B] mb-1 sm:mb-2">{t('machines.capacity')}</label>
               <select
                 value={selectedCapacity}
                 onChange={(e) => setSelectedCapacity(e.target.value)}
@@ -142,7 +144,7 @@ export default function MachinesPage() {
             <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
               <i className="ri-error-warning-line text-4xl text-red-400"></i>
             </div>
-            <h3 className="text-2xl font-bold text-[#00272B] mb-3">Erreur de chargement</h3>
+            <h3 className="text-2xl font-bold text-[#00272B] mb-3">{t('machines.loadError')}</h3>
             <p className="text-[#00272B]/60 mb-2">{error}</p>
           </div>
         )}
@@ -235,8 +237,8 @@ export default function MachinesPage() {
                 <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
                   <i className="ri-search-line text-4xl text-gray-400"></i>
                 </div>
-                <h3 className="text-2xl font-bold text-[#00272B] mb-3">Aucune machine trouvée</h3>
-                <p className="text-[#00272B]/60 mb-8">Essayez de modifier vos critères de recherche</p>
+                <h3 className="text-2xl font-bold text-[#00272B] mb-3">{t('machines.empty')}</h3>
+                <p className="text-[#00272B]/60 mb-8">{t('machines.emptyHint')}</p>
                 <button
                   onClick={() => { setSelectedType('all'); setSelectedPayment('all'); setSelectedCapacity('all'); setSearch(''); }}
                   className="px-6 py-3 bg-[#1AAA3F] text-white text-sm font-semibold rounded-lg hover:bg-[#158f35] transition-colors cursor-pointer whitespace-nowrap"

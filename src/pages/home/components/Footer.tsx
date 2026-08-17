@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 
 export default function Footer() {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -19,21 +21,21 @@ export default function Footer() {
               alt="SMALIM Corporate"
               className="h-14 sm:h-20 w-auto mb-5 object-contain"
             />
-            <h3 className="text-2xl sm:text-3xl font-bold text-white mb-6 sm:mb-10">Restez Informé</h3>
+            <h3 className="text-2xl sm:text-3xl font-bold text-white mb-6 sm:mb-10">{t('footer.stayInformed')}</h3>
           </div>
           <div className="lg:col-span-2">
-            <h4 className="text-base font-semibold text-white mb-4 sm:mb-6">Navigation</h4>
+            <h4 className="text-base font-semibold text-white mb-4 sm:mb-6">{t('footer.navigation')}</h4>
             <div className="space-y-3 sm:space-y-4">
-              <Link to="/" className="block text-sm text-[#A0A0A0] hover:text-white transition-colors">Accueil</Link>
-              <Link to="/machines" className="block text-sm text-[#A0A0A0] hover:text-white transition-colors">Machines</Link>
-              <Link to="/produits" className="block text-sm text-[#A0A0A0] hover:text-white transition-colors">Produits</Link>
-              <Link to="/a-propos" className="block text-sm text-[#A0A0A0] hover:text-white transition-colors">À Propos</Link>
-              <Link to="/blog" className="block text-sm text-[#A0A0A0] hover:text-white transition-colors">Blog</Link>
-              <Link to="/contact" className="block text-sm text-[#A0A0A0] hover:text-white transition-colors">Contact</Link>
+              <Link to="/" className="block text-sm text-[#A0A0A0] hover:text-white transition-colors">{t('nav.home')}</Link>
+              <Link to="/machines" className="block text-sm text-[#A0A0A0] hover:text-white transition-colors">{t('nav.machines')}</Link>
+              <Link to="/produits" className="block text-sm text-[#A0A0A0] hover:text-white transition-colors">{t('nav.products')}</Link>
+              <Link to="/a-propos" className="block text-sm text-[#A0A0A0] hover:text-white transition-colors">{t('nav.about')}</Link>
+              <Link to="/blog" className="block text-sm text-[#A0A0A0] hover:text-white transition-colors">{t('nav.blog')}</Link>
+              <Link to="/contact" className="block text-sm text-[#A0A0A0] hover:text-white transition-colors">{t('nav.contact')}</Link>
             </div>
           </div>
           <div className="lg:col-span-2">
-            <h4 className="text-base font-semibold text-white mb-4 sm:mb-6">Suivez-nous</h4>
+            <h4 className="text-base font-semibold text-white mb-4 sm:mb-6">{t('footer.followUs')}</h4>
             <div className="space-y-3 sm:space-y-4">
               <a href="https://www.instagram.com/senmartalim?igsh=MXFlMHBjbGNvNmI2cQ%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer" className="flex items-center text-sm text-[#A0A0A0] hover:text-white transition-colors">
                 <i className="ri-instagram-line text-xl mr-3"></i>Instagram
@@ -47,14 +49,14 @@ export default function Footer() {
             </div>
           </div>
           <div className="sm:col-span-2 lg:col-span-3">
-            <p className="text-sm text-white mb-2">Recevez nos dernières actualités</p>
+            <p className="text-sm text-white mb-2">{t('footer.newsletterHint')}</p>
             <p className="text-sm text-[#A0A0A0] mb-5">et offres exclusives par email</p>
             <form onSubmit={handleSubmit} className="relative">
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Votre adresse email"
+                placeholder={t('footer.emailPlaceholder')}
                 className="w-full h-14 bg-[#1A1A1A] border border-[#333333] rounded-xl px-5 pr-16 text-white placeholder-[#666666] text-sm focus:outline-none focus:border-[#0D8C2E] transition-colors"
                 required
               />
@@ -68,7 +70,7 @@ export default function Footer() {
           SMALIM
         </div>
         <div className="relative z-10 text-center pt-6 border-t border-[#1A1A1A]">
-          <p className="text-xs text-[#666666]">© 2024 SMALIM Corporate. Tous droits réservés.</p>
+          <p className="text-xs text-[#666666]">© 2024 SMALIM Corporate. {t('footer.rights')}</p>
         </div>
       </div>
     </footer>
