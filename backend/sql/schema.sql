@@ -327,6 +327,33 @@ CREATE TABLE IF NOT EXISTS auth_tokens (
 ) ENGINE=InnoDB;
 
 -- ────────────────────────────────────────────────────────────
+-- TRANSACTIONS DE PAIEMENT
+-- Une ligne par tentative de paiement. Le montant est recopié pour
+-- pouvoir vérifier que le prestataire confirme bien la somme attendue.
+-- ────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS payment_transactions (
+  id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  order_id        INT UNSIGNED NOT NULL,
+  provider        ENUM('wave','orange_money','bank_transfer','cash','card') NOT NULL,
+  status          ENUM('pending','processing','succeeded','failed','cancelled','expired') NOT NULL DEFAULT 'pending',
+  amount          DECIMAL(15,2) NOT NULL,
+  currency        VARCHAR(10) NOT NULL DEFAULT 'XOF',
+  /** Référence interne transmise au prestataire (idempotence) */
+  reference       VARCHAR(100) NOT NULL,
+  /** Identifiant de session/transaction renvoyé par le prestataire */
+  provider_ref    VARCHAR(255) NULL,
+  checkout_url    TEXT NULL,
+  /** Charge utile brute du dernier événement reçu, pour audit */
+  raw_payload     JSON NULL,
+  failure_reason  TEXT NULL,
+  paid_at         DATETIME NULL,
+  created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY uq_payment_reference (reference),
+  FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ────────────────────────────────────────────────────────────
 -- INDEX POUR PERFORMANCES
 -- ────────────────────────────────────────────────────────────
 CREATE INDEX idx_orders_client ON orders(client_id);

@@ -19,6 +19,7 @@ const clientsRoutes = require('./routes/clients');
 const blogRoutes = require('./routes/blog');
 const dashboardRoutes = require('./routes/dashboard');
 const uploadRoutes = require('./routes/upload');
+const paymentsRoutes = require('./routes/payments');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -53,7 +54,12 @@ app.use('/api/', limiter);
 app.use('/api/auth/', authLimiter);
 
 // Body parsers
-app.use(express.json({ limit: '10mb' }));
+// `verify` conserve les octets reçus : la signature des webhooks de paiement
+// se calcule sur le corps brut, pas sur le JSON re-sérialisé.
+app.use(express.json({
+  limit: '10mb',
+  verify: (req, _res, buf) => { req.rawBody = buf; },
+}));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Fichiers statiques (uploads)
@@ -71,6 +77,7 @@ app.use('/api/clients', clientsRoutes);
 app.use('/api/blog', blogRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/payments', paymentsRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

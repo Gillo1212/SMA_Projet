@@ -132,6 +132,39 @@ res.status(400).json({ error: "Message explicite" });
 res.status(500).json({ error: "Erreur interne du serveur" });
 ```
 
+## Paiements
+
+### Flux
+
+1. `POST /api/orders` crée la commande. **Le serveur calcule le sous-total, la TVA (18 %) et les frais de port** à partir des prix en base et du `delivery_mode` : les montants envoyés par le client sont ignorés.
+2. `POST /api/payments/initiate { order_id }` ouvre une session chez le prestataire et renvoie l'`checkout_url` de redirection.
+3. Le prestataire notifie `POST /api/payments/webhook/:provider` — c'est cette notification qui fait foi, pas le retour navigateur.
+4. Le frontend interroge `GET /api/payments/status/:reference` le temps que le webhook arrive.
+
+### Prestataires (`services/payment/`)
+
+| Fichier | Rôle |
+|---------|------|
+| `wave.provider.js` | Wave Checkout, signature webhook HMAC-SHA256 |
+| `orangeMoney.provider.js` | Orange Money WebPay (OAuth + `notif_token`) |
+| `simulator.provider.js` | Repli développement — refusé si `NODE_ENV=production` |
+| `index.js` | Choix du prestataire et repli automatique |
+
+Sans clés configurées, `getProvider()` retombe sur le simulateur : le tunnel reste parcourable en développement, via la page frontend `/paiement/simulation`.
+
+### Garanties
+
+- **Idempotence** : un webhook rejoué n'applique rien une seconde fois.
+- **Contrôle de montant** : si le prestataire annonce une somme différente de celle attendue, la transaction est marquée `failed` et la commande reste impayée.
+- **Cloisonnement** : un client ne peut ni payer ni consulter la commande d'un autre.
+- **Corps brut** : `express.json({ verify })` conserve les octets reçus, indispensable pour valider la signature Wave.
+
+### Variables d'environnement
+
+Voir `.env.example`, section Paiement : `BACKEND_URL`, `WAVE_API_KEY`, `WAVE_WEBHOOK_SECRET`, `ORANGE_MONEY_CLIENT_ID` / `_SECRET` / `_MERCHANT_KEY`.
+
+> Les URL et formats de payload des deux prestataires proviennent de leur documentation publique. **À confirmer avec la documentation de votre contrat marchand** avant la mise en production : ces intégrations n'ont pas été testées contre les API réelles.
+
 ## Uploads de fichiers
 
 - Middleware : `multer`

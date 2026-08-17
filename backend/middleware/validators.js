@@ -80,6 +80,20 @@ const resendVerificationRules = [
   body('email').isEmail().withMessage('Email invalide').normalizeEmail(),
 ];
 
+// ── Paiements ─────────────────────────────────────────────────
+
+const paymentInitiateRules = [
+  body('order_id').isInt({ min: 1 }).withMessage('ID de commande invalide'),
+];
+
+const paymentSimulateRules = [
+  body('reference').trim().notEmpty().withMessage('Référence requise'),
+  body('status')
+    .optional()
+    .isIn(['succeeded', 'failed', 'cancelled', 'expired'])
+    .withMessage('Statut de simulation invalide'),
+];
+
 // ── Machines ──────────────────────────────────────────────────
 
 const machineCreateRules = [
@@ -136,8 +150,12 @@ const orderCreateRules = [
     .isIn(['wave', 'orange_money', 'bank_transfer', 'cash', 'card'])
     .withMessage('Mode de paiement invalide'),
   body('shipping_address').notEmpty().withMessage('Adresse de livraison requise'),
-  body('shipping_amount').optional().isFloat({ min: 0 }).withMessage('Frais de livraison invalides'),
-  body('tax_amount').optional().isFloat({ min: 0 }).withMessage('Montant TVA invalide'),
+  // La TVA et les frais de port sont calculés par le serveur : le client
+  // indique seulement le mode de livraison souhaité.
+  body('delivery_mode')
+    .optional()
+    .isIn(['pickup', 'standard', 'express'])
+    .withMessage('Mode de livraison invalide'),
   body('promo_code').optional().trim(),
 ];
 
@@ -241,6 +259,9 @@ module.exports = {
   resetPasswordRules,
   verifyEmailRules,
   resendVerificationRules,
+  // Paiements
+  paymentInitiateRules,
+  paymentSimulateRules,
   // Machines
   machineCreateRules,
   machineUpdateRules,

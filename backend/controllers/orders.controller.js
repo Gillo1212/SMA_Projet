@@ -8,6 +8,24 @@ const generateOrderNumber = () => {
   return `CMD-${year}-${rand}`;
 };
 
+/** Taux de TVA appliqué aux commandes (18 % au Sénégal) */
+const TAX_RATE = Number(process.env.TAX_RATE ?? 0.18);
+
+/**
+ * Grille de frais de livraison, en FCFA.
+ * Calculée côté serveur : un client ne doit pas pouvoir choisir le montant
+ * qu'il paie en livraison, ni annuler la TVA en postant ses propres totaux.
+ */
+const DELIVERY_FEES = {
+  pickup: 0,
+  standard: 2500,
+  express: 5000,
+};
+
+function resolveDeliveryFee(mode) {
+  return DELIVERY_FEES[mode] ?? DELIVERY_FEES.standard;
+}
+
 exports.getAll = async (req, res, next) => {
   try {
     const { page = 1, limit = 20, status, client_id, search, date_from, date_to } = req.query;
@@ -64,7 +82,7 @@ exports.getById = async (req, res, next) => {
 
 exports.create = async (req, res, next) => {
   try {
-    const { items, shipping_address, payment_method, promo_code, notes } = req.body;
+    const { items, shipping_address, payment_method, promo_code, notes, delivery_mode } = req.body;
     const clientId = req.user?.type === 'client' ? req.user.id : null;
 
     if (!items?.length) return res.status(400).json({ success: false, message: 'Aucun article dans la commande' });
@@ -90,10 +108,11 @@ exports.create = async (req, res, next) => {
       resolvedItems.push({ ...item, realPrice: dbItem.price, dbName: dbItem.name });
     }
 
-    // ── 2. Calculer le sous-total côté serveur ──
-    const shipping_amount = req.body.shipping_amount || 0;
-    const tax_amount = req.body.tax_amount || 0;
+    // ── 2. Totaux calculés côté serveur ──
+    // Ni la TVA ni les frais de port ne sont repris du corps de requête :
+    // sinon un client pourrait poster tax_amount = 0 et payer moins.
     const subtotal = resolvedItems.reduce((sum, i) => sum + i.realPrice * i.quantity, 0);
+    const shipping_amount = resolveDeliveryFee(delivery_mode);
 
     // ── 3. Tout dans une transaction atomique ──
     const result = await transaction(async (conn) => {
@@ -119,14 +138,17 @@ exports.create = async (req, res, next) => {
         }
       }
 
-      const total_amount = subtotal + tax_amount + shipping_amount - discount;
+      // La TVA porte sur le montant réellement dû, remise déduite
+      const tax_amount = Math.round((subtotal - discount) * TAX_RATE);
+      const total_amount = subtotal - discount + shipping_amount + tax_amount;
       const orderNumber = generateOrderNumber();
 
       // ── 3b. Créer la commande ──
       const [orderResult] = await conn.execute(
         `INSERT INTO orders (order_number, client_id, subtotal, tax_amount, shipping_amount, discount_amount, total_amount, payment_method, promo_code, shipping_address, notes)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [orderNumber, clientId, subtotal, tax_amount, shipping_amount, discount, total_amount, payment_method, promo_code || null, JSON.stringify(shipping_address), notes]
+        // mysql2 refuse `undefined` : tout champ optionnel doit être explicitement null
+        [orderNumber, clientId, subtotal, tax_amount, shipping_amount, discount, total_amount, payment_method, promo_code || null, JSON.stringify(shipping_address), notes ?? null]
       );
       const orderId = orderResult.insertId;
 
@@ -134,7 +156,7 @@ exports.create = async (req, res, next) => {
       for (const item of resolvedItems) {
         await conn.execute(
           'INSERT INTO order_items (order_id, item_type, item_id, item_name, item_reference, quantity, unit_price, total_price) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-          [orderId, item.type, item.id, item.dbName, item.reference, item.quantity, item.realPrice, item.quantity * item.realPrice]
+          [orderId, item.type, item.id, item.dbName, item.reference ?? null, item.quantity, item.realPrice, item.quantity * item.realPrice]
         );
 
         const table = item.type === 'machine' ? 'machines' : 'products';
