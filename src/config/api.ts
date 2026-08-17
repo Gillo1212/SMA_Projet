@@ -114,6 +114,16 @@ export const ENDPOINTS = {
     UPDATE: '/settings',
     ADMINS: '/settings/admins',
   },
+
+  // ── Paiements ─────────────────────────────────────────────
+  // Backend : POST /api/payments/initiate → URL de redirection prestataire
+  PAYMENTS: {
+    INITIATE: '/payments/initiate',
+    STATUS:   (reference: string) => `/payments/status/${reference}`,
+    CONFIG:   '/payments/config',
+    /** Développement uniquement : rejoue l'issue d'un paiement */
+    SIMULATE: '/payments/simulate',
+  },
 } as const;
 
 /** Clé localStorage pour le token JWT admin */

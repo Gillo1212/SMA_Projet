@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import Navbar from '../home/components/Navbar';
 import Footer from '../home/components/Footer';
 import { useCart } from '../../contexts/CartContext';
+import { ordersService } from '../../services/orders.service';
+import { paymentsService } from '../../services/payments.service';
 
 interface ShippingAddress {
   firstName: string;
@@ -26,7 +28,7 @@ type PaymentMethod = 'wave' | 'orange_money';
 
 export default function CheckoutPage() {
   const navigate = useNavigate();
-  const { items, getSubtotal, getDiscount } = useCart();
+  const { items, getSubtotal, getDiscount, clearCart } = useCart();
 
   const [currentStep, setCurrentStep] = useState(1);
   
@@ -51,6 +53,8 @@ export default function CheckoutPage() {
 
   const [deliveryMode, setDeliveryMode] = useState<DeliveryMode>('standard');
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('wave');
+  const [placingOrder, setPlacingOrder] = useState(false);
+  const [orderError, setOrderError] = useState<string | null>(null);
 
   const TVA_RATE = 0.18;
 
@@ -89,22 +93,50 @@ export default function CheckoutPage() {
     setCurrentStep(4);
   };
 
-  const handleFinalizeOrder = () => {
-    const orderNumber = `SMA-${Date.now().toString().slice(-8)}`;
-    
-    navigate('/commande/confirmation', {
-      state: {
-        orderNumber,
-        items,
-        shippingAddress,
-        deliveryMode,
-        paymentMethod,
-        subtotal,
-        shippingCost,
-        tva,
-        total,
-      },
-    });
+  /**
+   * Crée la commande côté serveur puis ouvre la session de paiement.
+   * Les montants affichés ici sont indicatifs : le backend recalcule le total
+   * à partir des prix en base, et c'est ce total-là qui est payé.
+   */
+  const handleFinalizeOrder = async () => {
+    setOrderError(null);
+    setPlacingOrder(true);
+
+    try {
+      const order = await ordersService.create({
+        items: items.map(item => ({
+          id: item.product.id,
+          type: 'product' as const,
+          quantity: item.quantity,
+        })),
+        paiement: paymentMethod === 'wave' ? 'Wave' : 'Orange Money',
+        adresseLivraison: {
+          first_name: shippingAddress.firstName,
+          last_name: shippingAddress.lastName,
+          email: shippingAddress.email,
+          phone: shippingAddress.phone,
+          address: shippingAddress.address,
+          city: shippingAddress.city,
+          postal_code: shippingAddress.postalCode,
+          country: shippingAddress.country,
+        },
+        modeLivraison: deliveryMode,
+      });
+
+      const session = await paymentsService.initiate(order.id);
+
+      // Le panier est vidé avant la redirection : au retour, la commande
+      // existe déjà en base et le panier n'a plus de raison d'être.
+      clearCart();
+      window.location.href = session.checkoutUrl;
+    } catch (err) {
+      setOrderError(
+        err instanceof Error
+          ? err.message
+          : "La commande n'a pas pu être enregistrée. Réessayez.",
+      );
+      setPlacingOrder(false);
+    }
   };
 
   if (items.length === 0) {
@@ -529,19 +561,28 @@ export default function CheckoutPage() {
                     </p>
                   </div>
 
+                  {orderError && (
+                    <div className="p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3">
+                      <i className="ri-error-warning-line text-red-500 text-lg mt-0.5"></i>
+                      <p className="text-sm text-red-600">{orderError}</p>
+                    </div>
+                  )}
+
                   <div className="flex space-x-4">
                     <button
                       onClick={() => setCurrentStep(3)}
-                      className="flex-1 h-14 border-2 border-gray-300 text-[#00272B] text-base font-semibold rounded-xl hover:bg-gray-50 transition-colors cursor-pointer whitespace-nowrap"
+                      disabled={placingOrder}
+                      className="flex-1 h-14 border-2 border-gray-300 text-[#00272B] text-base font-semibold rounded-xl hover:bg-gray-50 disabled:opacity-60 transition-colors cursor-pointer whitespace-nowrap"
                     >
                       Retour
                     </button>
                     <button
                       onClick={handleFinalizeOrder}
-                      className="flex-1 h-14 bg-[#1AAA3F] text-white text-base font-semibold rounded-xl hover:bg-[#158f35] transition-colors cursor-pointer flex items-center justify-center space-x-2 whitespace-nowrap"
+                      disabled={placingOrder}
+                      className="flex-1 h-14 bg-[#1AAA3F] text-white text-base font-semibold rounded-xl hover:bg-[#158f35] disabled:opacity-60 transition-colors cursor-pointer flex items-center justify-center space-x-2 whitespace-nowrap"
                     >
-                      <i className="ri-checkbox-circle-line text-xl"></i>
-                      <span>Confirmer et payer</span>
+                      <i className={placingOrder ? 'ri-loader-4-line animate-spin text-xl' : 'ri-checkbox-circle-line text-xl'}></i>
+                      <span>{placingOrder ? 'Redirection vers le paiement…' : 'Confirmer et payer'}</span>
                     </button>
                   </div>
                 </div>

@@ -15,6 +15,8 @@ const ProductDetailPage = lazy(() => import('../pages/produits/detail/page'));
 const PanierPage = lazy(() => import('../pages/panier/page'));
 const CheckoutPage = lazy(() => import('../pages/checkout/page'));
 const ConfirmationPage = lazy(() => import('../pages/commande/confirmation/page'));
+const PaiementRetourPage = lazy(() => import('../pages/paiement/retour/page'));
+const PaiementSimulationPage = lazy(() => import('../pages/paiement/simulation/page'));
 const NotFound = lazy(() => import('../pages/NotFound'));
 
 const ConnexionPage = lazy(() => import('../pages/connexion/page'));
@@ -100,6 +102,17 @@ const routes: RouteObject[] = [
   {
     path: '/commande/confirmation',
     element: <ConfirmationPage />,
+  },
+  {
+    // Retour depuis le prestataire de paiement
+    path: '/paiement/retour',
+    element: <PaiementRetourPage />,
+  },
+  {
+    // Remplace la page du prestataire quand aucun compte marchand n'est
+    // configuré ; le backend refuse la validation en production.
+    path: '/paiement/simulation',
+    element: <PaiementSimulationPage />,
   },
   {
     path: '/connexion',

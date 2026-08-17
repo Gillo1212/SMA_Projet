@@ -161,7 +161,11 @@ export const ordersService = {
     adresseLivraison: Record<string, unknown> | string;
     promoCode?: string;
     note?: string;
-    fraisLivraison?: number;
+    /**
+     * Mode de livraison. Les frais et la TVA sont calculés par le backend :
+     * les envoyer depuis le client permettrait d'en réduire le montant.
+     */
+    modeLivraison?: 'pickup' | 'standard' | 'express';
   }): Promise<Order> {
     if (USE_MOCK) {
       await delay(MOCK_DELAY);
@@ -188,7 +192,7 @@ export const ordersService = {
       shipping_address: data.adresseLivraison,
       promo_code: data.promoCode,
       notes: data.note,
-      shipping_amount: data.fraisLivraison ?? 0,
+      delivery_mode: data.modeLivraison ?? 'standard',
     });
     return normalizeOrder(raw);
   },
