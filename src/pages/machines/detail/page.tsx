@@ -2,12 +2,27 @@ import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Navbar from '../../home/components/Navbar';
 import Footer from '../../home/components/Footer';
-import { machines } from '../../../mocks/machines';
+import { useMachine, useMachines } from '../../../hooks/useMachines';
+import { LoadingState } from '../../../components/feature/AsyncState';
 
 export default function MachineDetailPage() {
   const { slug } = useParams();
-  const machine = machines.find(m => m.slug === slug);
+  const { machine, isLoading } = useMachine(slug ?? '');
+  // Sert à proposer des modèles du même type en bas de page
+  const { machines } = useMachines();
   const [selectedImage, setSelectedImage] = useState(0);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#EEFFF2]">
+        <Navbar />
+        <div className="pt-32 pb-20">
+          <LoadingState label="Chargement de la machine…" />
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   if (!machine) {
     return (

@@ -371,6 +371,11 @@ export interface ListParams {
 export interface MachineListParams extends ListParams {
   type?: string;
   stock?: string;
+  /** Slug de catégorie — filtre appliqué côté backend */
+  category?: string;
+  /** Ne remonter que les machines mises en avant (is_featured) */
+  featured?: boolean;
+  active?: boolean;
 }
 
 export interface ProductListParams extends ListParams {

@@ -7,7 +7,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { blogService } from '../services/blog.service';
-import type { BlogPost, BlogCategory, ListParams } from '../types/models';
+import type { BlogPost, BlogCategory, BlogListParams } from '../types/models';
 
 // ── Liste ──────────────────────────────────────────────────────────────────
 
@@ -22,7 +22,7 @@ interface UseBlogPostsReturn {
 }
 
 export function useBlogPosts(
-  params?: ListParams & { category?: BlogCategory | 'all' },
+  params?: BlogListParams & { category?: BlogCategory | 'all' },
 ): UseBlogPostsReturn {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [isLoading, setIsLoading] = useState(true);

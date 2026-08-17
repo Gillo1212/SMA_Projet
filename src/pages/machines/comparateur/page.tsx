@@ -2,9 +2,12 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '../../home/components/Navbar';
 import Footer from '../../home/components/Footer';
-import { machines } from '../../../mocks/machines';
+import { useMachines } from '../../../hooks/useMachines';
+import { LoadingState, ErrorState } from '../../../components/feature/AsyncState';
+import type { Machine } from '../../../types/models';
 
 export default function ComparateurPage() {
+  const { machines, isLoading, error, refetch } = useMachines();
   const [selectedMachines, setSelectedMachines] = useState<string[]>([]);
   const [showSelector, setShowSelector] = useState(false);
 
@@ -22,20 +25,20 @@ export default function ComparateurPage() {
   const availableMachines = machines.filter(m => !selectedMachines.includes(m.id));
 
   const comparisonCriteria = [
-    { key: 'price', label: 'Prix', format: (m: typeof machines[0]) => m.priceDisplay },
-    { key: 'type', label: 'Type', format: (m: typeof machines[0]) => m.category },
-    { key: 'capacity', label: 'Capacité totale', format: (m: typeof machines[0]) => {
+    { key: 'price', label: 'Prix', format: (m: Machine) => m.priceDisplay },
+    { key: 'type', label: 'Type', format: (m: Machine) => m.category },
+    { key: 'capacity', label: 'Capacité totale', format: (m: Machine) => {
       const cap = m.capacity;
       if ('cups' in cap) return `${cap.cups} gobelets`;
       if ('totalProducts' in cap) return cap.totalProducts;
       if ('total' in cap) return cap.total;
       return 'N/A';
     }},
-    { key: 'dimensions', label: 'Dimensions', format: (m: typeof machines[0]) => m.specifications.dimensions },
-    { key: 'power', label: 'Puissance', format: (m: typeof machines[0]) => m.specifications.power },
-    { key: 'drinksPerMinute', label: 'Débit', format: (m: typeof machines[0]) => m.specifications.drinksPerMinute || 'N/A' },
-    { key: 'weight', label: 'Poids', format: (m: typeof machines[0]) => m.specifications.weight },
-    { key: 'payment', label: 'Paiements', format: (m: typeof machines[0]) => (
+    { key: 'dimensions', label: 'Dimensions', format: (m: Machine) => m.specifications.dimensions },
+    { key: 'power', label: 'Puissance', format: (m: Machine) => m.specifications.power },
+    { key: 'drinksPerMinute', label: 'Débit', format: (m: Machine) => m.specifications.drinksPerMinute || 'N/A' },
+    { key: 'weight', label: 'Poids', format: (m: Machine) => m.specifications.weight },
+    { key: 'payment', label: 'Paiements', format: (m: Machine) => (
       <div className="flex flex-wrap gap-2 justify-center">
         {m.paymentMethods.includes('wave') && <span className="px-2 py-1 bg-[#EEFFF2] rounded text-xs">Wave</span>}
         {m.paymentMethods.includes('orange') && <span className="px-2 py-1 bg-[#EEFFF2] rounded text-xs">Orange</span>}
@@ -43,19 +46,33 @@ export default function ComparateurPage() {
         {m.paymentMethods.includes('especes') && <span className="px-2 py-1 bg-[#EEFFF2] rounded text-xs">Espèces</span>}
       </div>
     )},
-    { key: 'maintenance', label: 'Maintenance incluse', format: (m: typeof machines[0]) => (
+    { key: 'maintenance', label: 'Maintenance incluse', format: (m: Machine) => (
       m.maintenanceIncluded ? 
       <i className="ri-check-line text-2xl text-[#1AAA3F]"></i> : 
       <i className="ri-close-line text-2xl text-red-500"></i>
     )},
-    { key: 'delivery', label: 'Délai de livraison', format: (m: typeof machines[0]) => m.deliveryTime },
-    { key: 'stock', label: 'Disponibilité', format: (m: typeof machines[0]) => m.stock }
+    { key: 'delivery', label: 'Délai de livraison', format: (m: Machine) => m.deliveryTime },
+    { key: 'stock', label: 'Disponibilité', format: (m: Machine) => m.stock }
   ];
+
+  if (isLoading || error) {
+    return (
+      <div className="min-h-screen bg-[#EEFFF2]">
+        <Navbar />
+        <div className="pt-32 pb-20">
+          {isLoading
+            ? <LoadingState label="Chargement des machines…" />
+            : <ErrorState message={error!} onRetry={refetch} />}
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#EEFFF2]">
       <Navbar />
-      
+
       <div className="pt-32 pb-20">
         <div className="max-w-7xl mx-auto px-6 lg:px-20">
           {/* Header */}

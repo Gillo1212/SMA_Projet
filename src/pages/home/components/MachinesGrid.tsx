@@ -1,8 +1,14 @@
 import { Link } from 'react-router-dom';
-import { machines } from '../../../mocks/machines';
+import { useMachines } from '../../../hooks/useMachines';
 
 export default function MachinesGrid() {
+  // Les machines mises en avant sont marquées is_featured côté backend
+  const { machines, isLoading } = useMachines({ featured: true, limit: 4 });
   const featured = machines.slice(0, 4);
+
+  // La section est masquée tant qu'il n'y a rien à montrer : c'est une
+  // vitrine, un bloc vide ou un spinner y seraient plus gênants qu'utiles.
+  if (isLoading || featured.length === 0) return null;
 
   return (
     <section className="py-16 sm:py-32 bg-white">

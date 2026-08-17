@@ -2,11 +2,13 @@ import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '../home/components/Navbar';
 import Footer from '../home/components/Footer';
-import { products, Product } from '../../mocks/products';
+import { useProducts } from '../../hooks/useProducts';
+import { LoadingState, ErrorState } from '../../components/feature/AsyncState';
 
 type SortOption = 'price-asc' | 'price-desc' | 'popularity' | 'newest';
 
 export default function ProductsPage() {
+  const { products, isLoading, error, refetch } = useProducts();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
@@ -84,7 +86,7 @@ export default function ProductsPage() {
     });
 
     return filtered;
-  }, [searchQuery, selectedCategory, selectedBrands, selectedFormats, selectedTastes, 
+  }, [products, searchQuery, selectedCategory, selectedBrands, selectedFormats, selectedTastes,
       selectedCompatibility, onlyAvailable, sortBy]);
 
   const toggleFilter = (value: string, currentFilters: string[], setFilters: (filters: string[]) => void) => {
@@ -112,6 +114,21 @@ export default function ProductsPage() {
     selectedTastes.length +
     selectedCompatibility.length +
     (onlyAvailable ? 1 : 0);
+
+  // Navbar et Footer restent affichés : seule la zone catalogue change d'état
+  if (isLoading || error) {
+    return (
+      <div className="min-h-screen bg-white font-['Inter']">
+        <Navbar />
+        <div className="pt-32 pb-20">
+          {isLoading
+            ? <LoadingState label="Chargement du catalogue…" />
+            : <ErrorState message={error!} onRetry={refetch} />}
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white font-['Inter']">

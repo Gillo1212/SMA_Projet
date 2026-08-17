@@ -1,11 +1,26 @@
 import { useParams, Link } from 'react-router-dom';
 import Navbar from '../../home/components/Navbar';
 import Footer from '../../home/components/Footer';
-import { blogArticles, blogCategories } from '../../../mocks/blog';
+import { useBlogPost, useBlogPosts } from '../../../hooks/useBlog';
+import { LoadingState } from '../../../components/feature/AsyncState';
 
 export default function BlogDetailPage() {
   const { slug } = useParams<{ slug: string }>();
-  const article = blogArticles.find(a => a.slug === slug);
+  const { post: article, isLoading } = useBlogPost({ slug });
+  // Alimente le bloc « articles récents » en bas de page
+  const { posts: blogArticles } = useBlogPosts({ status: 'published' });
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-white">
+        <Navbar />
+        <div className="pt-32 pb-20">
+          <LoadingState label="Chargement de l'article…" />
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   if (!article) {
     return (
@@ -43,7 +58,7 @@ export default function BlogDetailPage() {
           
           <div className="mb-6">
             <span className="px-4 py-2 bg-[#1AAA3F] text-white text-sm font-semibold rounded-full">
-              {blogCategories.find(cat => cat.id === article.category)?.name}
+              {article.categoryName ?? article.category}
             </span>
           </div>
           

@@ -2,11 +2,16 @@ import { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import Navbar from '../../home/components/Navbar';
 import Footer from '../../home/components/Footer';
-import { machines } from '../../../mocks/machines';
+import { useMachines } from '../../../hooks/useMachines';
+import { quotesService } from '../../../services/quotes.service';
+import { LoadingState, ErrorState } from '../../../components/feature/AsyncState';
 
 export default function DevisPage() {
   const [searchParams] = useSearchParams();
   const preselectedMachine = searchParams.get('machine');
+  const { machines, isLoading, error, refetch } = useMachines();
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
   
   const [formData, setFormData] = useState({
     nom: '',
@@ -45,36 +50,59 @@ export default function DevisPage() {
     e.preventDefault();
     if (formData.machines.length === 0) return;
 
-    // Prépare les données pour le formulaire
-    const formBody = new URLSearchParams();
-    formBody.append('nom', formData.nom);
-    formBody.append('entreprise', formData.entreprise);
-    formBody.append('email', formData.email);
-    formBody.append('telephone', formData.telephone);
-    formBody.append('machines', selectedMachineObjects.map(m => m.name).join(', '));
-    formBody.append('quantite', formData.quantite);
-    formBody.append('estimation', `${totalEstimated.toLocaleString('fr-FR')} FCFA`);
-    formBody.append('message', formData.message);
-    if (formData.rdv) {
-      formBody.append('rdv', `Oui - ${formData.rdvDate} à ${formData.rdvTime}`);
-    }
+    // La description reprend les éléments que le modèle `quotes` ne porte pas
+    // en colonnes dédiées (liste des modèles, estimation, demande de RDV).
+    const details = [
+      `Machines souhaitées : ${selectedMachineObjects.map(m => m.name).join(', ')}`,
+      `Estimation indicative : ${totalEstimated.toLocaleString('fr-FR')} FCFA`,
+      formData.rdv ? `Rendez-vous souhaité : ${formData.rdvDate} à ${formData.rdvTime}` : null,
+      '',
+      formData.message,
+    ]
+      .filter(l => l !== null)
+      .join('\n');
 
+    setSubmitting(true);
+    setSubmitError(null);
     try {
-      await fetch('https://readdy.ai/api/form/d6u4htn6t0doov8ffnvg', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: formBody.toString(),
+      await quotesService.create({
+        entreprise: formData.entreprise || undefined,
+        contact: formData.nom,
+        email: formData.email,
+        phone: formData.telephone || undefined,
+        machine: selectedMachineObjects.map(m => m.name).join(', '),
+        message: details,
+        quantite: parseInt(formData.quantite, 10) || 1,
+        budget: totalEstimated || undefined,
       });
-    } catch {
-      // Soumis côté client même si erreur réseau
-    }
 
-    setIsSubmitted(true);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+      setIsSubmitted(true);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (err) {
+      setSubmitError(
+        err instanceof Error ? err.message : "L'envoi a échoué. Réessayez dans un instant.",
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const selectedMachineObjects = machines.filter(m => formData.machines.includes(m.slug));
   const totalEstimated = selectedMachineObjects.reduce((sum, m) => sum + (m.price * parseInt(formData.quantite)), 0);
+
+  if (isLoading || error) {
+    return (
+      <div className="min-h-screen bg-[#EEFFF2]">
+        <Navbar />
+        <div className="pt-32 pb-20">
+          {isLoading
+            ? <LoadingState label="Chargement du catalogue…" />
+            : <ErrorState message={error!} onRetry={refetch} />}
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   if (isSubmitted) {
     return (
@@ -390,13 +418,19 @@ export default function DevisPage() {
                 </div>
 
                 {/* Submit */}
+                {submitError && (
+                  <div className="p-4 bg-red-50 border border-red-100 rounded-lg flex items-start gap-2">
+                    <i className="ri-error-warning-line text-red-500 mt-0.5"></i>
+                    <p className="text-sm text-red-600">{submitError}</p>
+                  </div>
+                )}
                 <button
                   type="submit"
-                  disabled={formData.machines.length === 0}
+                  disabled={formData.machines.length === 0 || submitting}
                   className="w-full h-14 bg-[#1AAA3F] text-white text-sm font-semibold rounded-lg hover:bg-[#158f35] transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer whitespace-nowrap"
                 >
-                  <i className="ri-send-plane-fill text-lg"></i>
-                  Envoyer ma demande de devis
+                  <i className={submitting ? 'ri-loader-4-line animate-spin text-lg' : 'ri-send-plane-fill text-lg'}></i>
+                  {submitting ? 'Envoi en cours…' : 'Envoyer ma demande de devis'}
                 </button>
               </form>
             </div>

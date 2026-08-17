@@ -2,18 +2,33 @@ import { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import Navbar from '../../home/components/Navbar';
 import Footer from '../../home/components/Footer';
-import { products } from '../../../mocks/products';
+import { useProduct, useProducts } from '../../../hooks/useProducts';
+import { LoadingState } from '../../../components/feature/AsyncState';
 import { useCart } from '../../../contexts/CartContext';
 
 export default function ProductDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const product = products.find(p => p.id === id);
+  const { product, isLoading } = useProduct(id ?? '');
+  // Sert à résoudre les produits liés référencés par le détail
+  const { products } = useProducts();
   const { addToCart } = useCart();
 
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-white font-['Inter']">
+        <Navbar />
+        <div className="pt-32 pb-20">
+          <LoadingState label="Chargement du produit…" />
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   if (!product) {
     return (

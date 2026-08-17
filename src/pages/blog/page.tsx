@@ -2,14 +2,40 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '../home/components/Navbar';
 import Footer from '../home/components/Footer';
-import { blogArticles, blogCategories } from '../../mocks/blog';
+import { useBlogPosts } from '../../hooks/useBlog';
+import { LoadingState, ErrorState, EmptyState } from '../../components/feature/AsyncState';
 
 export default function BlogPage() {
+  // Le site public ne montre que les articles publiés
+  const { posts, isLoading, error, refetch } = useBlogPosts({ status: 'published' });
   const [selectedCategory, setSelectedCategory] = useState('all');
 
-  const filteredArticles = selectedCategory === 'all' 
-    ? blogArticles 
-    : blogArticles.filter(article => article.category === selectedCategory);
+  const blogCategories = [
+    { id: 'all', name: 'Tous' },
+    ...Array.from(
+      new Map(
+        posts.map(a => [a.category, { id: a.category, name: a.categoryName ?? a.category }]),
+      ).values(),
+    ),
+  ];
+
+  const filteredArticles = selectedCategory === 'all'
+    ? posts
+    : posts.filter(article => article.category === selectedCategory);
+
+  if (isLoading || error) {
+    return (
+      <div className="min-h-screen bg-white">
+        <Navbar />
+        <div className="pt-32 pb-20">
+          {isLoading
+            ? <LoadingState label="Chargement des articles…" />
+            : <ErrorState message={error!} onRetry={refetch} />}
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white">
@@ -56,6 +82,13 @@ export default function BlogPage() {
       {/* Articles Grid */}
       <section className="py-12 sm:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-20">
+          {filteredArticles.length === 0 && (
+            <EmptyState
+              icon="ri-article-line"
+              title="Aucun article publié"
+              description="Revenez bientôt, de nouveaux contenus arrivent."
+            />
+          )}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8">
             {filteredArticles.map((article) => (
               <Link 
