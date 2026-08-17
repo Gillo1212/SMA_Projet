@@ -1,42 +1,57 @@
 import { useState } from 'react';
-import { clientInvoices, ClientInvoice } from '../../../mocks/clientPortal';
+import { useClientInvoices } from '../../../hooks/useClientPortal';
+import { useClientAuth } from '../../../contexts/ClientAuthContext';
+import { LoadingState, ErrorState, EmptyState } from '../../../components/feature/AsyncState';
 import { generateInvoicePDF } from '../../../utils/generatePDF';
+import type { Invoice } from '../../../types/models';
 
 const statusColors: Record<string, string> = {
   'Payée': 'bg-emerald-50 text-emerald-700 border-emerald-200',
   'En attente': 'bg-amber-50 text-amber-700 border-amber-200',
   'En retard': 'bg-red-50 text-red-700 border-red-200',
+  'Brouillon': 'bg-gray-50 text-gray-600 border-gray-200',
+  'Annulée': 'bg-gray-50 text-gray-500 border-gray-200',
 };
 
 const typeColors: Record<string, string> = {
-  'Commande': 'text-sky-600 bg-sky-50',
-  'Location': 'text-indigo-600 bg-indigo-50',
-  'Maintenance': 'text-amber-600 bg-amber-50',
+  'Facture': 'text-sky-600 bg-sky-50',
+  'Avoir': 'text-indigo-600 bg-indigo-50',
+  'Proforma': 'text-amber-600 bg-amber-50',
 };
 
 export default function ClientFacturesPage() {
+  const { invoices, isLoading, error, refetch } = useClientInvoices();
+  const { client } = useClientAuth();
   const [filter, setFilter] = useState('Tous');
   const [downloading, setDownloading] = useState<string | null>(null);
-  const filters = ['Tous', 'Payée', 'En attente', 'En retard'];
-  const filtered = filter === 'Tous' ? clientInvoices : clientInvoices.filter(i => i.statut === filter);
-  const totalDu = clientInvoices.filter(i => i.statut !== 'Payée').reduce((s, i) => s + i.montant, 0);
-  const totalPaye = clientInvoices.filter(i => i.statut === 'Payée').reduce((s, i) => s + i.montant, 0);
 
-  async function handleDownload(inv: ClientInvoice) {
+  if (isLoading) return <LoadingState label="Chargement de vos factures…" />;
+  if (error) return <ErrorState message={error} onRetry={refetch} />;
+
+  const filters = ['Tous', 'Payée', 'En attente', 'En retard'];
+  const filtered = filter === 'Tous' ? invoices : invoices.filter(i => i.statut === filter);
+  const totalDu = invoices
+    .filter(i => i.statut === 'En attente' || i.statut === 'En retard')
+    .reduce((s, i) => s + i.montant, 0);
+  const totalPaye = invoices.filter(i => i.statut === 'Payée').reduce((s, i) => s + i.montant, 0);
+
+  async function handleDownload(inv: Invoice) {
     setDownloading(inv.id);
-    await new Promise(r => setTimeout(r, 300));
-    generateInvoicePDF({
-      numero: inv.numero,
-      date: inv.date,
-      description: inv.description,
-      type: inv.type,
-      montant: inv.montant,
-      statut: inv.statut,
-      clientName: 'Amadou Traoré',
-      clientEmail: 'amadou@sonatel.sn',
-      clientCompany: 'Sonatel Orange Sénégal',
-    });
-    setDownloading(null);
+    try {
+      generateInvoicePDF({
+        numero: inv.numero,
+        date: inv.date,
+        description: inv.description,
+        type: inv.type,
+        montant: inv.montant,
+        statut: inv.statut,
+        clientName: `${client?.prenom ?? ''} ${client?.nom ?? ''}`.trim(),
+        clientEmail: client?.email ?? '',
+        clientCompany: client?.entreprise ?? '',
+      });
+    } finally {
+      setDownloading(null);
+    }
   }
 
   return (
@@ -44,9 +59,9 @@ export default function ClientFacturesPage() {
       {/* Summary */}
       <div className="grid grid-cols-3 gap-4">
         {[
-          { label: 'Factures réglées', value: `${(totalPaye / 1000000).toFixed(2)}M FCFA`, count: clientInvoices.filter(i => i.statut === 'Payée').length, color: 'text-emerald-600', bg: 'bg-emerald-50', icon: 'ri-checkbox-circle-line' },
-          { label: 'En attente de paiement', value: `${totalDu.toLocaleString('fr-FR')} FCFA`, count: clientInvoices.filter(i => i.statut === 'En attente').length, color: 'text-amber-600', bg: 'bg-amber-50', icon: 'ri-time-line' },
-          { label: 'En retard', value: `${clientInvoices.filter(i => i.statut === 'En retard').reduce((s, i) => s + i.montant, 0).toLocaleString('fr-FR')} FCFA`, count: clientInvoices.filter(i => i.statut === 'En retard').length, color: 'text-red-600', bg: 'bg-red-50', icon: 'ri-alert-line' },
+          { label: 'Factures réglées', value: `${(totalPaye / 1000000).toFixed(2)}M FCFA`, count: invoices.filter(i => i.statut === 'Payée').length, color: 'text-emerald-600', bg: 'bg-emerald-50', icon: 'ri-checkbox-circle-line' },
+          { label: 'En attente de paiement', value: `${totalDu.toLocaleString('fr-FR')} FCFA`, count: invoices.filter(i => i.statut === 'En attente').length, color: 'text-amber-600', bg: 'bg-amber-50', icon: 'ri-time-line' },
+          { label: 'En retard', value: `${invoices.filter(i => i.statut === 'En retard').reduce((s, i) => s + i.montant, 0).toLocaleString('fr-FR')} FCFA`, count: invoices.filter(i => i.statut === 'En retard').length, color: 'text-red-600', bg: 'bg-red-50', icon: 'ri-alert-line' },
         ].map((s, i) => (
           <div key={i} className="bg-white rounded-xl p-5 border border-gray-100 flex items-center gap-4">
             <div className={`w-11 h-11 ${s.bg} rounded-xl flex items-center justify-center flex-shrink-0`}>
@@ -69,6 +84,17 @@ export default function ClientFacturesPage() {
             ))}
           </div>
         </div>
+        {filtered.length === 0 ? (
+          <EmptyState
+            icon="ri-bill-line"
+            title={invoices.length === 0 ? 'Aucune facture' : 'Aucun résultat'}
+            description={
+              invoices.length === 0
+                ? 'Vos factures apparaîtront ici après vos premières commandes.'
+                : 'Aucune facture ne correspond à ce filtre.'
+            }
+          />
+        ) : (
         <div className="overflow-x-auto">
           <table className="w-full min-w-[750px]">
             <thead className="bg-gray-50/60">
@@ -79,10 +105,10 @@ export default function ClientFacturesPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
-              {filtered.map((inv: ClientInvoice) => (
+              {filtered.map((inv: Invoice) => (
                 <tr key={inv.id} className="hover:bg-gray-50/50 transition-colors">
                   <td className="px-5 py-4"><p className="text-sm font-semibold text-[#00272B]">{inv.numero}</p></td>
-                  <td className="px-5 py-4"><p className="text-sm text-[#00272B]/60">{new Date(inv.date).toLocaleDateString('fr-FR')}</p></td>
+                  <td className="px-5 py-4"><p className="text-sm text-[#00272B]/60">{inv.date}</p></td>
                   <td className="px-5 py-4"><p className="text-sm text-[#00272B]/70 max-w-xs truncate">{inv.description}</p></td>
                   <td className="px-5 py-4">
                     <span className={`text-xs font-medium px-2 py-1 rounded-lg ${typeColors[inv.type]}`}>{inv.type}</span>
@@ -110,6 +136,7 @@ export default function ClientFacturesPage() {
             </tbody>
           </table>
         </div>
+        )}
       </div>
     </div>
   );

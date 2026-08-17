@@ -11,6 +11,8 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { ordersService } from '../services/orders.service';
 import { quotesService } from '../services/quotes.service';
+import { clientPortalService } from '../services/clientPortal.service';
+import { useClientAuth } from '../contexts/ClientAuthContext';
 
 export interface AppNotification {
   id: string;
@@ -41,9 +43,28 @@ function relativeTime(dateStr: string): string {
   return d.toLocaleDateString('fr-FR');
 }
 
+/** État « lu » partagé par les deux hooks — non persisté côté serveur */
+function useReadState(notifications: AppNotification[]) {
+  const [readIds, setReadIds] = useState<Set<string>>(new Set());
+
+  const markAsRead = useCallback((id: string) => {
+    setReadIds(prev => new Set(prev).add(id));
+  }, []);
+
+  const markAllAsRead = useCallback(() => {
+    setReadIds(new Set(notifications.map(n => n.id)));
+  }, [notifications]);
+
+  const withReadState = useMemo(
+    () => notifications.map(n => ({ ...n, read: readIds.has(n.id) })),
+    [notifications, readIds],
+  );
+
+  return { notifications: withReadState, markAsRead, markAllAsRead };
+}
+
 export function useAdminNotifications() {
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
-  const [readIds, setReadIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     let cancelled = false;
@@ -83,18 +104,59 @@ export function useAdminNotifications() {
     return () => { cancelled = true; };
   }, []);
 
-  const markAsRead = useCallback((id: string) => {
-    setReadIds(prev => new Set(prev).add(id));
-  }, []);
+  return useReadState(notifications);
+}
 
-  const markAllAsRead = useCallback(() => {
-    setReadIds(new Set(notifications.map(n => n.id)));
-  }, [notifications]);
+/**
+ * Notifications de l'espace client : factures à régler et suivi des tickets.
+ * Le chargement ne démarre qu'une fois le client authentifié.
+ */
+export function useClientNotifications() {
+  const { client } = useClientAuth();
+  const clientId = client?.id ? String(client.id) : null;
+  const [notifications, setNotifications] = useState<AppNotification[]>([]);
 
-  const withReadState = useMemo(
-    () => notifications.map(n => ({ ...n, read: readIds.has(n.id) })),
-    [notifications, readIds],
-  );
+  useEffect(() => {
+    if (!clientId) return;
+    let cancelled = false;
 
-  return { notifications: withReadState, markAsRead, markAllAsRead };
+    Promise.all([
+      clientPortalService.getInvoices(clientId),
+      clientPortalService.getTickets(clientId),
+    ])
+      .then(([invoices, tickets]) => {
+        if (cancelled) return;
+
+        const dues: AppNotification[] = invoices
+          .filter(i => i.statut === 'En attente' || i.statut === 'En retard')
+          .map(i => ({
+            id: `invoice-${i.id}`,
+            type: 'invoice',
+            title: i.statut === 'En retard' ? 'Facture en retard' : 'Facture à régler',
+            message: `${i.numero} — ${i.montant.toLocaleString('fr-FR')} FCFA`,
+            time: i.dateEcheance ? `échéance ${i.dateEcheance}` : i.date,
+            read: false,
+            link: '/espace-client/factures',
+          }));
+
+        const actifs: AppNotification[] = tickets
+          .filter(t => t.statut !== 'Fermé')
+          .map(t => ({
+            id: `ticket-${t.id}`,
+            type: 'support',
+            title: `Ticket ${t.statut.toLowerCase()}`,
+            message: t.sujet,
+            time: t.date,
+            read: false,
+            link: '/espace-client/support',
+          }));
+
+        setNotifications([...dues, ...actifs]);
+      })
+      .catch(() => { if (!cancelled) setNotifications([]); });
+
+    return () => { cancelled = true; };
+  }, [clientId]);
+
+  return useReadState(notifications);
 }

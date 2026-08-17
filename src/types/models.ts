@@ -195,6 +195,90 @@ export interface Client {
   statut: ClientStatus;
 }
 
+// ── Espace client ──────────────────────────────────────────────────────────
+
+/** Client connecté, tel qu'exposé par GET /auth/me */
+export interface ClientProfile {
+  id: string;
+  nom: string;
+  prenom: string;
+  email: string;
+  telephone: string;
+  entreprise: string;
+  poste: string;
+  ville: string;
+  adresse: string;
+  dateInscription: string;
+  avatar?: string;
+}
+
+export type ClientMachineStatus = 'Opérationnelle' | 'Maintenance' | 'Hors service';
+
+/** Machine installée chez un client (table client_machines) */
+export interface ClientMachine {
+  id: string;
+  nom: string;
+  type: string;
+  image: string;
+  numeroSerie?: string;
+  dateInstallation: string;
+  site: string;
+  statut: ClientMachineStatus;
+  derniereMaintenance?: string;
+  prochaineMaintenance: string;
+  totalVentes: number;
+}
+
+export type InvoiceStatus = 'Payée' | 'En attente' | 'En retard' | 'Brouillon' | 'Annulée';
+
+export interface Invoice {
+  id: string;
+  numero: string;
+  date: string;
+  description: string;
+  /** Montant TTC */
+  montant: number;
+  montantHT: number;
+  statut: InvoiceStatus;
+  dateEcheance?: string;
+  commandeId?: string;
+  type: 'Facture' | 'Avoir' | 'Proforma';
+}
+
+export type TicketStatus = 'Ouvert' | 'En cours' | 'En attente client' | 'Résolu' | 'Fermé';
+export type TicketPriority = 'Basse' | 'Normale' | 'Haute' | 'Urgente';
+export type TicketCategory =
+  | 'Panne'
+  | 'Maintenance'
+  | 'Question'
+  | 'Livraison'
+  | 'Facturation'
+  | 'Autre';
+
+export interface SupportTicket {
+  id: string;
+  reference: string;
+  date: string;
+  sujet: string;
+  description: string;
+  categorie: TicketCategory;
+  priorite: TicketPriority;
+  statut: TicketStatus;
+  reponseAdmin?: string;
+  machineId?: string;
+  machineNom?: string;
+}
+
+/** KPIs de GET /dashboard/client */
+export interface ClientDashboardStats {
+  totalCommandes: number;
+  totalDepense: number;
+  machinesActives: number;
+  facturesEnAttente: number;
+  facturesEnAttenteMontant: number;
+  ticketsOuverts: number;
+}
+
 /** Catégorie renvoyée par /machines/categories, /products/categories, /blog/categories */
 export interface Category {
   id: string;

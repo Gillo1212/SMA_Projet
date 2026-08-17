@@ -1,27 +1,82 @@
-import { useState } from 'react';
-import { mockClient } from '../../../mocks/clientPortal';
+import { useState, useEffect } from 'react';
+import { useClientAuth } from '../../../contexts/ClientAuthContext';
+import { clientPortalService } from '../../../services/clientPortal.service';
+import { apiClient } from '../../../services/apiClient';
+import { ENDPOINTS } from '../../../config/api';
+import { LoadingState } from '../../../components/feature/AsyncState';
+import type { ClientProfile } from '../../../types/models';
+
+const EMPTY_PROFILE: ClientProfile = {
+  id: '', nom: '', prenom: '', email: '', telephone: '',
+  entreprise: '', poste: '', ville: '', adresse: '', dateInscription: '',
+};
 
 export default function ClientProfilPage() {
+  const { client, isLoading } = useClientAuth();
   const [editing, setEditing] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [form, setForm] = useState({ ...mockClient });
+  const [form, setForm] = useState<ClientProfile>(EMPTY_PROFILE);
+  const [saving, setSaving] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
+
   const [showPwdForm, setShowPwdForm] = useState(false);
   const [pwd, setPwd] = useState({ current: '', next: '', confirm: '' });
   const [showCurrent, setShowCurrent] = useState(false);
   const [showNext, setShowNext] = useState(false);
+  const [pwdSaving, setPwdSaving] = useState(false);
+  const [pwdError, setPwdError] = useState<string | null>(null);
+  const [pwdSaved, setPwdSaved] = useState(false);
 
-  const handleSave = (e: React.FormEvent) => {
+  // Le formulaire suit le client du contexte, chargé de façon asynchrone
+  useEffect(() => {
+    if (client) setForm(client);
+  }, [client]);
+
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    setEditing(false);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+    if (!client) return;
+
+    setSaving(true);
+    setFormError(null);
+    try {
+      await clientPortalService.updateProfile(client.id, form);
+      setEditing(false);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch (err) {
+      setFormError(err instanceof Error ? err.message : 'Enregistrement impossible.');
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const handlePwdSave = (e: React.FormEvent) => {
+  const handlePwdSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    setShowPwdForm(false);
-    setPwd({ current: '', next: '', confirm: '' });
+    setPwdError(null);
+
+    if (pwd.next !== pwd.confirm) {
+      setPwdError('Les mots de passe ne correspondent pas.');
+      return;
+    }
+
+    setPwdSaving(true);
+    try {
+      await apiClient.patch(ENDPOINTS.AUTH.CHANGE_PASSWORD, {
+        current_password: pwd.current,
+        new_password: pwd.next,
+      });
+      setShowPwdForm(false);
+      setPwd({ current: '', next: '', confirm: '' });
+      setPwdSaved(true);
+      setTimeout(() => setPwdSaved(false), 3000);
+    } catch (err) {
+      setPwdError(err instanceof Error ? err.message : 'Modification impossible.');
+    } finally {
+      setPwdSaving(false);
+    }
   };
+
+  if (isLoading) return <LoadingState label="Chargement de votre profil…" />;
 
   return (
     <div className="max-w-3xl space-y-6">
@@ -30,6 +85,12 @@ export default function ClientProfilPage() {
         <div className="flex items-center gap-3 p-4 bg-emerald-50 border border-emerald-200 rounded-xl">
           <i className="ri-checkbox-circle-line text-emerald-500"></i>
           <p className="text-sm font-medium text-emerald-700">Profil mis à jour avec succès.</p>
+        </div>
+      )}
+      {pwdSaved && (
+        <div className="flex items-center gap-3 p-4 bg-emerald-50 border border-emerald-200 rounded-xl">
+          <i className="ri-lock-unlock-line text-emerald-500"></i>
+          <p className="text-sm font-medium text-emerald-700">Mot de passe modifié avec succès.</p>
         </div>
       )}
 
@@ -84,11 +145,21 @@ export default function ClientProfilPage() {
             ))}
           </div>
 
+          {formError && (
+            <div className="mt-4 p-3 bg-red-50 border border-red-100 rounded-xl">
+              <p className="text-sm text-red-600">{formError}</p>
+            </div>
+          )}
+
           {editing && (
             <div className="flex justify-end mt-5">
-              <button type="submit" className="flex items-center gap-2 px-5 py-2.5 bg-[#1AAA3F] text-white text-sm font-semibold rounded-xl hover:bg-[#158f35] cursor-pointer transition-all whitespace-nowrap">
-                <i className="ri-save-line"></i>
-                Enregistrer
+              <button
+                type="submit"
+                disabled={saving}
+                className="flex items-center gap-2 px-5 py-2.5 bg-[#1AAA3F] text-white text-sm font-semibold rounded-xl hover:bg-[#158f35] disabled:opacity-60 cursor-pointer transition-all whitespace-nowrap"
+              >
+                <i className={saving ? 'ri-loader-4-line animate-spin' : 'ri-save-line'}></i>
+                {saving ? 'Enregistrement…' : 'Enregistrer'}
               </button>
             </div>
           )}
@@ -96,7 +167,7 @@ export default function ClientProfilPage() {
 
         <div className="mt-4 pt-4 border-t border-gray-100">
           <p className="text-xs text-[#00272B]/30">
-            Client depuis le {new Date(form.dateInscription).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })} · ID : {form.id}
+            {form.dateInscription ? `Client depuis le ${form.dateInscription} · ` : ''}ID : {form.id}
           </p>
         </div>
       </div>
@@ -138,10 +209,19 @@ export default function ClientProfilPage() {
                 </div>
               </div>
             ))}
+            {pwdError && (
+              <div className="p-3 bg-red-50 border border-red-100 rounded-xl">
+                <p className="text-sm text-red-600">{pwdError}</p>
+              </div>
+            )}
             <div className="flex justify-end">
-              <button type="submit" className="flex items-center gap-2 px-5 py-2.5 bg-[#1AAA3F] text-white text-sm font-semibold rounded-xl hover:bg-[#158f35] cursor-pointer transition-all whitespace-nowrap">
-                <i className="ri-lock-unlock-line"></i>
-                Mettre à jour
+              <button
+                type="submit"
+                disabled={pwdSaving}
+                className="flex items-center gap-2 px-5 py-2.5 bg-[#1AAA3F] text-white text-sm font-semibold rounded-xl hover:bg-[#158f35] disabled:opacity-60 cursor-pointer transition-all whitespace-nowrap"
+              >
+                <i className={pwdSaving ? 'ri-loader-4-line animate-spin' : 'ri-lock-unlock-line'}></i>
+                {pwdSaving ? 'Mise à jour…' : 'Mettre à jour'}
               </button>
             </div>
           </form>

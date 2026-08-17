@@ -3,7 +3,7 @@ import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import ClientSidebar from './components/ClientSidebar';
 import { useClientAuth } from '../../contexts/ClientAuthContext';
 import NotificationsDropdown from '../../components/feature/NotificationsDropdown';
-import { clientNotifications } from '../../mocks/notifications';
+import { useClientNotifications } from '../../hooks/useNotifications';
 
 const pageTitles: Record<string, string> = {
   '/espace-client': 'Tableau de bord',
@@ -19,6 +19,7 @@ export default function ClientLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const { isAuthenticated, isLoading } = useClientAuth();
+  const { notifications, markAsRead, markAllAsRead } = useClientNotifications();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
@@ -76,7 +77,11 @@ export default function ClientLayout() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <NotificationsDropdown notifications={clientNotifications} />
+            <NotificationsDropdown
+              notifications={notifications}
+              onMarkRead={markAsRead}
+              onMarkAllRead={markAllAsRead}
+            />
           </div>
         </header>
         <main className="flex-1 p-4 sm:p-8 overflow-y-auto min-h-0">

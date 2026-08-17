@@ -1,9 +1,12 @@
 import { useState } from 'react';
-import { clientTickets, SupportTicket } from '../../../mocks/clientPortal';
+import { useClientTickets } from '../../../hooks/useClientPortal';
+import { LoadingState, ErrorState, EmptyState } from '../../../components/feature/AsyncState';
+import type { TicketCategory, TicketPriority } from '../../../types/models';
 
 const statusColors: Record<string, string> = {
   'Ouvert': 'bg-amber-50 text-amber-700 border-amber-200',
   'En cours': 'bg-sky-50 text-sky-700 border-sky-200',
+  'En attente client': 'bg-indigo-50 text-indigo-700 border-indigo-200',
   'Résolu': 'bg-emerald-50 text-emerald-700 border-emerald-200',
   'Fermé': 'bg-gray-100 text-gray-500 border-gray-200',
 };
@@ -17,24 +20,60 @@ const priorityColors: Record<string, string> = {
 
 const categoryIcons: Record<string, string> = {
   'Panne': 'ri-tools-line',
-  'Réapprovisionnement': 'ri-shopping-cart-2-line',
+  'Maintenance': 'ri-settings-3-line',
+  'Question': 'ri-question-line',
+  'Livraison': 'ri-truck-line',
   'Facturation': 'ri-bill-line',
-  'Autre': 'ri-question-line',
+  'Autre': 'ri-chat-3-line',
 };
 
+// Doit rester aligné sur l'ENUM `category` de la table support_tickets
+const CATEGORIES: TicketCategory[] = [
+  'Panne',
+  'Maintenance',
+  'Question',
+  'Livraison',
+  'Facturation',
+  'Autre',
+];
+
+const PRIORITES: TicketPriority[] = ['Basse', 'Normale', 'Haute', 'Urgente'];
+
 export default function ClientSupportPage() {
+  const { tickets, isLoading, error, refetch, createTicket } = useClientTickets();
   const [showForm, setShowForm] = useState(false);
-  const [tickets] = useState<SupportTicket[]>(clientTickets);
   const [sujet, setSujet] = useState('');
   const [description, setDescription] = useState('');
-  const [categorie, setCategorie] = useState('Panne');
+  const [categorie, setCategorie] = useState<TicketCategory>('Panne');
+  const [priorite, setPriorite] = useState<TicketPriority>('Normale');
   const [submitted, setSubmitted] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
-    setTimeout(() => { setShowForm(false); setSubmitted(false); setSujet(''); setDescription(''); }, 2000);
+    setSending(true);
+    setFormError(null);
+    try {
+      await createTicket({ sujet, description, categorie, priorite });
+      setSubmitted(true);
+      setTimeout(() => {
+        setShowForm(false);
+        setSubmitted(false);
+        setSujet('');
+        setDescription('');
+        setCategorie('Panne');
+        setPriorite('Normale');
+      }, 2000);
+    } catch (err) {
+      setFormError(err instanceof Error ? err.message : "Envoi impossible. Réessayez.");
+    } finally {
+      setSending(false);
+    }
   };
+
+  if (isLoading) return <LoadingState label="Chargement de vos tickets…" />;
+  if (error) return <ErrorState message={error} onRetry={refetch} />;
 
   return (
     <div className="space-y-5">
@@ -69,11 +108,32 @@ export default function ClientSupportPage() {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-semibold text-[#00272B] mb-1.5">Catégorie</label>
-                  <select value={categorie} onChange={e => setCategorie(e.target.value)} className="w-full h-10 px-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#1AAA3F] cursor-pointer text-[#00272B]">
-                    {['Panne', 'Réapprovisionnement', 'Facturation', 'Autre'].map(c => <option key={c}>{c}</option>)}
-                  </select>
+                {formError && (
+                  <div className="p-3 bg-red-50 border border-red-100 rounded-xl">
+                    <p className="text-sm text-red-600">{formError}</p>
+                  </div>
+                )}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-semibold text-[#00272B] mb-1.5">Catégorie</label>
+                    <select
+                      value={categorie}
+                      onChange={e => setCategorie(e.target.value as TicketCategory)}
+                      className="w-full h-10 px-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#1AAA3F] cursor-pointer text-[#00272B]"
+                    >
+                      {CATEGORIES.map(c => <option key={c}>{c}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-[#00272B] mb-1.5">Priorité</label>
+                    <select
+                      value={priorite}
+                      onChange={e => setPriorite(e.target.value as TicketPriority)}
+                      className="w-full h-10 px-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#1AAA3F] cursor-pointer text-[#00272B]"
+                    >
+                      {PRIORITES.map(p => <option key={p}>{p}</option>)}
+                    </select>
+                  </div>
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-[#00272B] mb-1.5">Sujet</label>
@@ -86,7 +146,9 @@ export default function ClientSupportPage() {
                 </div>
                 <div className="flex gap-3 pt-1">
                   <button type="button" onClick={() => setShowForm(false)} className="flex-1 h-10 border border-gray-200 text-[#00272B]/60 text-sm font-medium rounded-xl hover:bg-gray-50 cursor-pointer whitespace-nowrap">Annuler</button>
-                  <button type="submit" className="flex-1 h-10 bg-[#1AAA3F] text-white text-sm font-semibold rounded-xl hover:bg-[#158f35] cursor-pointer whitespace-nowrap">Envoyer</button>
+                  <button type="submit" disabled={sending} className="flex-1 h-10 bg-[#1AAA3F] text-white text-sm font-semibold rounded-xl hover:bg-[#158f35] disabled:opacity-60 cursor-pointer whitespace-nowrap">
+                    {sending ? 'Envoi…' : 'Envoyer'}
+                  </button>
                 </div>
               </form>
             )}
@@ -95,6 +157,13 @@ export default function ClientSupportPage() {
       )}
 
       {/* Tickets list */}
+      {tickets.length === 0 ? (
+        <EmptyState
+          icon="ri-customer-service-2-line"
+          title="Aucun ticket"
+          description="Ouvrez un ticket si vous rencontrez un problème avec vos équipements."
+        />
+      ) : (
       <div className="space-y-4">
         {tickets.map(ticket => (
           <div key={ticket.id} className="bg-white rounded-2xl border border-gray-100 p-6">
@@ -105,7 +174,10 @@ export default function ClientSupportPage() {
                 </div>
                 <div>
                   <p className="text-sm font-bold text-[#00272B]">{ticket.sujet}</p>
-                  <p className="text-xs text-[#00272B]/40">{ticket.id} · {ticket.date} · {ticket.categorie}</p>
+                  <p className="text-xs text-[#00272B]/40">
+                    {ticket.reference} · {ticket.date} · {ticket.categorie}
+                    {ticket.machineNom ? ` · ${ticket.machineNom}` : ''}
+                  </p>
                 </div>
               </div>
               <div className="flex items-center gap-2 flex-shrink-0 ml-3">
@@ -128,6 +200,7 @@ export default function ClientSupportPage() {
           </div>
         ))}
       </div>
+      )}
     </div>
   );
 }

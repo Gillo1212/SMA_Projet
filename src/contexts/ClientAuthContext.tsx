@@ -14,13 +14,37 @@ import {
   ReactNode,
 } from 'react';
 import { apiClient } from '../services/apiClient';
-import { mockClient, ClientProfile } from '../mocks/clientPortal';
+import { mockClient } from '../mocks/clientPortal';
+import type { ClientProfile } from '../types/models';
+import { formatDate } from '../services/normalize';
 import {
   USE_MOCK,
   ENDPOINTS,
   CLIENT_TOKEN_KEY,
   CLIENT_USER_KEY,
 } from '../config/api';
+
+/**
+ * Le backend renvoie la ligne `clients` telle quelle (first_name, company_name…).
+ * Sans cette conversion, les pages liraient des champs `prenom` / `entreprise`
+ * inexistants et afficheraient du vide.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function normalizeClient(raw: Record<string, any>): ClientProfile {
+  return {
+    id: String(raw.id ?? ''),
+    nom: raw.nom ?? raw.last_name ?? '',
+    prenom: raw.prenom ?? raw.first_name ?? '',
+    email: raw.email ?? '',
+    telephone: raw.telephone ?? raw.phone ?? '',
+    entreprise: raw.entreprise ?? raw.company_name ?? '',
+    poste: raw.poste ?? raw.job_title ?? '',
+    ville: raw.ville ?? raw.city ?? '',
+    adresse: raw.adresse ?? raw.address ?? '',
+    dateInscription: raw.dateInscription ?? formatDate(raw.created_at),
+    avatar: raw.avatar ?? undefined,
+  };
+}
 
 const MOCK_CLIENT_EMAIL    = 'amadou@sonatel.sn';
 const MOCK_CLIENT_PASSWORD = 'client2024';
@@ -58,7 +82,7 @@ export function ClientAuthProvider({ children }: { children: ReactNode }) {
           .get<Record<string, any>>(ENDPOINTS.AUTH.ME)
           .then(res => {
             const userData = res.user ?? res;
-            setClient(userData as ClientProfile);
+            setClient(normalizeClient(userData));
           })
           .catch(() => {
             localStorage.removeItem(CLIENT_TOKEN_KEY);
@@ -99,9 +123,11 @@ export function ClientAuthProvider({ children }: { children: ReactNode }) {
         const token = res.token ?? res.accessToken ?? res.tokens?.accessToken;
         const userData = res.user ?? res;
 
+        const profile = normalizeClient(userData);
         localStorage.setItem(CLIENT_TOKEN_KEY, token);
-        localStorage.setItem(CLIENT_USER_KEY, JSON.stringify(userData));
-        setClient(userData as ClientProfile);
+        // On persiste la forme normalisée : c'est elle que relit la restauration
+        localStorage.setItem(CLIENT_USER_KEY, JSON.stringify(profile));
+        setClient(profile);
         return true;
       } catch (err) {
         setLoginError(
