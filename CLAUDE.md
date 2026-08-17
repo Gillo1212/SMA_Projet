@@ -138,9 +138,9 @@ Deux contrôles utiles avant de livrer : comparer les clés `fr/` et `en/` (aucu
 
 ### État de la traduction
 
-Traduits : navbar, pied de page, accueil, catalogue machines, panier, blog, tunnel de commande, retour de paiement.
+Traduits : navbar, pied de page, accueil, catalogues machines et produits, panier, blog (liste et détail), contact, tunnel de commande, retour de paiement, composants d'état partagés.
 
-**Encore en français en dur** : pages produits, contact, à-propos, pages de détail (machine, produit, article), comparateur, demande de devis — ainsi que le portail admin et l'espace client, qui sont des outils internes.
+**Encore en français en dur** : page à-propos, sections Features/About/Testimonials de l'accueil, détail machine, détail produit, comparateur, demande de devis — ainsi que le portail admin et l'espace client, qui sont des outils internes.
 
 ## Sélecteur de langue
 

@@ -32,6 +32,14 @@ export default {
     securePayment: '100% secure payment',
   },
 
+  blogDetail: {
+    notFound: 'Article not found',
+    backToBlog: 'Back to blog',
+    share: 'Share this article',
+    recent: 'Recent articles',
+    ctaTitle: 'Need a vending machine?',
+  },
+
   blogPage: {
     eyebrow: 'SMA BLOG',
     title: 'News & Advice',

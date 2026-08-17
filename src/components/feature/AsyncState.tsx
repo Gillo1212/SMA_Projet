@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 /**
  * États de chargement / erreur / vide
  * ────────────────────────────────────
@@ -14,12 +16,13 @@ interface LoadingStateProps {
   compact?: boolean;
 }
 
-export function LoadingState({ label = 'Chargement…', compact = false }: LoadingStateProps) {
+export function LoadingState({ label, compact = false }: LoadingStateProps) {
+  const { t } = useTranslation();
   return (
     <div className={`flex items-center justify-center ${compact ? 'h-32' : 'h-64'}`}>
       <div className="flex flex-col items-center gap-3">
         <i className="ri-loader-4-line text-3xl text-[#1AAA3F] animate-spin"></i>
-        <p className="text-sm text-[#00272B]/50">{label}</p>
+        <p className="text-sm text-[#00272B]/50">{label ?? t('common.loading')}</p>
       </div>
     </div>
   );
@@ -32,6 +35,7 @@ interface ErrorStateProps {
 }
 
 export function ErrorState({ message, onRetry, compact = false }: ErrorStateProps) {
+  const { t } = useTranslation();
   return (
     <div className={`flex items-center justify-center ${compact ? 'h-32' : 'h-64'}`}>
       <div className="flex flex-col items-center gap-3 text-center max-w-sm px-4">
@@ -39,7 +43,7 @@ export function ErrorState({ message, onRetry, compact = false }: ErrorStateProp
           <i className="ri-error-warning-line text-2xl text-red-500"></i>
         </div>
         <div>
-          <p className="text-sm font-semibold text-[#00272B]">Impossible de charger les données</p>
+          <p className="text-sm font-semibold text-[#00272B]">{t('common.loadError')}</p>
           <p className="text-sm text-[#00272B]/50 mt-1">{message}</p>
         </div>
         {onRetry && (
@@ -48,7 +52,7 @@ export function ErrorState({ message, onRetry, compact = false }: ErrorStateProp
             className="mt-1 px-4 py-2 bg-[#1AAA3F] text-white text-sm font-semibold rounded-xl hover:bg-[#158f35] transition-all cursor-pointer whitespace-nowrap"
           >
             <i className="ri-refresh-line mr-1.5"></i>
-            Réessayer
+            {t('common.retry')}
           </button>
         )}
       </div>

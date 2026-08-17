@@ -101,12 +101,14 @@ export default function ClientConnexionPage() {
             </button>
           </form>
 
-          {/* Demo hint */}
-          <div className="mt-5 p-3.5 bg-[#f0f9f4] rounded-xl border border-[#1AAA3F]/20">
-            <p className="text-xs font-semibold text-[#1AAA3F]/70 uppercase tracking-wide mb-1.5">Compte de démonstration</p>
-            <p className="text-xs text-[#00272B]/60">Email : <span className="font-mono font-medium text-[#00272B]">amadou@sonatel.sn</span></p>
-            <p className="text-xs text-[#00272B]/60 mt-0.5">Mot de passe : <span className="font-mono font-medium text-[#00272B]">client2024</span></p>
-          </div>
+          {/* Compte du jeu de démonstration (npm run seed) — masqué en production */}
+          {import.meta.env.DEV && (
+            <div className="mt-5 p-3.5 bg-[#f0f9f4] rounded-xl border border-[#1AAA3F]/20">
+              <p className="text-xs font-semibold text-[#1AAA3F]/70 uppercase tracking-wide mb-1.5">Compte de démonstration</p>
+              <p className="text-xs text-[#00272B]/60">Email : <span className="font-mono font-medium text-[#00272B]">amadou@sonatel.sn</span></p>
+              <p className="text-xs text-[#00272B]/60 mt-0.5">Mot de passe : <span className="font-mono font-medium text-[#00272B]">client2024</span></p>
+            </div>
+          )}
         </div>
 
         <div className="mt-5 text-center">

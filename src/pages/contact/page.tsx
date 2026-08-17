@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import Navbar from '../home/components/Navbar';
 import Footer from '../home/components/Footer';
 import CTABanner from '../../components/feature/CTABanner';
 
 export default function ContactPage() {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     nom: '',
     email: '',
@@ -88,25 +90,25 @@ export default function ContactPage() {
               <div className="w-14 h-14 sm:w-16 sm:h-16 bg-[#1AAA3F] rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-5">
                 <i className="ri-phone-line text-2xl sm:text-3xl text-white"></i>
               </div>
-              <h3 className="text-lg sm:text-xl font-bold text-[#00272B] mb-2 sm:mb-3">Téléphone</h3>
+              <h3 className="text-lg sm:text-xl font-bold text-[#00272B] mb-2 sm:mb-3">{t('contact.phone')}</h3>
               <p className="text-sm sm:text-base text-[#4A4A4A] mb-1">+221 33 123 45 67</p>
               <p className="text-sm sm:text-base text-[#4A4A4A]">+221 77 123 45 67</p>
-              <p className="text-xs sm:text-sm text-[#4A4A4A] mt-2 sm:mt-3">Lun - Ven : 8h - 18h</p>
+              <p className="text-xs sm:text-sm text-[#4A4A4A] mt-2 sm:mt-3">{t('contact.phoneHours')}</p>
             </div>
             <div className="bg-[#EEFFF2] rounded-2xl p-6 sm:p-8 text-center">
               <div className="w-14 h-14 sm:w-16 sm:h-16 bg-[#25A9F2] rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-5">
                 <i className="ri-mail-line text-2xl sm:text-3xl text-white"></i>
               </div>
-              <h3 className="text-lg sm:text-xl font-bold text-[#00272B] mb-2 sm:mb-3">Email</h3>
+              <h3 className="text-lg sm:text-xl font-bold text-[#00272B] mb-2 sm:mb-3">{t('contact.email')}</h3>
               <p className="text-sm sm:text-base text-[#4A4A4A] mb-1">contact@sma-senegal.com</p>
               <p className="text-sm sm:text-base text-[#4A4A4A]">commercial@sma-senegal.com</p>
-              <p className="text-xs sm:text-sm text-[#4A4A4A] mt-2 sm:mt-3">Réponse sous 24h</p>
+              <p className="text-xs sm:text-sm text-[#4A4A4A] mt-2 sm:mt-3">{t('contact.emailDelay')}</p>
             </div>
             <div className="bg-[#EEFFF2] rounded-2xl p-6 sm:p-8 text-center">
               <div className="w-14 h-14 sm:w-16 sm:h-16 bg-[#1AAA3F] rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-5">
                 <i className="ri-map-pin-line text-2xl sm:text-3xl text-white"></i>
               </div>
-              <h3 className="text-lg sm:text-xl font-bold text-[#00272B] mb-2 sm:mb-3">Adresse</h3>
+              <h3 className="text-lg sm:text-xl font-bold text-[#00272B] mb-2 sm:mb-3">{t('contact.address')}</h3>
               <p className="text-sm sm:text-base text-[#4A4A4A] mb-1">Zone Industrielle de Dakar</p>
               <p className="text-sm sm:text-base text-[#4A4A4A]">Rue 15, Parcelle 234</p>
               <p className="text-xs sm:text-sm text-[#4A4A4A] mt-2 sm:mt-3">Dakar, Sénégal</p>
@@ -121,7 +123,7 @@ export default function ContactPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-16">
             {/* Formulaire */}
             <div>
-              <h2 className="text-2xl sm:text-4xl font-bold text-[#00272B] mb-3 sm:mb-4">Envoyez-nous un Message</h2>
+              <h2 className="text-2xl sm:text-4xl font-bold text-[#00272B] mb-3 sm:mb-4">{t('contact.formTitle')}</h2>
               <p className="text-base sm:text-lg text-[#4A4A4A] mb-6 sm:mb-8">
                 Remplissez le formulaire ci-dessous et nous vous répondrons dans les plus brefs délais.
               </p>
@@ -139,7 +141,7 @@ export default function ContactPage() {
                     onChange={handleChange}
                     required
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-[#1AAA3F] focus:border-transparent"
-                    placeholder="Votre nom"
+                    placeholder={t('contact.namePlaceholder')}
                   />
                 </div>
 
@@ -155,7 +157,7 @@ export default function ContactPage() {
                     onChange={handleChange}
                     required
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-[#1AAA3F] focus:border-transparent"
-                    placeholder="votre@email.com"
+                    placeholder={t('contact.emailPlaceholder')}
                   />
                 </div>
 
@@ -171,7 +173,7 @@ export default function ContactPage() {
                     onChange={handleChange}
                     required
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-[#1AAA3F] focus:border-transparent"
-                    placeholder="+221 XX XXX XX XX"
+                    placeholder={t('contact.phonePlaceholder')}
                   />
                 </div>
 
@@ -187,12 +189,12 @@ export default function ContactPage() {
                     required
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-[#1AAA3F] focus:border-transparent cursor-pointer"
                   >
-                    <option value="">Sélectionnez un sujet</option>
-                    <option value="Demande de devis">Demande de devis</option>
-                    <option value="Information produit">Information produit</option>
-                    <option value="Support technique">Support technique</option>
-                    <option value="Partenariat">Partenariat</option>
-                    <option value="Autre">Autre</option>
+                    <option value="">{t('contact.selectSubject')}</option>
+                    <option value="Demande de devis">{t('contact.subjectQuote')}</option>
+                    <option value="Information produit">{t('contact.subjectProduct')}</option>
+                    <option value="Support technique">{t('contact.subjectSupport')}</option>
+                    <option value="Partenariat">{t('contact.subjectPartnership')}</option>
+                    <option value="Autre">{t('contact.subjectOther')}</option>
                   </select>
                 </div>
 
@@ -209,7 +211,7 @@ export default function ContactPage() {
                     maxLength={500}
                     rows={6}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-[#1AAA3F] focus:border-transparent resize-none"
-                    placeholder="Décrivez votre besoin..."
+                    placeholder={t('contact.messagePlaceholder')}
                   />
                   <p className="text-sm text-[#4A4A4A] mt-2">
                     {formData.message.length}/500 caractères
@@ -228,9 +230,9 @@ export default function ContactPage() {
                   <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg">
                     <div className="flex items-center gap-2">
                       <i className="ri-checkbox-circle-line text-xl"></i>
-                      <span className="font-semibold">Message envoyé avec succès !</span>
+                      <span className="font-semibold">{t('contact.successTitle')}</span>
                     </div>
-                    <p className="text-sm mt-1">Nous vous répondrons dans les plus brefs délais.</p>
+                    <p className="text-sm mt-1">{t('contact.successHint')}</p>
                   </div>
                 )}
 
@@ -238,9 +240,9 @@ export default function ContactPage() {
                   <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg">
                     <div className="flex items-center gap-2">
                       <i className="ri-error-warning-line text-xl"></i>
-                      <span className="font-semibold">Erreur lors de l'envoi</span>
+                      <span className="font-semibold">{t('contact.errorTitle')}</span>
                     </div>
-                    <p className="text-sm mt-1">Veuillez réessayer ou nous contacter par téléphone.</p>
+                    <p className="text-sm mt-1">{t('contact.errorHint')}</p>
                   </div>
                 )}
               </form>
@@ -249,25 +251,25 @@ export default function ContactPage() {
             {/* Carte + Horaires */}
             <div>
               <div className="bg-[#EEFFF2] rounded-2xl p-6 sm:p-8 mb-6 sm:mb-8">
-                <h3 className="text-2xl font-bold text-[#00272B] mb-6">Horaires d'Ouverture</h3>
+                <h3 className="text-2xl font-bold text-[#00272B] mb-6">{t('contact.hoursTitle')}</h3>
                 
                 <div className="space-y-4">
                   <div className="flex justify-between items-center pb-4 border-b border-gray-200">
-                    <span className="text-base font-semibold text-[#00272B]">Lundi - Vendredi</span>
+                    <span className="text-base font-semibold text-[#00272B]">{t('contact.weekdays')}</span>
                     <span className="text-base text-[#4A4A4A]">8h00 - 18h00</span>
                   </div>
                   <div className="flex justify-between items-center pb-4 border-b border-gray-200">
-                    <span className="text-base font-semibold text-[#00272B]">Samedi</span>
+                    <span className="text-base font-semibold text-[#00272B]">{t('contact.saturday')}</span>
                     <span className="text-base text-[#4A4A4A]">9h00 - 13h00</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-base font-semibold text-[#00272B]">Dimanche</span>
-                    <span className="text-base text-red-600">Fermé</span>
+                    <span className="text-base font-semibold text-[#00272B]">{t('contact.sunday')}</span>
+                    <span className="text-base text-red-600">{t('contact.closed')}</span>
                   </div>
                 </div>
 
                 <div className="mt-8 pt-8 border-t border-gray-200">
-                  <h4 className="text-lg font-bold text-[#00272B] mb-4">Support Technique 24/7</h4>
+                  <h4 className="text-lg font-bold text-[#00272B] mb-4">{t('contact.support247')}</h4>
                   <p className="text-base text-[#4A4A4A] mb-3">
                     Pour toute urgence technique, notre hotline est disponible 7 jours sur 7.
                   </p>

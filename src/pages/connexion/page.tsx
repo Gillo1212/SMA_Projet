@@ -126,7 +126,7 @@ export default function ConnexionPage() {
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   required
-                  placeholder="admin@smalim.com"
+                  placeholder="admin@smalim.sn"
                   className="w-full h-12 pl-11 pr-4 border border-gray-200 rounded-xl text-sm text-[#00272B] placeholder-gray-400 focus:outline-none focus:border-[#1AAA3F] focus:ring-2 focus:ring-[#1AAA3F]/10 transition-all"
                 />
               </div>
@@ -177,13 +177,19 @@ export default function ConnexionPage() {
             </button>
           </form>
 
-          <div className="mt-8 p-4 bg-gray-50 rounded-xl border border-gray-100">
-            <p className="text-xs font-semibold text-[#00272B]/50 uppercase tracking-wide mb-2">Identifiants de démonstration</p>
-            <div className="space-y-1">
-              <p className="text-xs text-[#00272B]/60">Email: <span className="font-mono font-medium text-[#00272B]">admin@smalim.com</span></p>
-              <p className="text-xs text-[#00272B]/60">Mot de passe: <span className="font-mono font-medium text-[#00272B]">smalim2024</span></p>
+          {/*
+            Identifiants du jeu de démonstration (npm run seed).
+            Masqué en production : ne jamais afficher de compte réel en ligne.
+          */}
+          {import.meta.env.DEV && (
+            <div className="mt-8 p-4 bg-gray-50 rounded-xl border border-gray-100">
+              <p className="text-xs font-semibold text-[#00272B]/50 uppercase tracking-wide mb-2">Identifiants de démonstration</p>
+              <div className="space-y-1">
+                <p className="text-xs text-[#00272B]/60">Email: <span className="font-mono font-medium text-[#00272B]">admin@smalim.sn</span></p>
+                <p className="text-xs text-[#00272B]/60">Mot de passe: <span className="font-mono font-medium text-[#00272B]">Admin@2024!</span></p>
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="mt-6 text-center">
             <Link to="/" className="text-sm text-[#00272B]/40 hover:text-[#1AAA3F] transition-colors">

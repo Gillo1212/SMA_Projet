@@ -1,10 +1,12 @@
 import { useParams, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import Navbar from '../../home/components/Navbar';
 import Footer from '../../home/components/Footer';
 import { useBlogPost, useBlogPosts } from '../../../hooks/useBlog';
 import { LoadingState } from '../../../components/feature/AsyncState';
 
 export default function BlogDetailPage() {
+  const { t } = useTranslation();
   const { slug } = useParams<{ slug: string }>();
   const { post: article, isLoading } = useBlogPost({ slug });
   // Alimente le bloc « articles récents » en bas de page
@@ -15,7 +17,7 @@ export default function BlogDetailPage() {
       <div className="min-h-screen bg-white">
         <Navbar />
         <div className="pt-32 pb-20">
-          <LoadingState label="Chargement de l'article…" />
+          <LoadingState label={t('common.loading')} />
         </div>
         <Footer />
       </div>
@@ -27,9 +29,9 @@ export default function BlogDetailPage() {
       <div className="min-h-screen bg-white">
         <Navbar />
         <div className="pt-32 pb-20 text-center">
-          <h1 className="text-4xl font-bold text-[#00272B] mb-4">Article non trouvé</h1>
+          <h1 className="text-4xl font-bold text-[#00272B] mb-4">{t('blogDetail.notFound')}</h1>
           <Link to="/blog" className="text-[#1AAA3F] hover:underline">
-            Retour au blog
+            {t('blogDetail.backToBlog')}
           </Link>
         </div>
         <Footer />
@@ -53,7 +55,7 @@ export default function BlogDetailPage() {
             className="inline-flex items-center gap-2 text-[#1AAA3F] hover:underline mb-6 cursor-pointer"
           >
             <i className="ri-arrow-left-line"></i>
-            Retour au blog
+            {t('blogDetail.backToBlog')}
           </Link>
           
           <div className="mb-6">
@@ -119,7 +121,7 @@ export default function BlogDetailPage() {
               
               {/* Partage */}
               <div className="mt-12 pt-8 border-t border-gray-200">
-                <h3 className="text-xl font-bold text-[#00272B] mb-4">Partager cet article</h3>
+                <h3 className="text-xl font-bold text-[#00272B] mb-4">{t('blogDetail.share')}</h3>
                 <div className="flex gap-3">
                   <button className="w-12 h-12 bg-[#1AAA3F] text-white rounded-full flex items-center justify-center hover:bg-[#158f35] transition-colors cursor-pointer">
                     <i className="ri-facebook-fill text-xl"></i>
@@ -140,7 +142,7 @@ export default function BlogDetailPage() {
             {/* Sidebar */}
             <div className="lg:col-span-1">
               <div className="sticky top-24">
-                <h3 className="text-2xl font-bold text-[#00272B] mb-6">Articles récents</h3>
+                <h3 className="text-2xl font-bold text-[#00272B] mb-6">{t('blogDetail.recent')}</h3>
                 
                 <div className="space-y-6">
                   {recentArticles.map((recentArticle) => (
@@ -176,7 +178,7 @@ export default function BlogDetailPage() {
 
                 {/* CTA */}
                 <div className="mt-10 bg-gradient-to-br from-[#1AAA3F] to-[#158f35] rounded-2xl p-8 text-white">
-                  <h3 className="text-2xl font-bold mb-3">Besoin d'un distributeur ?</h3>
+                  <h3 className="text-2xl font-bold mb-3">{t('blogDetail.ctaTitle')}</h3>
                   <p className="text-base mb-6 opacity-90">
                     Contactez-nous pour une étude personnalisée et un devis gratuit.
                   </p>

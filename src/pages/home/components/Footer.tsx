@@ -60,7 +60,7 @@ export default function Footer() {
                 className="w-full h-14 bg-[#1A1A1A] border border-[#333333] rounded-xl px-5 pr-16 text-white placeholder-[#666666] text-sm focus:outline-none focus:border-[#0D8C2E] transition-colors"
                 required
               />
-              <button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-full flex items-center justify-center hover:scale-110 transition-transform cursor-pointer">
+              <button type="submit" aria-label={t('footer.subscribe')} className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-full flex items-center justify-center hover:scale-110 transition-transform cursor-pointer">
                 <i className="ri-arrow-right-line text-[#0D8C2E] text-xl"></i>
               </button>
             </form>

@@ -32,6 +32,14 @@ export default {
     securePayment: 'Paiement 100% sécurisé',
   },
 
+  blogDetail: {
+    notFound: 'Article non trouvé',
+    backToBlog: 'Retour au blog',
+    share: 'Partager cet article',
+    recent: 'Articles récents',
+    ctaTitle: "Besoin d'un distributeur ?",
+  },
+
   blogPage: {
     eyebrow: 'BLOG SMA',
     title: 'Actualités & Conseils',

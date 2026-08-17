@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import Navbar from '../home/components/Navbar';
 import Footer from '../home/components/Footer';
@@ -8,6 +9,7 @@ import { LoadingState, ErrorState } from '../../components/feature/AsyncState';
 type SortOption = 'price-asc' | 'price-desc' | 'popularity' | 'newest';
 
 export default function ProductsPage() {
+  const { t } = useTranslation();
   const { products, isLoading, error, refetch } = useProducts();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -122,7 +124,7 @@ export default function ProductsPage() {
         <Navbar />
         <div className="pt-32 pb-20">
           {isLoading
-            ? <LoadingState label="Chargement du catalogue…" />
+            ? <LoadingState label={t('common.loading')} />
             : <ErrorState message={error!} onRetry={refetch} />}
         </div>
         <Footer />
@@ -139,18 +141,17 @@ export default function ProductsPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-20">
           <div className="text-center max-w-3xl mx-auto">
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold text-[#00272B] mb-4 sm:mb-6">
-              Catalogue Produits
+              {t('products.title')}
             </h1>
             <p className="text-base sm:text-lg text-gray-600 mb-6 sm:mb-8">
-              Découvrez notre sélection de produits pour vos distributeurs automatiques : 
-              café, snacks et boissons de qualité premium.
+              {t('products.subtitle')}
             </p>
 
             {/* Search Bar */}
             <div className="relative max-w-2xl mx-auto">
               <input
                 type="text"
-                placeholder="Rechercher un produit, une marque..."
+                placeholder={t('products.searchPlaceholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full h-12 sm:h-16 pl-12 sm:pl-16 pr-6 rounded-xl border-2 border-gray-200 focus:border-[#1AAA3F] focus:outline-none text-sm sm:text-base transition-all"
@@ -175,14 +176,14 @@ export default function ProductsPage() {
           {/* Mobile filter button */}
           <div className="flex items-center justify-between mb-4 lg:hidden">
             <p className="text-sm text-gray-600">
-              <strong className="text-[#00272B]">{filteredProducts.length}</strong> produit{filteredProducts.length > 1 ? 's' : ''}
+              {t('products.count', { count: filteredProducts.length })}
             </p>
             <button
               onClick={() => setShowFilters(true)}
               className="flex items-center gap-2 px-4 py-2 bg-[#EEFFF2] border border-[#1AAA3F]/30 rounded-lg text-sm font-semibold text-[#00272B] cursor-pointer"
             >
               <i className="ri-filter-line text-[#1AAA3F]"></i>
-              Filtres
+              {t('products.filters')}
               {activeFiltersCount > 0 && (
                 <span className="w-5 h-5 bg-[#1AAA3F] text-white text-xs rounded-full flex items-center justify-center">{activeFiltersCount}</span>
               )}
@@ -195,7 +196,7 @@ export default function ProductsPage() {
               <div className="absolute inset-0 bg-black/50" onClick={() => setShowFilters(false)}></div>
               <div className="absolute left-0 top-0 bottom-0 w-80 max-w-full bg-white overflow-y-auto">
                 <div className="flex items-center justify-between p-4 border-b border-gray-200">
-                  <h3 className="text-lg font-bold text-[#00272B]">Filtres</h3>
+                  <h3 className="text-lg font-bold text-[#00272B]">{t('products.filters')}</h3>
                   <button onClick={() => setShowFilters(false)} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 cursor-pointer">
                     <i className="ri-close-line text-xl text-gray-600"></i>
                   </button>
@@ -204,13 +205,13 @@ export default function ProductsPage() {
                   <div className="bg-[#EEFFF2] rounded-2xl p-6">
                     {activeFiltersCount > 0 && (
                       <button onClick={clearAllFilters} className="text-sm text-[#1AAA3F] hover:underline cursor-pointer mb-4 block">
-                        Tout effacer
+                        {t('products.clearAll')}
                       </button>
                     )}
                     <div className="space-y-8">
                       {/* Category Filter */}
                       <div>
-                        <h4 className="text-sm font-semibold text-[#00272B] mb-4">Catégories</h4>
+                        <h4 className="text-sm font-semibold text-[#00272B] mb-4">{t('products.categories')}</h4>
                         <div className="space-y-2">
                           {categories.map(cat => (
                             <label key={cat} className="flex items-center space-x-3 cursor-pointer group">
@@ -221,7 +222,7 @@ export default function ProductsPage() {
                         </div>
                       </div>
                       <div>
-                        <h4 className="text-sm font-semibold text-[#00272B] mb-4">Marques</h4>
+                        <h4 className="text-sm font-semibold text-[#00272B] mb-4">{t('products.brands')}</h4>
                         <div className="space-y-2">
                           {brands.map(brand => (
                             <label key={brand} className="flex items-center space-x-3 cursor-pointer group">
@@ -234,12 +235,12 @@ export default function ProductsPage() {
                       <div>
                         <label className="flex items-center space-x-3 cursor-pointer group">
                           <input type="checkbox" checked={onlyAvailable} onChange={(e) => setOnlyAvailable(e.target.checked)} className="w-5 h-5 text-[#1AAA3F] border-gray-300 rounded focus:ring-[#1AAA3F] cursor-pointer" />
-                          <span className="text-sm font-semibold text-[#00272B]">En stock uniquement</span>
+                          <span className="text-sm font-semibold text-[#00272B]">{t('products.inStockOnly')}</span>
                         </label>
                       </div>
                     </div>
                     <button onClick={() => setShowFilters(false)} className="w-full mt-6 py-3 bg-[#1AAA3F] text-white font-semibold rounded-lg cursor-pointer">
-                      Voir les résultats ({filteredProducts.length})
+                      {t('products.showResults')} ({filteredProducts.length})
                     </button>
                   </div>
                 </div>
@@ -252,10 +253,10 @@ export default function ProductsPage() {
             <aside className="w-80 flex-shrink-0 sticky top-32 self-start hidden lg:block">
               <div className="bg-[#EEFFF2] rounded-2xl p-8">
                 <div className="flex items-center justify-between mb-8">
-                  <h3 className="text-xl font-bold text-[#00272B]">Filtres</h3>
+                  <h3 className="text-xl font-bold text-[#00272B]">{t('products.filters')}</h3>
                   {activeFiltersCount > 0 && (
                     <button onClick={clearAllFilters} className="text-sm text-[#1AAA3F] hover:underline cursor-pointer whitespace-nowrap">
-                      Tout effacer
+                      {t('products.clearAll')}
                     </button>
                   )}
                 </div>
@@ -263,7 +264,7 @@ export default function ProductsPage() {
                 <div className="space-y-8">
                   {/* Category Filter */}
                   <div>
-                    <h4 className="text-sm font-semibold text-[#00272B] mb-4">Catégories</h4>
+                    <h4 className="text-sm font-semibold text-[#00272B] mb-4">{t('products.categories')}</h4>
                     <div className="space-y-2">
                       {categories.map(cat => (
                         <label key={cat} className="flex items-center space-x-3 cursor-pointer group">
@@ -276,7 +277,7 @@ export default function ProductsPage() {
 
                   {/* Brand Filter */}
                   <div>
-                    <h4 className="text-sm font-semibold text-[#00272B] mb-4">Marques</h4>
+                    <h4 className="text-sm font-semibold text-[#00272B] mb-4">{t('products.brands')}</h4>
                     <div className="space-y-2">
                       {brands.map(brand => (
                         <label key={brand} className="flex items-center space-x-3 cursor-pointer group">
@@ -289,7 +290,7 @@ export default function ProductsPage() {
 
                   {/* Format Filter */}
                   <div>
-                    <h4 className="text-sm font-semibold text-[#00272B] mb-4">Format</h4>
+                    <h4 className="text-sm font-semibold text-[#00272B] mb-4">{t('products.format')}</h4>
                     <div className="space-y-2">
                       {formats.slice(0, 5).map(format => (
                         <label key={format} className="flex items-center space-x-3 cursor-pointer group">
@@ -317,7 +318,7 @@ export default function ProductsPage() {
 
                   {/* Compatibility Filter */}
                   <div>
-                    <h4 className="text-sm font-semibold text-[#00272B] mb-4">Compatibilité</h4>
+                    <h4 className="text-sm font-semibold text-[#00272B] mb-4">{t('products.compatibility')}</h4>
                     <div className="space-y-2">
                       {machines.map(machine => (
                         <label key={machine} className="flex items-center space-x-3 cursor-pointer group">
@@ -332,7 +333,7 @@ export default function ProductsPage() {
                   <div>
                     <label className="flex items-center space-x-3 cursor-pointer group">
                       <input type="checkbox" checked={onlyAvailable} onChange={(e) => setOnlyAvailable(e.target.checked)} className="w-5 h-5 text-[#1AAA3F] border-gray-300 rounded focus:ring-[#1AAA3F] cursor-pointer" />
-                      <span className="text-sm font-semibold text-[#00272B] group-hover:text-[#1AAA3F] transition-colors">En stock uniquement</span>
+                      <span className="text-sm font-semibold text-[#00272B] group-hover:text-[#1AAA3F] transition-colors">{t('products.inStockOnly')}</span>
                     </label>
                   </div>
                 </div>
@@ -343,20 +344,20 @@ export default function ProductsPage() {
             <div className="flex-1">
               <div className="flex items-center justify-between mb-6 sm:mb-8">
                 <p className="text-sm sm:text-base text-gray-600 hidden lg:block">
-                  <strong className="text-[#00272B]">{filteredProducts.length}</strong> produit{filteredProducts.length > 1 ? 's' : ''} trouvé{filteredProducts.length > 1 ? 's' : ''}
+                  {t('products.countFound', { count: filteredProducts.length })}
                 </p>
 
                 <div className="flex items-center space-x-3 w-full lg:w-auto justify-between lg:justify-start">
-                  <span className="text-sm text-gray-600">Trier par :</span>
+                  <span className="text-sm text-gray-600">{t('products.sortBy')}</span>
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value as SortOption)}
                     className="h-11 px-4 pr-10 rounded-lg border border-gray-200 focus:border-[#1AAA3F] focus:outline-none text-sm cursor-pointer"
                   >
-                    <option value="popularity">Popularité</option>
-                    <option value="newest">Nouveautés</option>
-                    <option value="price-asc">Prix croissant</option>
-                    <option value="price-desc">Prix décroissant</option>
+                    <option value="popularity">{t('products.sortPopularity')}</option>
+                    <option value="newest">{t('products.sortNewest')}</option>
+                    <option value="price-asc">{t('products.sortPriceAsc')}</option>
+                    <option value="price-desc">{t('products.sortPriceDesc')}</option>
                   </select>
                 </div>
               </div>
@@ -371,11 +372,11 @@ export default function ProductsPage() {
                     >
                       <div className="relative aspect-square bg-gray-50 overflow-hidden">
                         <img src={product.images[0]} alt={product.name} className="w-full h-full object-contain object-center p-6 group-hover:scale-105 transition-transform duration-300" />
-                        {product.isNew && <div className="absolute top-4 left-4 px-3 py-1 bg-[#25A9F2] text-white text-xs font-semibold rounded-full">Nouveau</div>}
-                        {product.isPopular && <div className="absolute top-4 right-4 px-3 py-1 bg-[#1AAA3F] text-white text-xs font-semibold rounded-full">Populaire</div>}
+                        {product.isNew && <div className="absolute top-4 left-4 px-3 py-1 bg-[#25A9F2] text-white text-xs font-semibold rounded-full">{t('products.badgeNew')}</div>}
+                        {product.isPopular && <div className="absolute top-4 right-4 px-3 py-1 bg-[#1AAA3F] text-white text-xs font-semibold rounded-full">{t('products.badgePopular')}</div>}
                         {!product.isAvailable && (
                           <div className="absolute inset-0 bg-white/90 flex items-center justify-center">
-                            <span className="text-sm font-semibold text-gray-500">Rupture de stock</span>
+                            <span className="text-sm font-semibold text-gray-500">{t('products.outOfStock')}</span>
                           </div>
                         )}
                       </div>
@@ -406,10 +407,10 @@ export default function ProductsPage() {
               ) : (
                 <div className="text-center py-20">
                   <i className="ri-search-line text-6xl text-gray-300 mb-6"></i>
-                  <h3 className="text-2xl font-bold text-[#00272B] mb-3">Aucun produit trouvé</h3>
-                  <p className="text-gray-600 mb-8">Essayez de modifier vos filtres ou votre recherche</p>
+                  <h3 className="text-2xl font-bold text-[#00272B] mb-3">{t('products.empty')}</h3>
+                  <p className="text-gray-600 mb-8">{t('products.emptyHint')}</p>
                   <button onClick={clearAllFilters} className="px-8 py-3 bg-[#1AAA3F] text-white font-semibold rounded-lg hover:bg-[#158f35] transition-colors cursor-pointer whitespace-nowrap">
-                    Réinitialiser les filtres
+                    {t('products.resetFilters')}
                   </button>
                 </div>
               )}
