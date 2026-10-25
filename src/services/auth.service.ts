@@ -165,8 +165,11 @@ export const authService = {
       return stored ? (JSON.parse(stored) as AuthUser) : null;
     }
 
+    // Jeton admin explicite : apiClient choisit sinon le jeton selon la page
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const res = await apiClient.get<Record<string, any>>(ENDPOINTS.AUTH.ME);
+    const res = await apiClient.get<Record<string, any>>(ENDPOINTS.AUTH.ME, undefined, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
     // Backend retourne { success: true, user: {...} } - on extrait user
     const u = res.user ?? res;

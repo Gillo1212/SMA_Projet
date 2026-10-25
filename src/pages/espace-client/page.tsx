@@ -25,6 +25,14 @@ const statusMachine: Record<string, string> = {
   'Hors service': 'bg-red-50 text-red-700',
 };
 
+/** dateInscription arrive au format jj/mm/aaaa, que `new Date()` ne lit pas */
+function parseFrenchDate(value?: string): Date | null {
+  const m = value?.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if (m) return new Date(Number(m[3]), Number(m[2]) - 1, Number(m[1]));
+  const d = value ? new Date(value) : null;
+  return d && !isNaN(d.getTime()) ? d : null;
+}
+
 export default function ClientDashboardPage() {
   const { t, i18n } = useTranslation();
   const status = useStatusLabels();
@@ -60,7 +68,7 @@ export default function ClientDashboardPage() {
         <div className="relative z-10 text-right">
           <p className="text-white/50 text-xs">{t('clientPortal.dashboard.clientSince')}</p>
           <p className="text-white font-semibold text-sm mt-0.5">
-            {new Date(client?.dateInscription ?? '').toLocaleDateString(i18n.language, { month: 'long', year: 'numeric' })}
+            {parseFrenchDate(client?.dateInscription)?.toLocaleDateString(i18n.language, { month: 'long', year: 'numeric' }) ?? '-'}
           </p>
         </div>
       </div>

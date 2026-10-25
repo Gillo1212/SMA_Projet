@@ -13,7 +13,7 @@ import {
   useCallback,
   ReactNode,
 } from 'react';
-import { apiClient } from '../services/apiClient';
+import { apiClient, ApiError } from '../services/apiClient';
 import { mockClient } from '../mocks/clientPortal';
 import type { ClientProfile } from '../types/models';
 import { formatDate } from '../services/normalize';
@@ -79,14 +79,24 @@ export function ClientAuthProvider({ children }: { children: ReactNode }) {
         // Backend retourne { success, user: {...} } - on extrait user
         apiClient
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          .get<Record<string, any>>(ENDPOINTS.AUTH.ME)
+          // Jeton client explicite : apiClient choisit sinon le jeton selon la page
+          .get<Record<string, any>>(ENDPOINTS.AUTH.ME, undefined, {
+            headers: { Authorization: `Bearer ${token}` },
+          })
           .then(res => {
             const userData = res.user ?? res;
             setClient(normalizeClient(userData));
           })
-          .catch(() => {
-            localStorage.removeItem(CLIENT_TOKEN_KEY);
-            localStorage.removeItem(CLIENT_USER_KEY);
+          .catch(err => {
+            // Seul un 401 signe la fin de la session. Sur une erreur passagère
+            // (429, 500, réseau), on garde le jeton et le dernier profil connu.
+            if (err instanceof ApiError && err.status === 401) {
+              localStorage.removeItem(CLIENT_TOKEN_KEY);
+              localStorage.removeItem(CLIENT_USER_KEY);
+              return;
+            }
+            const stored = localStorage.getItem(CLIENT_USER_KEY);
+            if (stored) setClient(JSON.parse(stored) as ClientProfile);
           })
           .finally(() => setIsLoading(false));
       }

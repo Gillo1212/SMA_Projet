@@ -7,7 +7,13 @@
  *  - Les erreurs HTTP (401 → redirect login, etc.)
  */
 
-import { API_URL, AUTH_TOKEN_KEY } from '../config/api';
+import {
+  API_URL,
+  AUTH_TOKEN_KEY,
+  AUTH_USER_KEY,
+  CLIENT_TOKEN_KEY,
+  CLIENT_USER_KEY,
+} from '../config/api';
 
 // ── Types internes ─────────────────────────────────────────────────────────
 
@@ -36,8 +42,24 @@ interface RequestOptions {
 
 // ── Utilitaires ────────────────────────────────────────────────────────────
 
+/**
+ * Zone de l'application : décide quel jeton accompagne les requêtes.
+ * Le portail admin et l'espace client ont chacun leur session ; le reste du
+ * site (checkout compris) agit pour le compte du client.
+ */
+function currentArea(): 'admin' | 'client' {
+  const path = window.location.pathname;
+  return path.startsWith('/admin') || path === '/connexion' ? 'admin' : 'client';
+}
+
+function sessionKeys() {
+  return currentArea() === 'admin'
+    ? { token: AUTH_TOKEN_KEY, user: AUTH_USER_KEY, login: '/connexion', protectedPrefix: '/admin' }
+    : { token: CLIENT_TOKEN_KEY, user: CLIENT_USER_KEY, login: '/espace-client/connexion', protectedPrefix: '/espace-client' };
+}
+
 function getAuthHeader(): Record<string, string> {
-  const token = localStorage.getItem(AUTH_TOKEN_KEY);
+  const token = localStorage.getItem(sessionKeys().token);
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
@@ -54,16 +76,25 @@ function buildUrl(endpoint: string, params?: Record<string, unknown>): string {
 }
 
 async function handleResponse<T>(response: Response): Promise<T> {
-  // 401 → déconnexion automatique
-  if (response.status === 401) {
-    localStorage.removeItem(AUTH_TOKEN_KEY);
-    window.location.href = '/connexion';
-    throw new ApiError(401, 'Session expirée');
-  }
-
   const contentType = response.headers.get('Content-Type') ?? '';
   const isJson = contentType.includes('application/json');
   const body = isJson ? await response.json() : await response.text();
+
+  // 401 avec une session ouverte : elle a expiré, on la ferme. Sans session
+  // (identifiants refusés à la connexion), on laisse remonter le message.
+  if (response.status === 401) {
+    const keys = sessionKeys();
+    if (localStorage.getItem(keys.token)) {
+      localStorage.removeItem(keys.token);
+      localStorage.removeItem(keys.user);
+      const path = window.location.pathname;
+      if (path.startsWith(keys.protectedPrefix) && path !== keys.login) {
+        window.location.href = keys.login;
+      }
+      throw new ApiError(401, 'Session expirée');
+    }
+    throw new ApiError(401, isJson ? (body?.message ?? 'Non autorisé') : 'Non autorisé');
+  }
 
   if (!response.ok) {
     throw new ApiError(
