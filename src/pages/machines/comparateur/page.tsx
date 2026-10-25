@@ -1,18 +1,22 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import Navbar from '../../home/components/Navbar';
 import Footer from '../../home/components/Footer';
 import { useMachines } from '../../../hooks/useMachines';
 import { LoadingState, ErrorState } from '../../../components/feature/AsyncState';
 import type { Machine } from '../../../types/models';
 
+const MAX_COMPARED = 5;
+
 export default function ComparateurPage() {
+  const { t } = useTranslation();
   const { machines, isLoading, error, refetch } = useMachines();
   const [selectedMachines, setSelectedMachines] = useState<string[]>([]);
   const [showSelector, setShowSelector] = useState(false);
 
   const addMachine = (machineId: string) => {
-    if (selectedMachines.length < 5 && !selectedMachines.includes(machineId)) {
+    if (selectedMachines.length < MAX_COMPARED && !selectedMachines.includes(machineId)) {
       setSelectedMachines([...selectedMachines, machineId]);
     }
   };
@@ -25,34 +29,34 @@ export default function ComparateurPage() {
   const availableMachines = machines.filter(m => !selectedMachines.includes(m.id));
 
   const comparisonCriteria = [
-    { key: 'price', label: 'Prix', format: (m: Machine) => m.priceDisplay },
-    { key: 'type', label: 'Type', format: (m: Machine) => m.category },
-    { key: 'capacity', label: 'Capacité totale', format: (m: Machine) => {
+    { key: 'price', label: t('compare.price'), format: (m: Machine) => m.priceDisplay },
+    { key: 'type', label: t('compare.type'), format: (m: Machine) => m.category },
+    { key: 'capacity', label: t('compare.totalCapacity'), format: (m: Machine) => {
       const cap = m.capacity;
-      if ('cups' in cap) return `${cap.cups} gobelets`;
+      if ('cups' in cap) return t('compare.cups', { count: Number(cap.cups) });
       if ('totalProducts' in cap) return cap.totalProducts;
       if ('total' in cap) return cap.total;
-      return 'N/A';
+      return t('compare.notAvailable');
     }},
-    { key: 'dimensions', label: 'Dimensions', format: (m: Machine) => m.specifications.dimensions },
-    { key: 'power', label: 'Puissance', format: (m: Machine) => m.specifications.power },
-    { key: 'drinksPerMinute', label: 'Débit', format: (m: Machine) => m.specifications.drinksPerMinute || 'N/A' },
-    { key: 'weight', label: 'Poids', format: (m: Machine) => m.specifications.weight },
-    { key: 'payment', label: 'Paiements', format: (m: Machine) => (
+    { key: 'dimensions', label: t('compare.dimensions'), format: (m: Machine) => m.specifications.dimensions },
+    { key: 'power', label: t('compare.power'), format: (m: Machine) => m.specifications.power },
+    { key: 'drinksPerMinute', label: t('compare.throughput'), format: (m: Machine) => m.specifications.drinksPerMinute || t('compare.notAvailable') },
+    { key: 'weight', label: t('compare.weight'), format: (m: Machine) => m.specifications.weight },
+    { key: 'payment', label: t('compare.payments'), format: (m: Machine) => (
       <div className="flex flex-wrap gap-2 justify-center">
         {m.paymentMethods.includes('wave') && <span className="px-2 py-1 bg-[#F6F3EC] rounded text-xs">Wave</span>}
         {m.paymentMethods.includes('orange') && <span className="px-2 py-1 bg-[#F6F3EC] rounded text-xs">Orange</span>}
-        {m.paymentMethods.includes('carte') && <span className="px-2 py-1 bg-[#F6F3EC] rounded text-xs">CB</span>}
-        {m.paymentMethods.includes('especes') && <span className="px-2 py-1 bg-[#F6F3EC] rounded text-xs">Espèces</span>}
+        {m.paymentMethods.includes('carte') && <span className="px-2 py-1 bg-[#F6F3EC] rounded text-xs">{t('compare.cardShort')}</span>}
+        {m.paymentMethods.includes('especes') && <span className="px-2 py-1 bg-[#F6F3EC] rounded text-xs">{t('machineDetail.payment.especes')}</span>}
       </div>
     )},
-    { key: 'maintenance', label: 'Maintenance incluse', format: (m: Machine) => (
+    { key: 'maintenance', label: t('compare.maintenanceIncluded'), format: (m: Machine) => (
       m.maintenanceIncluded ? 
       <i className="ri-check-line text-2xl text-[#1AAA3F]"></i> : 
       <i className="ri-close-line text-2xl text-red-500"></i>
     )},
-    { key: 'delivery', label: 'Délai de livraison', format: (m: Machine) => m.deliveryTime },
-    { key: 'stock', label: 'Disponibilité', format: (m: Machine) => m.stock }
+    { key: 'delivery', label: t('compare.deliveryTime'), format: (m: Machine) => m.deliveryTime },
+    { key: 'stock', label: t('compare.availability'), format: (m: Machine) => m.stock }
   ];
 
   if (isLoading || error) {
@@ -61,7 +65,7 @@ export default function ComparateurPage() {
         <Navbar />
         <div className="pt-32 pb-20">
           {isLoading
-            ? <LoadingState label="Chargement des machines…" />
+            ? <LoadingState label={t('compare.loading')} />
             : <ErrorState message={error!} onRetry={refetch} />}
         </div>
         <Footer />
@@ -79,26 +83,26 @@ export default function ComparateurPage() {
           <div className="mb-12">
             <Link to="/machines" className="inline-flex items-center gap-2 text-sm text-[#00272B]/60 hover:text-[#1AAA3F] transition-colors mb-6">
               <i className="ri-arrow-left-line"></i>
-              Retour au catalogue
+              {t('machineDetail.backToCatalogue')}
             </Link>
             
             <h1 className="text-4xl lg:text-5xl font-bold text-[#00272B] mb-4">
-              Comparateur de machines
+              {t('compare.title')}
             </h1>
             <p className="text-lg text-[#00272B]/70">
-              Comparez jusqu'à 5 machines pour trouver celle qui correspond le mieux à vos besoins
+              {t('compare.subtitle')}
             </p>
           </div>
 
           {/* Add Machine Button */}
-          {selectedMachines.length < 5 && (
+          {selectedMachines.length < MAX_COMPARED && (
             <div className="mb-8">
               <button
                 onClick={() => setShowSelector(!showSelector)}
                 className="px-6 py-3 bg-[#1AAA3F] text-white text-sm font-semibold rounded-lg hover:bg-[#158f35] transition-colors flex items-center gap-2 cursor-pointer whitespace-nowrap"
               >
                 <i className="ri-add-line text-xl"></i>
-                Ajouter une machine ({selectedMachines.length}/5)
+                {t('compare.addMachine', { count: selectedMachines.length, max: MAX_COMPARED })}
               </button>
             </div>
           )}
@@ -107,7 +111,7 @@ export default function ComparateurPage() {
           {showSelector && (
             <div className="mb-8 bg-white rounded-2xl p-6">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-bold text-[#00272B]">Sélectionner une machine</h3>
+                <h3 className="text-xl font-bold text-[#00272B]">{t('compare.selectMachine')}</h3>
                 <button 
                   onClick={() => setShowSelector(false)}
                   className="w-8 h-8 flex items-center justify-center text-[#00272B]/40 hover:text-[#00272B] transition-colors cursor-pointer"
@@ -150,13 +154,13 @@ export default function ComparateurPage() {
               <div className="w-20 h-20 bg-[#F6F3EC] rounded-full flex items-center justify-center mx-auto mb-6">
                 <i className="ri-scales-line text-4xl text-[#1AAA3F]"></i>
               </div>
-              <h3 className="text-2xl font-bold text-[#00272B] mb-3">Aucune machine sélectionnée</h3>
-              <p className="text-[#00272B]/60 mb-8">Ajoutez des machines pour commencer la comparaison</p>
+              <h3 className="text-2xl font-bold text-[#00272B] mb-3">{t('compare.emptyTitle')}</h3>
+              <p className="text-[#00272B]/60 mb-8">{t('compare.emptyHint')}</p>
               <button
                 onClick={() => setShowSelector(true)}
                 className="px-8 py-4 bg-[#1AAA3F] text-white text-sm font-semibold rounded-lg hover:bg-[#158f35] transition-colors cursor-pointer whitespace-nowrap"
               >
-                Sélectionner des machines
+                {t('compare.selectMachines')}
               </button>
             </div>
           ) : (
@@ -166,7 +170,7 @@ export default function ComparateurPage() {
                   <thead>
                     <tr className="border-b border-gray-100">
                       <th className="p-6 text-left text-sm font-semibold text-[#00272B] bg-[#F6F3EC] sticky left-0 z-10">
-                        Critères
+                        {t('compare.criteria')}
                       </th>
                       {comparedMachines.map(machine => (
                         <th key={machine.id} className="p-6 min-w-[280px]">
@@ -179,6 +183,7 @@ export default function ComparateurPage() {
                               />
                               <button
                                 onClick={() => removeMachine(machine.id)}
+                                aria-label={t('compare.remove')}
                                 className="absolute top-2 right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center hover:bg-red-50 transition-colors cursor-pointer"
                               >
                                 <i className="ri-close-line text-red-500"></i>
@@ -189,7 +194,7 @@ export default function ComparateurPage() {
                               to={`/machines/${machine.slug}`}
                               className="text-xs text-[#1AAA3F] hover:underline"
                             >
-                              Voir les détails
+                              {t('compare.seeDetails')}
                             </Link>
                           </div>
                         </th>
@@ -220,7 +225,7 @@ export default function ComparateurPage() {
                             to={`/machines/devis?machine=${machine.slug}`}
                             className="block w-full px-6 py-3 bg-[#1AAA3F] text-white text-sm font-semibold rounded-lg hover:bg-[#158f35] transition-colors text-center cursor-pointer whitespace-nowrap"
                           >
-                            Demander un devis
+                            {t('compare.requestQuote')}
                           </Link>
                         </td>
                       ))}

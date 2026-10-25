@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useTranslation, Trans } from 'react-i18next';
 import Navbar from '../../home/components/Navbar';
 import Footer from '../../home/components/Footer';
 import { useProduct, useProducts } from '../../../hooks/useProducts';
@@ -7,6 +8,7 @@ import { LoadingState } from '../../../components/feature/AsyncState';
 import { useCart } from '../../../contexts/CartContext';
 
 export default function ProductDetailPage() {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { product, isLoading } = useProduct(id ?? '');
@@ -23,7 +25,7 @@ export default function ProductDetailPage() {
       <div className="min-h-screen bg-white">
         <Navbar />
         <div className="pt-32 pb-20">
-          <LoadingState label="Chargement du produit…" />
+          <LoadingState label={t('productDetail.loading')} />
         </div>
         <Footer />
       </div>
@@ -35,9 +37,9 @@ export default function ProductDetailPage() {
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <i className="ri-error-warning-line text-6xl text-gray-300 mb-6"></i>
-          <h1 className="text-3xl font-bold text-[#00272B] mb-3">Produit non trouvé</h1>
+          <h1 className="text-3xl font-bold text-[#00272B] mb-3">{t('productDetail.notFound')}</h1>
           <Link to="/produits" className="text-[#1AAA3F] hover:underline">
-            Retour au catalogue
+            {t('productDetail.backToCatalogue')}
           </Link>
         </div>
       </div>
@@ -92,9 +94,9 @@ export default function ProductDetailPage() {
       <section className="pt-32 pb-8 bg-[#F6F3EC]">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="flex items-center space-x-2 text-sm">
-            <Link to="/" className="text-gray-600 hover:text-[#1AAA3F]">Accueil</Link>
+            <Link to="/" className="text-gray-600 hover:text-[#1AAA3F]">{t('productDetail.home')}</Link>
             <i className="ri-arrow-right-s-line text-gray-400"></i>
-            <Link to="/produits" className="text-gray-600 hover:text-[#1AAA3F]">Produits</Link>
+            <Link to="/produits" className="text-gray-600 hover:text-[#1AAA3F]">{t('productDetail.products')}</Link>
             <i className="ri-arrow-right-s-line text-gray-400"></i>
             <Link to={`/produits?category=${product.category}`} className="text-gray-600 hover:text-[#1AAA3F]">
               {product.category}
@@ -150,17 +152,17 @@ export default function ProductDetailPage() {
                 <div>
                   {product.isNew && (
                     <span className="inline-block px-3 py-1 bg-[#25A9F2] text-white text-xs font-semibold rounded-full mb-3">
-                      Nouveau
+                      {t('productDetail.badgeNew')}
                     </span>
                   )}
                   {product.isPopular && (
                     <span className="inline-block px-3 py-1 bg-[#1AAA3F] text-white text-xs font-semibold rounded-full mb-3 ml-2">
-                      Populaire
+                      {t('productDetail.badgePopular')}
                     </span>
                   )}
                   <p className="text-sm text-[#1AAA3F] font-semibold mb-2">{product.brand}</p>
                 </div>
-                <span className="text-sm text-gray-500">SKU: {product.sku}</span>
+                <span className="text-sm text-gray-500">{t('productDetail.sku', { sku: product.sku })}</span>
               </div>
 
               <h1 className="text-4xl font-bold text-[#00272B] mb-4">{product.name}</h1>
@@ -178,13 +180,13 @@ export default function ProductDetailPage() {
                     </p>
                   )}
                 </div>
-                <p className="text-sm text-gray-600">Prix unitaire</p>
+                <p className="text-sm text-gray-600">{t('productDetail.unitPrice')}</p>
               </div>
 
               {/* Volume Discounts */}
               {product.volumeDiscounts.length > 0 && (
                 <div className="mb-8">
-                  <h3 className="text-base font-semibold text-[#00272B] mb-4">Remises par volume</h3>
+                  <h3 className="text-base font-semibold text-[#00272B] mb-4">{t('productDetail.volumeDiscounts')}</h3>
                   <div className="grid grid-cols-3 gap-3">
                     {product.volumeDiscounts.map((vd, index) => (
                       <div
@@ -196,7 +198,7 @@ export default function ProductDetailPage() {
                         }`}
                       >
                         <p className="text-2xl font-bold text-[#1AAA3F] mb-1">-{vd.discount}%</p>
-                        <p className="text-xs text-gray-600">Dès {vd.quantity} unités</p>
+                        <p className="text-xs text-gray-600">{t('productDetail.fromUnits', { count: vd.quantity })}</p>
                       </div>
                     ))}
                   </div>
@@ -205,7 +207,7 @@ export default function ProductDetailPage() {
 
               {/* Quantity Selector */}
               <div className="mb-8">
-                <h3 className="text-base font-semibold text-[#00272B] mb-4">Quantité</h3>
+                <h3 className="text-base font-semibold text-[#00272B] mb-4">{t('productDetail.quantity')}</h3>
                 <div className="flex items-center space-x-4">
                   <div className="flex items-center border-2 border-gray-200 rounded-xl overflow-hidden">
                     <button
@@ -233,7 +235,11 @@ export default function ProductDetailPage() {
                   </div>
 
                   <p className="text-sm text-gray-600">
-                    <strong className="text-[#00272B]">{product.stock}</strong> en stock
+                    <Trans
+                      i18nKey="productDetail.inStock"
+                      values={{ count: product.stock }}
+                      components={{ b: <strong className="text-[#00272B]" /> }}
+                    />
                   </p>
                 </div>
               </div>
@@ -241,14 +247,14 @@ export default function ProductDetailPage() {
               {/* Total */}
               <div className="flex items-center justify-between p-6 bg-gray-50 rounded-2xl mb-8">
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Total</p>
+                  <p className="text-sm text-gray-600 mb-1">{t('productDetail.total')}</p>
                   <p className="text-3xl font-bold text-[#00272B]">
                     {totalPrice.toLocaleString('fr-FR')} <span className="text-lg">FCFA</span>
                   </p>
                 </div>
                 {discount > 0 && (
                   <div className="text-right">
-                    <p className="text-sm text-gray-600 mb-1">Économie</p>
+                    <p className="text-sm text-gray-600 mb-1">{t('productDetail.savings')}</p>
                     <p className="text-2xl font-bold text-[#1AAA3F]">
                       -{((unitPrice - discountedPrice) * quantity).toLocaleString('fr-FR')} FCFA
                     </p>
@@ -264,14 +270,14 @@ export default function ProductDetailPage() {
                   className="flex-1 h-16 bg-[#1AAA3F] text-white text-lg font-semibold rounded-xl hover:bg-[#158f35] transition-colors cursor-pointer disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center space-x-3 whitespace-nowrap"
                 >
                   <i className="ri-shopping-cart-line text-2xl"></i>
-                  <span>{product.isAvailable ? 'Ajouter au panier' : 'Rupture de stock'}</span>
+                  <span>{product.isAvailable ? t('productDetail.addToCart') : t('productDetail.outOfStock')}</span>
                 </button>
                 <button
                   onClick={handleBuyNow}
                   disabled={!product.isAvailable}
                   className="flex-1 h-16 bg-[#00272B] text-white text-lg font-semibold rounded-xl hover:bg-[#003d42] transition-colors cursor-pointer disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center space-x-3 whitespace-nowrap"
                 >
-                  <span>Acheter maintenant</span>
+                  <span>{t('productDetail.buyNow')}</span>
                   <i className="ri-arrow-right-line text-xl"></i>
                 </button>
               </div>
@@ -281,9 +287,9 @@ export default function ProductDetailPage() {
                 <div className="mb-6 p-4 bg-[#F6F3EC] border border-[#1AAA3F] rounded-xl flex items-center space-x-3">
                   <i className="ri-checkbox-circle-fill text-2xl text-[#1AAA3F]"></i>
                   <div className="flex-1">
-                    <p className="text-sm font-semibold text-[#1AAA3F]">Produit ajouté au panier !</p>
+                    <p className="text-sm font-semibold text-[#1AAA3F]">{t('productDetail.added')}</p>
                     <Link to="/panier" className="text-xs text-[#00272B] hover:underline">
-                      Voir mon panier
+                      {t('productDetail.viewCart')}
                     </Link>
                   </div>
                 </div>
@@ -293,11 +299,11 @@ export default function ProductDetailPage() {
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div className="flex items-center space-x-3 text-gray-600">
                   <i className="ri-truck-line text-xl text-[#1AAA3F]"></i>
-                  <span>Livraison gratuite dès 50 000 FCFA</span>
+                  <span>{t('productDetail.freeShipping')}</span>
                 </div>
                 <div className="flex items-center space-x-3 text-gray-600">
                   <i className="ri-shield-check-line text-xl text-[#1AAA3F]"></i>
-                  <span>Paiement sécurisé</span>
+                  <span>{t('productDetail.securePayment')}</span>
                 </div>
               </div>
             </div>
@@ -308,34 +314,34 @@ export default function ProductDetailPage() {
             <div className="border-b border-gray-200 mb-8">
               <div className="flex space-x-8">
                 <button className="pb-4 px-2 border-b-2 border-[#1AAA3F] text-base font-semibold text-[#1AAA3F] whitespace-nowrap">
-                  Description
+                  {t('productDetail.tabDescription')}
                 </button>
                 <button className="pb-4 px-2 border-b-2 border-transparent text-base font-semibold text-gray-400 hover:text-[#00272B] transition-colors whitespace-nowrap">
-                  Ingrédients et allergènes
+                  {t('productDetail.tabIngredients')}
                 </button>
                 <button className="pb-4 px-2 border-b-2 border-transparent text-base font-semibold text-gray-400 hover:text-[#00272B] transition-colors whitespace-nowrap">
-                  Compatibilité
+                  {t('productDetail.tabCompatibility')}
                 </button>
               </div>
             </div>
 
             <div className="grid lg:grid-cols-3 gap-12">
               <div className="lg:col-span-2">
-                <h3 className="text-2xl font-bold text-[#00272B] mb-4">Description du produit</h3>
+                <h3 className="text-2xl font-bold text-[#00272B] mb-4">{t('productDetail.descriptionTitle')}</h3>
                 <p className="text-base text-gray-700 leading-relaxed mb-8">
                   {product.description}
                 </p>
 
                 <div className="bg-[#F6F3EC] rounded-2xl p-8 mb-8">
-                  <h4 className="text-lg font-semibold text-[#00272B] mb-4">Ingrédients</h4>
+                  <h4 className="text-lg font-semibold text-[#00272B] mb-4">{t('productDetail.ingredients')}</h4>
                   <p className="text-sm text-gray-700 mb-6">{product.ingredients}</p>
 
-                  <h4 className="text-lg font-semibold text-[#00272B] mb-4">Allergènes</h4>
+                  <h4 className="text-lg font-semibold text-[#00272B] mb-4">{t('productDetail.allergens')}</h4>
                   <p className="text-sm text-gray-700">{product.allergens}</p>
                 </div>
 
                 <div className="bg-gray-50 rounded-2xl p-8">
-                  <h4 className="text-lg font-semibold text-[#00272B] mb-4">Compatible avec</h4>
+                  <h4 className="text-lg font-semibold text-[#00272B] mb-4">{t('productDetail.compatibleWith')}</h4>
                   <div className="flex flex-wrap gap-3">
                     {product.compatibility.map((machine, index) => (
                       <span
@@ -352,15 +358,15 @@ export default function ProductDetailPage() {
               <div>
                 <div className="bg-[#00272B] rounded-2xl p-8 text-white">
                   <i className="ri-customer-service-2-line text-5xl mb-6"></i>
-                  <h4 className="text-xl font-bold mb-3">Besoin d'aide ?</h4>
+                  <h4 className="text-xl font-bold mb-3">{t('productDetail.helpTitle')}</h4>
                   <p className="text-sm text-gray-300 mb-6">
-                    Notre équipe est à votre disposition pour vous conseiller.
+                    {t('productDetail.helpText')}
                   </p>
                   <Link
                     to="/contact"
                     className="block w-full h-12 bg-white text-[#00272B] text-sm font-semibold rounded-lg hover:bg-gray-100 transition-colors flex items-center justify-center whitespace-nowrap"
                   >
-                    Nous contacter
+                    {t('productDetail.contactUs')}
                   </Link>
                 </div>
               </div>
@@ -370,7 +376,7 @@ export default function ProductDetailPage() {
           {/* Related Products */}
           {relatedProducts.length > 0 && (
             <div className="mt-20">
-              <h2 className="text-3xl font-bold text-[#00272B] mb-8">Produits similaires</h2>
+              <h2 className="text-3xl font-bold text-[#00272B] mb-8">{t('productDetail.similar')}</h2>
               <div className="grid grid-cols-4 gap-8">
                 {relatedProducts.map(relatedProduct => (
                   <Link
