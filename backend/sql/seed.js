@@ -14,6 +14,68 @@ const daysAgo = (n) => {
 const dateOnly = (n) =>
   new Date(Date.now() - n * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
+/** Ancien catalogue de démo, remplacé par les produits réels SMALIM */
+const LEGACY_MACHINE_SLUGS = [
+  'tcn-ncf-7n-v22', 'tcn-ncf-4n-v10', 'tcn-csc-10g-h5', 'tcn-csc-6g-h5', 'tcn-csc-10c-32v',
+  'tcn-csc-8c-50sp', 'tcn-60g-c4', 'tcn-cfz-510l', 'tcn-cfz-1200-v10',
+];
+const LEGACY_PRODUCT_SLUGS = [
+  'cafe-grains-arabica-1kg', 'cafe-soluble-vending-500g', 'chocolat-poudre-1kg',
+  'lait-poudre-vending-1kg', 'the-vert-dosettes-200', 'sucre-batonnets-4g-1000',
+  // Consommables sans photo réelle, retirés du catalogue
+  'gobelet-carton-20cl-1000', 'gobelet-plastique-18cl-2000', 'touillettes-bois-5000', 'couvercles-20cl-1000',
+  'assortiment-biscuits-100', 'barres-chocolatees-50', 'chips-sachets-30g-60', 'cacahuetes-40g-60',
+  'spirale-distributrice-standard', 'moteur-spirale-24v', 'groupe-brassage-cafe', 'filtre-eau-anticalcaire',
+  'kit-maintenance-annuelle', 'monnayeur-electronique-mdb',
+];
+const LEGACY_PRODUCT_CATEGORY_SLUGS = ['gobelets-emballages', 'produits-sucres', 'pieces-detachees'];
+/** Données de démo qui citaient l'ancien catalogue : supprimées puis recréées par le seed */
+const LEGACY_DEMO_ROWS = {
+  orders: ['CMD-2024-0001', 'CMD-2024-0002', 'CMD-2024-0003', 'CMD-2024-0004', 'CMD-2024-0005', 'CMD-2024-0006', 'CMD-2024-0007'],
+  invoices: ['FAC-2024-0001', 'FAC-2024-0002', 'FAC-2024-0003', 'FAC-2024-0004'],
+  quotes: ['DEV-2024-0001', 'DEV-2024-0002', 'DEV-2024-0005'],
+  tickets: ['TIC-2024-0001', 'TIC-2024-0002', 'TIC-2024-0003'],
+  fleet: ['SN-NCF7N-00142', 'SN-CSC10G-00311', 'SN-CSC10C-00087', 'SN-CSC6G-00205', 'SN-CFZ510-00064', 'SN-60GC4-00019'],
+};
+
+/**
+ * Retire l'ancien catalogue de démo d'une base déjà initialisée.
+ * Ne touche qu'aux lignes de démo listées ci-dessus : les commandes, tickets
+ * ou parcs créés depuis l'application sont conservés. Une machine encore
+ * rattachée à un parc client réel est désactivée plutôt que supprimée.
+ */
+async function removeLegacyDemoCatalog() {
+  const [legacy] = await query(
+    `SELECT (SELECT COUNT(*) FROM machines WHERE slug IN (?)) + (SELECT COUNT(*) FROM products WHERE slug IN (?)) AS n`,
+    [LEGACY_MACHINE_SLUGS, LEGACY_PRODUCT_SLUGS]
+  );
+  if (!legacy.n) return;
+
+  const { orders, invoices, quotes, tickets, fleet } = LEGACY_DEMO_ROWS;
+  await query('DELETE FROM invoices WHERE invoice_number IN (?)', [invoices]);
+  await query('DELETE FROM orders WHERE order_number IN (?)', [orders]);           // lignes et suivi en cascade
+  await query('DELETE FROM quotes WHERE quote_number IN (?)', [quotes]);
+  await query('DELETE FROM support_tickets WHERE ticket_number IN (?)', [tickets]); // messages en cascade
+  await query('DELETE FROM client_machines WHERE serial_number IN (?)', [fleet]);
+
+  await query(
+    `DELETE m FROM machines m
+     LEFT JOIN client_machines cm ON cm.machine_id = m.id
+     WHERE m.slug IN (?) AND cm.id IS NULL`,
+    [LEGACY_MACHINE_SLUGS]
+  );
+  await query('UPDATE machines SET is_active = 0, is_featured = 0 WHERE slug IN (?)', [LEGACY_MACHINE_SLUGS]);
+  await query('DELETE FROM products WHERE slug IN (?)', [LEGACY_PRODUCT_SLUGS]);
+  await query(
+    `DELETE c FROM product_categories c
+     LEFT JOIN products p ON p.category_id = c.id
+     WHERE c.slug IN (?) AND p.id IS NULL`,
+    [LEGACY_PRODUCT_CATEGORY_SLUGS]
+  );
+
+  console.log('Ancien catalogue de démo retiré (TCN, consommables sans photo)');
+}
+
 async function seed() {
   try {
     console.log('🌱 Début du seeding...');
@@ -51,37 +113,40 @@ async function seed() {
 
     // ── Catégories machines ───────────────────────
     const machineCategories = [
-      ['Distributeurs Automatiques', 'distributeurs-automatiques', 'Machines de vente automatique'],
-      ['Machines à Café', 'machines-cafe', 'Équipements pour café et boissons chaudes'],
-      ['Machines à Glace', 'machines-glace', 'Productrices de glace et boissons fraîches'],
-      ['Équipements Frigorifiques', 'equipements-frigorifiques', 'Réfrigérateurs et congélateurs professionnels'],
+      ['Distributeurs automatiques', 'distributeurs-automatiques', 'Machines de vente automatique'],
+      ['Machines à café', 'machines-cafe', 'Équipements pour café et boissons chaudes'],
+      ['Machines à glace', 'machines-glace', 'Productrices de glace et boissons fraîches'],
+      ['Équipements frigorifiques', 'equipements-frigorifiques', 'Réfrigérateurs et congélateurs professionnels'],
     ];
     for (const [name, slug, desc] of machineCategories) {
-      await query('INSERT IGNORE INTO machine_categories (name, slug, description) VALUES (?, ?, ?)', [name, slug, desc]);
+      await query(
+        'INSERT INTO machine_categories (name, slug, description) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE name = VALUES(name), description = VALUES(description)',
+        [name, slug, desc]
+      );
     }
     console.log('Catégories machines créées');
 
     // ── Catégories produits ───────────────────────
     const productCategories = [
-      ['Gobelets & Emballages', 'gobelets-emballages', 'Consommables de packaging'],
-      ['Cafés & Boissons', 'cafes-boissons', 'Café, chocolat, thé en dosettes'],
-      ['Produits Sucrés', 'produits-sucres', 'Snacks et confiseries'],
-      ['Pièces Détachées', 'pieces-detachees', 'Pièces de rechange et maintenance'],
+      ['Cafés et boissons', 'cafes-boissons', 'Cafés, chocolats et cappuccinos pour distributeurs et machines à café'],
     ];
     for (const [name, slug, desc] of productCategories) {
-      await query('INSERT IGNORE INTO product_categories (name, slug, description) VALUES (?, ?, ?)', [name, slug, desc]);
+      await query(
+        'INSERT INTO product_categories (name, slug, description) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE name = VALUES(name), description = VALUES(description)',
+        [name, slug, desc]
+      );
     }
     console.log('Catégories produits créées');
 
     // ── Catégories blog ───────────────────────────
     const blogCategories = [
       ['Actualités', 'actualites'],
-      ['Conseils & Maintenance', 'conseils-maintenance'],
+      ['Conseils et maintenance', 'conseils-maintenance'],
       ['Études de cas', 'etudes-de-cas'],
       ['Innovation', 'innovation'],
     ];
     for (const [name, slug] of blogCategories) {
-      await query('INSERT IGNORE INTO blog_categories (name, slug) VALUES (?, ?)', [name, slug]);
+      await query('INSERT INTO blog_categories (name, slug) VALUES (?, ?) ON DUPLICATE KEY UPDATE name = VALUES(name)', [name, slug]);
     }
     console.log('Catégories blog créées');
 
@@ -95,260 +160,187 @@ async function seed() {
     `);
     console.log('Codes promo créés : BIENVENUE10, SMALIM2024, LIVRAISON');
 
-    // ── Machines TCN ──────────────────────────────────────────────
+    // ── Retrait de l'ancien catalogue de démo ─────────────────────
+    // Les premières versions du seed chargeaient des machines TCN et des
+    // cafés génériques. Sur une base déjà initialisée, on retire ces lignes
+    // et les données de démo qui s'y rattachent, pour qu'elles soient
+    // recréées plus bas avec le catalogue réel. Sans effet sur une base neuve.
+    await removeLegacyDemoCatalog();
+
+    // ── Machines (catalogue réel SMALIM) ──────────────────────────
     // Récupérer les IDs de catégories
     const [catDistrib] = await query("SELECT id FROM machine_categories WHERE slug = 'distributeurs-automatiques'");
     const [catCafe]    = await query("SELECT id FROM machine_categories WHERE slug = 'machines-cafe'");
-    const [catFrigo]   = await query("SELECT id FROM machine_categories WHERE slug = 'equipements-frigorifiques'");
 
     const idDistrib = catDistrib?.id;
     const idCafe    = catCafe?.id;
-    const idFrigo   = catFrigo?.id;
 
     const paymentModes = JSON.stringify(['wave', 'orange_money', 'carte_bancaire', 'especes', 'qr_code']);
 
+    // Les photos sont servies par le frontend (frontend/public/images),
+    // numérotées 1.webp, 2.webp… : la première sert d'image principale.
+    const gallery = (kind, slug, count) =>
+      Array.from({ length: count }, (_, i) => `/images/${kind}/${slug}/${i + 1}.webp`);
+
     const machinesData = [
-      // ── Machines à Café ─────────────────────────────────────────
+      // ── Machines à café de comptoir ─────────────────────────────
       {
         category_id: idCafe,
-        name: 'TCN Machine à Café Commerciale',
-        slug: 'tcn-ncf-7n-v22',
-        model_ref: 'TCN-NCF-7N(V22)',
-        brand: 'TCN',
-        description: 'Machine à café professionnelle haute capacité. 20 variétés de boissons chaudes, mouture fraîche intégrée, chaudière haute pression 92°C. Idéale pour les grandes entreprises, hôtels et centres commerciaux.',
-        stock: 5,
-        delivery_delay: '7-14 jours ouvrés',
-        is_featured: 1,
-        specifications: JSON.stringify({
-          dimensions: 'H: 194 cm × L: 73,5 cm × P: 79 cm',
-          poids: '220 kg',
-          temperature: '92°C',
-          capacite_gobelets: '160 gobelets',
-          boissons: '20 boissons chaudes',
-          affichage: 'Écran tactile couleur',
-          certifications: 'CE, CB, ISO9001, SGS',
-          interface: 'MDB/DEX'
-        }),
-      },
-      {
-        category_id: idCafe,
-        name: 'TCN Mini Machine à Café',
-        slug: 'tcn-ncf-4n-v10',
-        model_ref: 'TCN-NCF-4N(V10.1)',
-        brand: 'TCN',
-        description: 'Machine à café compacte avec mouture fraîche. Format ultra-compact, 4 conteneurs d\'ingrédients, chauffe rapide 3000W, température de brassage 92°C. Parfaite pour les PME et espaces réduits.',
-        stock: 8,
-        delivery_delay: '5-10 jours ouvrés',
+        name: 'Sapoe AVM',
+        slug: 'sapoe-avm',
+        model_ref: 'AVM',
+        brand: 'Sapoe',
+        description: 'Machine à café instantané de comptoir, compacte et facile à entretenir. Trois bacs à poudre pour proposer café, cappuccino ou chocolat chaud. Idéale pour les petits bureaux, salles de pause et commerces.',
+        stock: 12,
+        delivery_delay: '3-7 jours ouvrés',
         is_featured: 0,
+        images: 6,
         specifications: JSON.stringify({
-          dimensions: 'H: 81 cm × L: 50 cm × P: 45 cm',
-          temperature: '92°C',
-          puissance: '3000W (pointe)',
-          conteneurs: '4 conteneurs d\'ingrédients',
-          affichage: 'Écran 10" couleur',
-          certifications: 'CE, CB, ISO9001'
+          type: 'Machine à café instantané de comptoir',
+          conteneurs: '3 bacs à poudre',
+          selection: 'Boutons de sélection et afficheur digital',
         }),
       },
-      // ── Distributeurs Automatiques ──────────────────────────────
       {
-        category_id: idDistrib,
-        name: 'TCN Distributeur Snack & Boissons Standard',
-        slug: 'tcn-csc-10g-h5',
-        model_ref: 'TCN-CSC-10G(H5)',
-        brand: 'TCN',
-        description: 'Distributeur automatique polyvalent. 60 emplacements snacks + 300 boissons réfrigérées. Température 2–25°C, écran LED 5", puissance réfrigération 422W. Certifié CE, CB, ISO9001.',
+        category_id: idCafe,
+        name: 'Lecon 4 saveurs',
+        slug: 'lecon-machine-cafe-instantane',
+        model_ref: null,
+        brand: 'Lecon',
+        description: 'Machine à café instantané de comptoir avec façade lumineuse. Quatre bacs à poudre pour varier les boissons chaudes : café, café au lait, chocolat, thé au lait. Pour bureaux, restaurants et stations-service.',
         stock: 10,
-        delivery_delay: '7-14 jours ouvrés',
-        is_featured: 1,
-        specifications: JSON.stringify({
-          dimensions: 'H: 194 cm × L: 103,6 cm × P: 79 cm',
-          poids: '261 kg',
-          capacite_snacks: '60 emplacements spirales',
-          capacite_boissons: '300 bouteilles / canettes',
-          affichage: 'Écran LED 5"',
-          puissance: '422W (réfrigération)',
-          temperature: '2°C à 25°C',
-          certifications: 'CE, CB, ISO9001, SGS'
-        }),
-      },
-      {
-        category_id: idDistrib,
-        name: 'TCN Distributeur Snack & Boissons Compact',
-        slug: 'tcn-csc-6g-h5',
-        model_ref: 'TCN-CSC-6G(H5)',
-        brand: 'TCN',
-        description: 'Distributeur slim pour espaces contraints. 36 emplacements snacks + 180 boissons réfrigérées. Même technologie que le modèle standard dans un format plus étroit.',
-        stock: 8,
-        delivery_delay: '7-14 jours ouvrés',
+        delivery_delay: '3-7 jours ouvrés',
         is_featured: 0,
+        images: 6,
         specifications: JSON.stringify({
-          dimensions: 'H: 194 cm × L: 73,2 cm × P: 79 cm',
-          poids: '261 kg',
-          capacite_snacks: '36 emplacements spirales',
-          capacite_boissons: '180 bouteilles / canettes',
-          affichage: 'Écran LED 5"',
-          puissance: '422W (réfrigération)',
-          temperature: '2°C à 25°C',
-          certifications: 'CE, CB, ISO9001'
+          type: 'Machine à café instantané de comptoir',
+          conteneurs: '4 bacs à poudre',
+          affichage: 'Façade lumineuse publicitaire',
         }),
       },
       {
-        category_id: idDistrib,
-        name: 'TCN Distributeur Grand Écran 32"',
-        slug: 'tcn-csc-10c-32v',
-        model_ref: 'TCN-CSC-10C(32V)',
-        brand: 'TCN',
-        description: 'Distributeur avec grand écran 32" pour une expérience premium. 60 emplacements snacks + 300 boissons réfrigérées. Affichage publicitaire et catalogue produit visuel.',
+        category_id: idCafe,
+        name: 'Lecon Good Taste 50S',
+        slug: 'lecon-good-taste-50s',
+        model_ref: '50S',
+        brand: 'Lecon',
+        description: 'Distributeur de café instantané entièrement automatique, 5 boissons chaudes. Boutons tactiles, affichage LED, nettoyage automatique en un bouton et verrouillage anti-brûlure. Trois modes d\'alimentation en eau : bonbonne, réservoir avec purificateur ou pompe. Logiciel programmable pour régler le goût et la taille de tasse.',
+        stock: 8,
+        delivery_delay: '3-7 jours ouvrés',
+        is_featured: 1,
+        images: 5,
+        specifications: JSON.stringify({
+          type: 'Distributeur automatique de café instantané',
+          boissons: '5 boissons chaudes',
+          conteneurs: '5 bacs à poudre de 1 500 ml',
+          alimentation: '220 V / 50 Hz, 1 600 W',
+          reservoir_eau: '3,0 L',
+          chaudiere: '1,6 L',
+          dimensions: 'L 430 × P 490 × H 780 mm',
+          emballage: 'L 510 × P 585 × H 860 mm',
+          poids: '31 kg net / 35 kg brut',
+          ingredients: 'Toutes poudres instantanées (café 3-en-1, thé au lait, chocolat…)',
+          options: 'Meuble support en acier assorti',
+        }),
+      },
+      // ── Distributeur de café sur pied ───────────────────────────
+      {
+        category_id: idCafe,
+        name: 'SEN Coffee',
+        slug: 'sen-coffee-distributeur-cafe-grains',
+        model_ref: null,
+        brand: 'SMALIM',
+        description: 'Distributeur automatique de café fraîchement moulu, aux couleurs SEN Coffee. Moulin à grains intégré, écran tactile de sélection, distributeur de gobelets et alimentation en eau par bonbonne. Pour halls d\'entreprise, campus, hôtels et lieux à forte affluence.',
         stock: 5,
         delivery_delay: '7-14 jours ouvrés',
         is_featured: 1,
+        images: 10,
         specifications: JSON.stringify({
-          dimensions: 'H: 194,5 cm × L: 143 cm × P: 79 cm',
-          poids: '300 kg',
-          capacite_snacks: '60 emplacements spirales',
-          capacite_boissons: '300 bouteilles / canettes',
-          affichage: 'Écran 32"',
-          puissance: '422W (réfrigération)',
-          temperature: '2°C à 25°C',
-          certifications: 'CE, CB, ISO9001, SGS'
+          type: 'Distributeur de café en grains (mouture fraîche)',
+          affichage: 'Écran tactile',
+          equipement: 'Moulin à café, distributeur de gobelets intégré',
+          alimentation_eau: 'Bonbonne d\'eau intégrée',
         }),
       },
+      // ── Distributeurs automatiques ──────────────────────────────
       {
         category_id: idDistrib,
-        name: 'TCN Distributeur Tactile Publicitaire 49"',
-        slug: 'tcn-csc-8c-50sp',
-        model_ref: 'TCN-CSC-8C(50SP)',
-        brand: 'TCN',
-        description: 'Distributeur premium avec écran tactile 49". 48 emplacements snacks + 240 boissons réfrigérées. Diffusion HD de publicités, interface tactile immersive. Solution marketing autant que distributeur.',
-        stock: 3,
-        delivery_delay: '10-14 jours ouvrés',
-        is_featured: 1,
-        specifications: JSON.stringify({
-          dimensions: 'H: 196 cm × L: 104,2 cm × P: 89 cm',
-          poids: '320 kg',
-          capacite_snacks: '48 emplacements spirales',
-          capacite_boissons: '240 bouteilles / canettes',
-          affichage: 'Écran tactile 49"',
-          puissance: '458W (réfrigération)',
-          temperature: '4°C à 25°C',
-          certifications: 'CE, CB, ISO9001, SGS'
-        }),
-      },
-      {
-        category_id: idDistrib,
-        name: 'TCN Distributeur Combiné Snack + Boissons + Café',
-        slug: 'tcn-60g-c4',
-        model_ref: 'TCN-60G-C4',
-        brand: 'TCN',
-        description: 'Solution tout-en-un : café fraîchement moulu (130 gobelets) + 60 emplacements snacks + boissons réfrigérées. Une seule machine pour tous les besoins. Puissance 1800W chauffe / 505W réfrigération.',
-        stock: 3,
-        delivery_delay: '10-14 jours ouvrés',
-        is_featured: 1,
-        specifications: JSON.stringify({
-          dimensions: 'H: 194 cm × L: 140 cm × P: 79 cm',
-          poids: '920 kg',
-          capacite_snacks: '60 emplacements spirales',
-          capacite_cafe: '130 gobelets',
-          puissance_chauffe: '1800W',
-          puissance_froid: '505W',
-          certifications: 'CE, CB, ISO9001, SGS'
-        }),
-      },
-      // ── Équipements Frigorifiques ────────────────────────────────
-      {
-        category_id: idFrigo,
-        name: 'TCN Smart Fridge Réfrigérée 24h',
-        slug: 'tcn-cfz-510l',
-        model_ref: 'TCN-CFZ-510L',
-        brand: 'TCN',
-        description: 'Réfrigérateur intelligent connecté 510L en libre-service 24h/24. Température 0–10°C, ~200 bouteilles, format slim. Paiement mobile intégré. Idéal pour hôtels, commerces de proximité et pharmacies.',
+        name: 'NEXX Snacks & Drinks',
+        slug: 'nexx-distributeur-snacks-boissons',
+        model_ref: null,
+        brand: 'NEXX',
+        description: 'Distributeur automatique de snacks et boissons fraîches avec grande vitrine vitrée et écran de commande en façade. Habillage « Healthy Snacks & Drinks » personnalisable. Pour entreprises, écoles, hôpitaux et espaces publics.',
         stock: 6,
         delivery_delay: '7-14 jours ouvrés',
-        is_featured: 0,
+        is_featured: 1,
+        images: 4,
         specifications: JSON.stringify({
-          dimensions: 'H: 210 cm × L: 65 cm × P: 69 cm',
-          poids: '140 kg',
-          capacite: '510 L / ~200 bouteilles',
-          temperature: '0°C à 10°C',
-          acces: 'Libre-service 24h/24',
-          certifications: 'CE, CB, ISO9001'
-        }),
-      },
-      {
-        category_id: idFrigo,
-        name: 'TCN Smart Cooler Grande Capacité',
-        slug: 'tcn-cfz-1200-v10',
-        model_ref: 'TCN-CFZ-1200(V10)',
-        brand: 'TCN',
-        description: 'Réfrigérateur intelligent grande capacité. 5 étagères de 30 plateaux, température 0–10°C, consommation optimisée 3 kWh/jour. Système IA multi-capteurs. Pour grandes surfaces et volumes importants.',
-        stock: 4,
-        delivery_delay: '10-14 jours ouvrés',
-        is_featured: 0,
-        specifications: JSON.stringify({
-          dimensions: 'H: 212 cm × L: 126,5 cm × P: 71,5 cm',
-          poids: '180 kg',
-          capacite: '5 étagères / 30 plateaux',
-          temperature: '0°C à 10°C',
-          consommation: '3,0 kWh/jour',
-          certifications: 'CE, CB, ISO9001'
+          type: 'Distributeur snacks & boissons',
+          vitrine: 'Grande vitrine vitrée éclairée',
+          affichage: 'Écran de commande en façade',
         }),
       },
     ];
 
     for (const m of machinesData) {
+      const images = gallery('machines', m.slug, m.images);
       await query(`
-        INSERT IGNORE INTO machines
+        INSERT INTO machines
           (category_id, name, slug, description, price, stock, unit, brand, model_ref,
-           delivery_delay, specifications, payment_modes, is_active, is_featured)
-        VALUES (?, ?, ?, ?, 0.00, ?, 'unité', ?, ?, ?, ?, ?, 1, ?)
+           delivery_delay, image_url, gallery, specifications, payment_modes, is_active, is_featured)
+        VALUES (?, ?, ?, ?, 0.00, ?, 'unité', ?, ?, ?, ?, ?, ?, ?, 1, ?)
+        ON DUPLICATE KEY UPDATE
+          name = VALUES(name), description = VALUES(description), brand = VALUES(brand),
+          model_ref = VALUES(model_ref), image_url = VALUES(image_url), gallery = VALUES(gallery),
+          specifications = VALUES(specifications)
       `, [
         m.category_id, m.name, m.slug, m.description,
         m.stock, m.brand, m.model_ref, m.delivery_delay,
-        m.specifications, paymentModes, m.is_featured
+        images[0], JSON.stringify(images), m.specifications, paymentModes, m.is_featured
       ]);
     }
-    console.log(`${machinesData.length} machines TCN créées`);
+    console.log(`${machinesData.length} machines créées`);
 
     // ── Consommables ──────────────────────────────────────────────
     const productCats = await query('SELECT id, slug FROM product_categories');
     const catId = Object.fromEntries(productCats.map(c => [c.slug, c.id]));
 
     const productsData = [
-      // Gobelets & emballages
-      ['gobelets-emballages', 'Gobelet carton 20cl (x1000)', 'gobelet-carton-20cl-1000', 'Gobelets en carton double paroi, 20cl. Compatibles tous distributeurs. Carton de 1000 unités.', 32000, 240, 'carton', 'SMALIM', 'GOB-C20-1000', 1],
-      ['gobelets-emballages', 'Gobelet plastique 18cl (x2000)', 'gobelet-plastique-18cl-2000', 'Gobelets plastique rigide 18cl, format standard vending. Carton de 2000 unités.', 28000, 180, 'carton', 'SMALIM', 'GOB-P18-2000', 0],
-      ['gobelets-emballages', 'Touillettes bois (x5000)', 'touillettes-bois-5000', 'Touillettes en bois de bouleau 11cm, certifiées FSC. Boîte de 5000.', 15000, 120, 'boîte', 'SMALIM', 'TOU-B11-5000', 0],
-      ['gobelets-emballages', 'Couvercles gobelets 20cl (x1000)', 'couvercles-20cl-1000', 'Couvercles à clipser pour gobelets 20cl, anti-renversement. Carton de 1000.', 18000, 95, 'carton', 'SMALIM', 'COU-20-1000', 0],
 
-      // Cafés & boissons
-      ['cafes-boissons', 'Café en grains Arabica 1kg', 'cafe-grains-arabica-1kg', 'Café Arabica 100% en grains, torréfaction moyenne. Sachet 1kg pour machines à mouture fraîche.', 12500, 320, 'sachet', 'Café Touba Premium', 'CAF-ARA-1K', 1],
-      ['cafes-boissons', 'Café soluble vending 500g', 'cafe-soluble-vending-500g', 'Café lyophilisé spécial distributeurs automatiques. Dissolution rapide. Sachet 500g.', 8500, 260, 'sachet', 'SMALIM', 'CAF-SOL-500', 0],
-      ['cafes-boissons', 'Chocolat en poudre 1kg', 'chocolat-poudre-1kg', 'Préparation pour chocolat chaud, soluble. Sachet 1kg compatible distributeurs.', 9500, 180, 'sachet', 'SMALIM', 'CHO-POU-1K', 0],
-      ['cafes-boissons', 'Lait en poudre vending 1kg', 'lait-poudre-vending-1kg', 'Lait en poudre instantané pour machines à boissons chaudes. Sachet 1kg.', 7800, 210, 'sachet', 'SMALIM', 'LAI-POU-1K', 0],
-      ['cafes-boissons', 'Thé vert en dosettes (x200)', 'the-vert-dosettes-200', 'Dosettes de thé vert individuelles, compatibles distributeurs. Boîte de 200.', 14000, 85, 'boîte', 'SMALIM', 'THE-VER-200', 0],
-      ['cafes-boissons', 'Sucre bâtonnets 4g (x1000)', 'sucre-batonnets-4g-1000', 'Bâtonnets de sucre blanc 4g. Boîte de 1000 unités.', 11000, 150, 'boîte', 'SMALIM', 'SUC-BAT-1000', 0],
+      // Cafés et boissons : matières premières réelles.
+      // PRIX PROVISOIRES : à confirmer puis corriger depuis l'admin.
+      ['cafes-boissons', 'Café de Colombie Craft Roasters', 'craft-roasters-cafe-colombie', 'Café 100 % Colombie de la gamme Craft Roasters. Arômes ronds et équilibrés, adapté aux distributeurs à mouture fraîche comme le SEN Coffee.', 14500, 150, 'sachet', 'Craft Roasters', 'MP-CRF-COL', 1],
+      ['cafes-boissons', 'Chocolat chaud crémeux Kingsmill', 'kingsmill-creamy-hot-chocolate', 'Préparation instantanée Kingsmill pour chocolat chaud crémeux. Conçue pour les distributeurs automatiques et machines à café instantané.', 13500, 120, 'sachet', 'Kingsmill', 'MP-KGM-HCH', 1],
+      ['cafes-boissons', 'Chocolat blanc chaud Kingsmill', 'kingsmill-creamy-white-hot-chocolate', 'Préparation instantanée Kingsmill pour chocolat blanc chaud, texture onctueuse. Pour distributeurs automatiques et machines à café instantané.', 14000, 80, 'sachet', 'Kingsmill', 'MP-KGM-WCH', 0],
+      ['cafes-boissons', 'Cappuccino vanille française Kingsmill', 'kingsmill-french-vanilla-cappuccino', 'Mélange instantané Kingsmill pour cappuccino à la vanille française. Prêt à l\'emploi dans les bacs à poudre des machines Lecon et Sapoe.', 14000, 100, 'sachet', 'Kingsmill', 'MP-KGM-FVC', 0],
+      ['cafes-boissons', 'Cappuccino glacé Kingsmill', 'kingsmill-iced-cappuccino', 'Mélange Kingsmill pour cappuccino glacé, à préparer avec de l\'eau froide ou de la glace. Idéal pour élargir l\'offre de boissons fraîches.', 14500, 60, 'sachet', 'Kingsmill', 'MP-KGM-ICC', 0],
 
-      // Produits sucrés / snacks
-      ['produits-sucres', 'Assortiment biscuits vending (x100)', 'assortiment-biscuits-100', 'Assortiment de biscuits emballés individuellement, formats vending. Carton de 100.', 22000, 140, 'carton', 'SMALIM', 'BIS-ASS-100', 1],
-      ['produits-sucres', 'Barres chocolatées (x50)', 'barres-chocolatees-50', 'Barres chocolatées format standard distributeur. Carton de 50 unités.', 18500, 200, 'carton', 'SMALIM', 'BAR-CHO-50', 0],
-      ['produits-sucres', 'Chips sachets 30g (x60)', 'chips-sachets-30g-60', 'Sachets de chips 30g, format distributeur automatique. Carton de 60.', 16000, 175, 'carton', 'SMALIM', 'CHI-30-60', 0],
-      ['produits-sucres', 'Cacahuètes grillées 40g (x60)', 'cacahuetes-40g-60', 'Sachets de cacahuètes grillées salées 40g. Carton de 60 unités.', 17500, 110, 'carton', 'SMALIM', 'CAC-40-60', 0],
 
-      // Pièces détachées
-      ['pieces-detachees', 'Spirale distributrice standard', 'spirale-distributrice-standard', 'Spirale de rechange pour distributeurs TCN série CSC. Pas standard, acier inox.', 8500, 60, 'unité', 'TCN', 'PDR-SPI-STD', 0],
-      ['pieces-detachees', 'Moteur de spirale 24V', 'moteur-spirale-24v', 'Moteur d\'entraînement de spirale 24V pour distributeurs TCN. Pièce d\'origine.', 24000, 35, 'unité', 'TCN', 'PDR-MOT-24V', 0],
-      ['pieces-detachees', 'Groupe de brassage café', 'groupe-brassage-cafe', 'Groupe de brassage complet pour machines TCN NCF. Pièce d\'origine constructeur.', 145000, 12, 'unité', 'TCN', 'PDR-GRB-NCF', 0],
-      ['pieces-detachees', 'Filtre à eau anticalcaire', 'filtre-eau-anticalcaire', 'Cartouche filtrante anticalcaire pour machines à café. Durée ~6 mois.', 18000, 75, 'unité', 'TCN', 'PDR-FIL-AC', 0],
-      ['pieces-detachees', 'Kit de maintenance annuelle', 'kit-maintenance-annuelle', 'Kit complet : joints, filtre, lubrifiant alimentaire et produit détartrant.', 45000, 40, 'kit', 'SMALIM', 'PDR-KIT-ANN', 1],
-      ['pieces-detachees', 'Monnayeur électronique MDB', 'monnayeur-electronique-mdb', 'Monnayeur électronique compatible interface MDB. Rendu de monnaie 6 tubes.', 185000, 8, 'unité', 'TCN', 'PDR-MON-MDB', 0],
     ];
 
+    // Nombre de photos disponibles par produit (frontend/public/images/products/<slug>/)
+    const productImageCount = {
+      'craft-roasters-cafe-colombie': 4,
+      'kingsmill-creamy-hot-chocolate': 1,
+      'kingsmill-creamy-white-hot-chocolate': 1,
+      'kingsmill-french-vanilla-cappuccino': 1,
+      'kingsmill-iced-cappuccino': 1,
+    };
+
     for (const [catSlug, name, slug, desc, price, stock, unit, brand, ref, featured] of productsData) {
+      const images = gallery('products', slug, productImageCount[slug] || 0);
       await query(`
-        INSERT IGNORE INTO products
-          (category_id, name, slug, description, price, stock, unit, brand, reference, is_active, is_featured)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)
-      `, [catId[catSlug], name, slug, desc, price, stock, unit, brand, ref, featured]);
+        INSERT INTO products
+          (category_id, name, slug, description, price, stock, unit, brand, reference,
+           image_url, gallery, is_active, is_featured)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)
+        ON DUPLICATE KEY UPDATE
+          name = VALUES(name), description = VALUES(description), brand = VALUES(brand),
+          image_url = VALUES(image_url), gallery = VALUES(gallery)
+      `, [
+        catId[catSlug], name, slug, desc, price, stock, unit, brand, ref,
+        images[0] || null, images.length ? JSON.stringify(images) : null, featured
+      ]);
     }
     console.log(`${productsData.length} consommables créés`);
 
@@ -375,9 +367,8 @@ async function seed() {
         delivered_days_ago: 38,
         shipping: 25000,
         items: [
-          { type: 'product', slug: 'cafe-grains-arabica-1kg', qty: 20 },
-          { type: 'product', slug: 'gobelet-carton-20cl-1000', qty: 5 },
-          { type: 'product', slug: 'sucre-batonnets-4g-1000', qty: 4 },
+          { type: 'product', slug: 'craft-roasters-cafe-colombie', qty: 20 },
+          { type: 'product', slug: 'kingsmill-french-vanilla-cappuccino', qty: 4 },
         ],
       },
       {
@@ -392,8 +383,8 @@ async function seed() {
         promo_code: 'BIENVENUE10',
         discount: 12000,
         items: [
-          { type: 'product', slug: 'assortiment-biscuits-100', qty: 6 },
-          { type: 'product', slug: 'chips-sachets-30g-60', qty: 4 },
+          { type: 'product', slug: 'kingsmill-creamy-hot-chocolate', qty: 6 },
+          { type: 'product', slug: 'kingsmill-iced-cappuccino', qty: 4 },
         ],
       },
       {
@@ -405,8 +396,8 @@ async function seed() {
         created_days_ago: 9,
         shipping: 30000,
         items: [
-          { type: 'product', slug: 'kit-maintenance-annuelle', qty: 2 },
-          { type: 'product', slug: 'filtre-eau-anticalcaire', qty: 4 },
+          { type: 'product', slug: 'craft-roasters-cafe-colombie', qty: 10 },
+          { type: 'product', slug: 'kingsmill-creamy-white-hot-chocolate', qty: 4 },
         ],
       },
       {
@@ -418,9 +409,8 @@ async function seed() {
         created_days_ago: 5,
         shipping: 12000,
         items: [
-          { type: 'product', slug: 'cafe-soluble-vending-500g', qty: 10 },
-          { type: 'product', slug: 'lait-poudre-vending-1kg', qty: 8 },
-          { type: 'product', slug: 'gobelet-plastique-18cl-2000', qty: 3 },
+          { type: 'product', slug: 'kingsmill-creamy-hot-chocolate', qty: 10 },
+          { type: 'product', slug: 'kingsmill-iced-cappuccino', qty: 8 },
         ],
       },
       {
@@ -432,8 +422,8 @@ async function seed() {
         created_days_ago: 3,
         shipping: 45000,
         items: [
-          { type: 'product', slug: 'monnayeur-electronique-mdb', qty: 2 },
-          { type: 'product', slug: 'moteur-spirale-24v', qty: 6 },
+          { type: 'product', slug: 'craft-roasters-cafe-colombie', qty: 30 },
+          { type: 'product', slug: 'kingsmill-french-vanilla-cappuccino', qty: 10 },
         ],
       },
       {
@@ -445,8 +435,8 @@ async function seed() {
         created_days_ago: 1,
         shipping: 18000,
         items: [
-          { type: 'product', slug: 'barres-chocolatees-50', qty: 8 },
-          { type: 'product', slug: 'cacahuetes-40g-60', qty: 5 },
+          { type: 'product', slug: 'kingsmill-creamy-white-hot-chocolate', qty: 6 },
+          { type: 'product', slug: 'kingsmill-french-vanilla-cappuccino', qty: 4 },
         ],
       },
       {
@@ -459,7 +449,7 @@ async function seed() {
         cancelled_days_ago: 18,
         shipping: 10000,
         items: [
-          { type: 'product', slug: 'the-vert-dosettes-200', qty: 3 },
+          { type: 'product', slug: 'kingsmill-creamy-white-hot-chocolate', qty: 3 },
         ],
       },
     ];
@@ -571,19 +561,19 @@ async function seed() {
         budget: 9000000,
         status: 'accepted',
         proposed_amount: 8700000,
-        admin_response: 'Proposition pour 3 TCN-CSC-10G(H5) avec installation, formation et contrat de maintenance 1 an inclus.',
+        admin_response: 'Proposition pour 3 distributeurs NEXX Snacks & Boissons avec installation, formation et contrat de maintenance 1 an inclus.',
         created_days_ago: 40,
       },
       {
         quote_number: 'DEV-2024-0002',
         client: 'fatou.ndiaye@ucad.sn',
-        machine_type: 'Machine à Café Commerciale',
+        machine_type: 'Distributeur de café en grains',
         description: 'Installation de machines à café en libre-service pour les espaces étudiants du campus. Forte fréquentation attendue.',
         quantity: 5,
         budget: 15000000,
         status: 'quoted',
         proposed_amount: 14250000,
-        admin_response: 'Devis pour 5 TCN-NCF-7N(V22) avec tarif dégressif volume. Validité 30 jours.',
+        admin_response: 'Devis pour 5 distributeurs SEN Coffee avec tarif dégressif volume. Validité 30 jours.',
         created_days_ago: 14,
       },
       {
@@ -613,13 +603,13 @@ async function seed() {
       {
         quote_number: 'DEV-2024-0005',
         client: 'aissatou.ba@pharmacie-plateau.sn',
-        machine_type: 'Distributeur Tactile Publicitaire',
+        machine_type: 'Distributeur Snacks & Boissons',
         description: 'Distributeur avec écran publicitaire pour la vitrine de la pharmacie. Diffusion de contenus santé souhaitée.',
         quantity: 1,
         budget: 1800000,
         status: 'refused',
         proposed_amount: 3200000,
-        admin_response: 'Le modèle 49" dépasse le budget indiqué. Une alternative 32" a été proposée.',
+        admin_response: 'Deux distributeurs NEXX dépassent le budget indiqué. Une machine à café Lecon Good Taste a été proposée en alternative.',
         created_days_ago: 25,
       },
     ];
@@ -659,12 +649,14 @@ async function seed() {
 
     // ── Parc de machines installées ───────────────────────────────
     const fleetData = [
-      ['amadou@sonatel.sn', 'tcn-ncf-7n-v22', 'SN-NCF7N-00142', 200, 'Siège Sonatel — Hall d\'accueil', 'active', 12480],
-      ['amadou@sonatel.sn', 'tcn-csc-10g-h5', 'SN-CSC10G-00311', 200, 'Siège Sonatel — Cafétéria 2e étage', 'active', 8930],
-      ['fatou.ndiaye@ucad.sn', 'tcn-csc-10c-32v', 'SN-CSC10C-00087', 150, 'UCAD — Faculté des Sciences', 'active', 21540],
-      ['fatou.ndiaye@ucad.sn', 'tcn-csc-6g-h5', 'SN-CSC6G-00205', 150, 'UCAD — Bibliothèque centrale', 'maintenance', 15220],
-      ['moussa.sarr@teranga-hotel.sn', 'tcn-cfz-510l', 'SN-CFZ510-00064', 90, 'Teranga Hôtel — Étage 3', 'active', 4310],
-      ['ibrahima.fall@sococim.sn', 'tcn-60g-c4', 'SN-60GC4-00019', 300, 'SOCOCIM — Cantine principale', 'active', 33800],
+      ['amadou@sonatel.sn', 'sen-coffee-distributeur-cafe-grains', 'SN-SENC-00142', 200, 'Siège Sonatel, hall d\'accueil', 'active', 12480],
+      ['amadou@sonatel.sn', 'nexx-distributeur-snacks-boissons', 'SN-NEXX-00311', 200, 'Siège Sonatel, cafétéria 2e étage', 'active', 8930],
+      ['fatou.ndiaye@ucad.sn', 'sen-coffee-distributeur-cafe-grains', 'SN-SENC-00087', 150, 'UCAD, faculté des Sciences', 'active', 21540],
+      ['fatou.ndiaye@ucad.sn', 'nexx-distributeur-snacks-boissons', 'SN-NEXX-00205', 150, 'UCAD, bibliothèque centrale', 'maintenance', 15220],
+      ['moussa.sarr@teranga-hotel.sn', 'lecon-good-taste-50s', 'SN-LGT50S-00064', 90, 'Teranga Hôtel, étage 3', 'active', 4310],
+      ['ibrahima.fall@sococim.sn', 'sen-coffee-distributeur-cafe-grains', 'SN-SENC-00019', 300, 'SOCOCIM, cantine principale', 'active', 33800],
+      ['aissatou.ba@pharmacie-plateau.sn', 'sapoe-avm', 'SN-SAPOE-00051', 60, 'Pharmacie du Plateau, salle de pause', 'active', 2140],
+      ['aissatou.ba@pharmacie-plateau.sn', 'lecon-machine-cafe-instantane', 'SN-LECON-00052', 60, 'Pharmacie du Plateau, accueil', 'active', 1870],
     ];
 
     let fleetCreated = 0;
@@ -691,7 +683,7 @@ async function seed() {
 
     // ── Factures (adossées aux commandes payées) ──────────────────
     const paidOrders = await query(
-      "SELECT id, order_number, client_id, subtotal, tax_amount, total_amount, created_at FROM orders WHERE payment_status = 'paid'"
+      "SELECT id, order_number, client_id, subtotal, tax_amount, total_amount, created_at FROM orders WHERE payment_status = 'paid' AND order_number LIKE 'CMD-2024-%'"
     );
 
     let invoicesCreated = 0;
@@ -734,7 +726,7 @@ async function seed() {
       {
         ticket_number: 'TIC-2024-0001',
         client: 'fatou.ndiaye@ucad.sn',
-        machine: 'tcn-csc-6g-h5',
+        machine: 'nexx-distributeur-snacks-boissons',
         subject: 'Distributeur bibliothèque : spirale bloquée rangée B3',
         description: 'La spirale de la rangée B3 tourne dans le vide depuis ce matin. Les produits restent coincés et les clients sont débités.',
         category: 'panne',
@@ -750,7 +742,7 @@ async function seed() {
       {
         ticket_number: 'TIC-2024-0002',
         client: 'amadou@sonatel.sn',
-        machine: 'tcn-ncf-7n-v22',
+        machine: 'sen-coffee-distributeur-cafe-grains',
         subject: 'Café trop clair depuis la dernière recharge',
         description: 'Depuis le réapprovisionnement de la semaine dernière, le café sort nettement plus clair et moins corsé qu\'avant.',
         category: 'question',
@@ -768,9 +760,9 @@ async function seed() {
       {
         ticket_number: 'TIC-2024-0003',
         client: 'moussa.sarr@teranga-hotel.sn',
-        machine: 'tcn-cfz-510l',
+        machine: 'lecon-good-taste-50s',
         subject: 'Demande de maintenance préventive',
-        description: 'Nous souhaitons planifier la maintenance préventive annuelle du réfrigérateur intelligent avant la haute saison.',
+        description: 'Nous souhaitons planifier la maintenance préventive annuelle de la machine à café de l\'étage 3 avant la haute saison.',
         category: 'maintenance',
         priority: 'medium',
         status: 'open',
@@ -805,7 +797,7 @@ async function seed() {
         status: 'open',
         created_days_ago: 1,
         messages: [
-          ['client', 'Où en est ma commande ? Nous sommes bientôt en rupture de gobelets.'],
+          ['client', 'Où en est ma commande ? Nous sommes bientôt en rupture de chocolat chaud.'],
         ],
       },
     ];
@@ -876,7 +868,7 @@ Chaque machine est alimentée et approvisionnée : vous pouvez réaliser un acha
 
 Nos commerciaux vous aident à dimensionner votre installation en fonction du flux de passage attendu, de la surface disponible et du type de consommation visé. Un chiffrage de rentabilité vous est remis à l'issue de la visite.
 
-**Adresse :** Zone industrielle, Dakar — du lundi au vendredi, 8h à 18h.`,
+**Adresse :** Zone industrielle, Dakar. Ouvert du lundi au vendredi, de 8h à 18h.`,
         read_time: 3,
         status: 'published',
         published_days_ago: 5,
@@ -1055,12 +1047,12 @@ L'ensemble de la gamme est commandable depuis votre espace client. Livraison sou
         category: 'innovation',
         title: 'Réfrigérateurs intelligents : le libre-service 24h/24',
         slug: 'refrigerateurs-intelligents-libre-service',
-        excerpt: 'Brouillon — comment les smart fridges à reconnaissance de produits transforment le commerce de proximité.',
+        excerpt: 'Brouillon : comment les smart fridges à reconnaissance de produits transforment le commerce de proximité.',
         content: `# Le principe
 
 Le réfrigérateur intelligent supprime l'étape de sélection : le client ouvre la porte, prend ce qu'il veut, referme. Le débit est facturé automatiquement.
 
-*(Article en cours de rédaction — sections à compléter : technologies de détection, retours d'expérience terrain, modèle économique.)*`,
+*(Article en cours de rédaction. Sections à compléter : technologies de détection, retours d'expérience terrain, modèle économique.)*`,
         read_time: 3,
         status: 'draft',
         published_days_ago: null,
@@ -1086,6 +1078,21 @@ Le réfrigérateur intelligent supprime l'étape de sélection : le client ouvre
       articlesCreated++;
     }
     console.log(`${articlesCreated} articles de blog créés`);
+
+    // Illustrations tirées de la banque d'images : ne remplit que les articles
+    // sans image, pour respecter un visuel choisi depuis l'admin.
+    const blogImages = {
+      'smalim-ouvre-showroom-dakar': '/images/machines/sapoe-avm/6.webp',
+      'entretien-machine-cafe-professionnelle': '/images/machines/lecon-machine-cafe-instantane/5.webp',
+      'etude-cas-ucad-distributeurs': '/images/machines/nexx-distributeur-snacks-boissons/4.webp',
+      'paiement-mobile-wave-orange-money-vending': '/images/machines/sen-coffee-distributeur-cafe-grains/10.webp',
+      'choisir-emplacement-distributeur-automatique': '/images/machines/sen-coffee-distributeur-cafe-grains/9.webp',
+      'nouvelle-gamme-consommables-smalim': '/images/products/kingsmill-french-vanilla-cappuccino/1.webp',
+      'refrigerateurs-intelligents-libre-service': '/images/machines/nexx-distributeur-snacks-boissons/2.webp',
+    };
+    for (const [slug, image] of Object.entries(blogImages)) {
+      await query("UPDATE blog_articles SET image_url = ? WHERE slug = ? AND (image_url IS NULL OR image_url = '')", [image, slug]);
+    }
 
     console.log('\n🎉 Seeding terminé avec succès !');
     process.exit(0);
