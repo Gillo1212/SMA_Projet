@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useTranslation, Trans } from 'react-i18next';
 import { authService } from '../../services/auth.service';
 
 export default function EmailConfirmePage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
@@ -48,8 +50,8 @@ export default function EmailConfirmePage() {
             <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <i className="ri-loader-4-line text-[#1AAA3F] text-4xl animate-spin"></i>
             </div>
-            <h1 className="text-xl font-bold text-[#00272B] mb-2">Vérification en cours...</h1>
-            <p className="text-[#00272B]/50 text-sm">Nous vérifions votre adresse email.</p>
+            <h1 className="text-xl font-bold text-[#00272B] mb-2">{t('emailConfirmed.verifying')}</h1>
+            <p className="text-[#00272B]/50 text-sm">{t('emailConfirmed.verifyingHint')}</p>
           </>
         )}
 
@@ -62,22 +64,22 @@ export default function EmailConfirmePage() {
               </div>
             </div>
 
-            <h1 className="text-2xl font-bold text-[#00272B] mb-3">Email confirmé !</h1>
+            <h1 className="text-2xl font-bold text-[#00272B] mb-3">{t('emailConfirmed.title')}</h1>
             <p className="text-[#00272B]/60 text-sm mb-6">
-              Votre compte SMALIM a été activé avec succès. Vous pouvez maintenant accéder à votre espace client.
+              {t('emailConfirmed.hint')}
             </p>
 
             <div className="p-4 bg-[#EEFFF2] border border-[#1AAA3F]/20 rounded-xl mb-6">
               <p className="text-sm text-[#1AAA3F] font-medium">
                 <i className="ri-time-line mr-1"></i>
-                Redirection automatique dans <strong>{countdown}s</strong>
+                <Trans i18nKey="emailConfirmed.redirect" values={{ count: countdown }} components={{ b: <strong /> }} />
               </p>
             </div>
 
             <Link to="/espace-client/connexion"
               className="w-full py-3.5 bg-[#1AAA3F] text-white text-sm font-semibold rounded-xl hover:bg-[#158f35] transition-all cursor-pointer whitespace-nowrap flex items-center justify-center gap-2">
               <i className="ri-login-circle-line"></i>
-              Accéder à mon espace client maintenant
+              {t('emailConfirmed.accessNow')}
             </Link>
           </>
         )}
@@ -87,19 +89,19 @@ export default function EmailConfirmePage() {
             <div className="w-24 h-24 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
               <i className="ri-close-circle-line text-red-500 text-4xl"></i>
             </div>
-            <h1 className="text-2xl font-bold text-[#00272B] mb-3">Lien invalide</h1>
+            <h1 className="text-2xl font-bold text-[#00272B] mb-3">{t('emailConfirmed.invalidTitle')}</h1>
             <p className="text-[#00272B]/60 text-sm mb-6">
-              Ce lien de confirmation est invalide ou a expiré. Veuillez vous reconnecter pour renvoyer un email de confirmation.
+              {t('emailConfirmed.invalidHint')}
             </p>
             <div className="flex flex-col gap-3">
               <Link to="/inscription"
                 className="w-full py-3 bg-[#1AAA3F] text-white text-sm font-semibold rounded-xl hover:bg-[#158f35] transition-all cursor-pointer whitespace-nowrap flex items-center justify-center gap-2">
                 <i className="ri-user-add-line"></i>
-                Créer un nouveau compte
+                {t('emailConfirmed.newAccount')}
               </Link>
               <Link to="/espace-client/connexion"
                 className="w-full py-3 border-2 border-gray-200 text-[#00272B] text-sm font-semibold rounded-xl hover:bg-gray-50 transition-all cursor-pointer whitespace-nowrap">
-                Se connecter
+                {t('auth.signIn')}
               </Link>
             </div>
           </>
@@ -107,7 +109,7 @@ export default function EmailConfirmePage() {
 
         <div className="mt-6">
           <Link to="/" className="text-xs text-[#00272B]/30 hover:text-[#1AAA3F] transition-colors">
-            <i className="ri-arrow-left-line mr-1"></i>Retour au site
+            <i className="ri-arrow-left-line mr-1"></i>{t('auth.backToSite')}
           </Link>
         </div>
       </div>

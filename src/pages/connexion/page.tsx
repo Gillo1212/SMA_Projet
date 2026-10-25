@@ -1,8 +1,10 @@
 import { useEffect, FormEvent, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuthContext } from '../../contexts/AuthContext';
 
 export default function ConnexionPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { login, loginError, clearLoginError, isAuthenticated, isLoading } = useAuthContext();
 
@@ -54,21 +56,21 @@ export default function ConnexionPage() {
         <div className="relative z-10">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#1AAA3F]/20 rounded-full mb-6">
             <div className="w-2 h-2 bg-[#1AAA3F] rounded-full animate-pulse"></div>
-            <span className="text-[#1AAA3F] text-sm font-medium">Espace administration</span>
+            <span className="text-[#1AAA3F] text-sm font-medium">{t('adminLogin.badge')}</span>
           </div>
           <h2 className="text-4xl font-bold text-white mb-4 leading-tight">
-            Gérez votre activité<br />
-            <span className="text-[#1AAA3F]">en toute simplicité</span>
+            {t('adminLogin.titleLine1')}<br />
+            <span className="text-[#1AAA3F]">{t('adminLogin.titleLine2')}</span>
           </h2>
           <p className="text-white/60 text-base leading-relaxed mb-10">
-            Pilotez vos machines, suivez vos commandes et gérez vos clients depuis un seul tableau de bord.
+            {t('adminLogin.subtitle')}
           </p>
           <div className="space-y-4">
             {[
-              { icon: 'ri-dashboard-line', text: 'Tableau de bord en temps réel' },
-              { icon: 'ri-file-list-3-line', text: 'Suivi des commandes et devis' },
-              { icon: 'ri-customer-service-2-line', text: 'Gestion des clients' },
-              { icon: 'ri-bar-chart-line', text: 'Analyses et rapports détaillés' },
+              { icon: 'ri-dashboard-line', text: t('adminLogin.featureDashboard') },
+              { icon: 'ri-file-list-3-line', text: t('adminLogin.featureOrders') },
+              { icon: 'ri-customer-service-2-line', text: t('adminLogin.featureClients') },
+              { icon: 'ri-bar-chart-line', text: t('adminLogin.featureReports') },
             ].map((item, i) => (
               <div key={i} className="flex items-center gap-3">
                 <div className="w-9 h-9 bg-[#1AAA3F]/15 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -86,8 +88,8 @@ export default function ConnexionPage() {
               <i className="ri-shield-check-line text-[#1AAA3F]"></i>
             </div>
             <div>
-              <p className="text-white text-sm font-medium">Accès sécurisé</p>
-              <p className="text-white/50 text-xs">Connexion chiffrée SSL – Données protégées</p>
+              <p className="text-white text-sm font-medium">{t('adminLogin.secureTitle')}</p>
+              <p className="text-white/50 text-xs">{t('adminLogin.secureHint')}</p>
             </div>
           </div>
         </div>
@@ -101,8 +103,8 @@ export default function ConnexionPage() {
           </div>
 
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-[#00272B] mb-2">Connexion</h1>
-            <p className="text-[#00272B]/60 text-sm">Bienvenue ! Connectez-vous à votre espace admin.</p>
+            <h1 className="text-3xl font-bold text-[#00272B] mb-2">{t('adminLogin.title')}</h1>
+            <p className="text-[#00272B]/60 text-sm">{t('adminLogin.welcome')}</p>
           </div>
 
           {loginError && (
@@ -116,7 +118,7 @@ export default function ConnexionPage() {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-semibold text-[#00272B] mb-2">Adresse email</label>
+              <label className="block text-sm font-semibold text-[#00272B] mb-2">{t('auth.email')}</label>
               <div className="relative">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center">
                   <i className="ri-mail-line text-[#00272B]/40"></i>
@@ -133,7 +135,7 @@ export default function ConnexionPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-[#00272B] mb-2">Mot de passe</label>
+              <label className="block text-sm font-semibold text-[#00272B] mb-2">{t('auth.password')}</label>
               <div className="relative">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center">
                   <i className="ri-lock-line text-[#00272B]/40"></i>
@@ -159,9 +161,9 @@ export default function ConnexionPage() {
             <div className="flex items-center justify-between">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" checked={rememberMe} onChange={e => setRememberMe(e.target.checked)} className="w-4 h-4 rounded border-gray-300 accent-[#1AAA3F] cursor-pointer" />
-                <span className="text-sm text-[#00272B]/60">Se souvenir de moi</span>
+                <span className="text-sm text-[#00272B]/60">{t('adminLogin.rememberMe')}</span>
               </label>
-              <Link to="/mot-de-passe-oublie" className="text-sm text-[#1AAA3F] hover:underline font-medium">Mot de passe oublié ?</Link>
+              <Link to="/mot-de-passe-oublie?type=admin" className="text-sm text-[#1AAA3F] hover:underline font-medium">{t('auth.forgotPassword')}</Link>
             </div>
 
             <button
@@ -170,9 +172,9 @@ export default function ConnexionPage() {
               className="w-full py-3.5 bg-[#1AAA3F] text-white text-sm font-semibold rounded-xl hover:bg-[#158f35] disabled:opacity-60 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap"
             >
               {submitting ? (
-                <><i className="ri-loader-4-line animate-spin"></i><span>Connexion en cours...</span></>
+                <><i className="ri-loader-4-line animate-spin"></i><span>{t('adminLogin.signingIn')}</span></>
               ) : (
-                <><i className="ri-login-circle-line"></i><span>Se connecter</span></>
+                <><i className="ri-login-circle-line"></i><span>{t('auth.signIn')}</span></>
               )}
             </button>
           </form>
@@ -183,17 +185,17 @@ export default function ConnexionPage() {
           */}
           {import.meta.env.DEV && (
             <div className="mt-8 p-4 bg-gray-50 rounded-xl border border-gray-100">
-              <p className="text-xs font-semibold text-[#00272B]/50 uppercase tracking-wide mb-2">Identifiants de démonstration</p>
+              <p className="text-xs font-semibold text-[#00272B]/50 uppercase tracking-wide mb-2">{t('adminLogin.demoTitle')}</p>
               <div className="space-y-1">
-                <p className="text-xs text-[#00272B]/60">Email: <span className="font-mono font-medium text-[#00272B]">admin@smalim.sn</span></p>
-                <p className="text-xs text-[#00272B]/60">Mot de passe: <span className="font-mono font-medium text-[#00272B]">Admin@2024!</span></p>
+                <p className="text-xs text-[#00272B]/60">{t('auth.demoEmail')} <span className="font-mono font-medium text-[#00272B]">admin@smalim.sn</span></p>
+                <p className="text-xs text-[#00272B]/60">{t('auth.demoPassword')} <span className="font-mono font-medium text-[#00272B]">Admin@2024!</span></p>
               </div>
             </div>
           )}
 
           <div className="mt-6 text-center">
             <Link to="/" className="text-sm text-[#00272B]/40 hover:text-[#1AAA3F] transition-colors">
-              <i className="ri-arrow-left-line mr-1"></i>Retour au site
+              <i className="ri-arrow-left-line mr-1"></i>{t('auth.backToSite')}
             </Link>
           </div>
         </div>

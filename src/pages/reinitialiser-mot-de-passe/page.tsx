@@ -1,11 +1,15 @@
 import { useState, FormEvent } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { authService } from '../../services/auth.service';
 
 export default function ReinitialiserMotDePassePage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token') ?? '';
+  // Ajouté au lien par le backend ; absent des anciens emails, d'où le repli sur les deux connexions
+  const accountType = searchParams.get('type');
 
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
@@ -25,18 +29,34 @@ export default function ReinitialiserMotDePassePage() {
   };
 
   const strength = getStrength(password);
-  const strengthLabels = ['', 'Faible', 'Moyen', 'Bon', 'Excellent'];
+  const strengthKeys = ['', 'weak', 'medium', 'good', 'excellent'];
+
+  // Mêmes règles que resetPasswordRules côté backend
+  const rules = [
+    { key: 'ruleLength',    ok: password.length >= 8 },
+    { key: 'ruleUppercase', ok: /[A-Z]/.test(password) },
+    { key: 'ruleDigit',     ok: /[0-9]/.test(password) },
+    { key: 'ruleSpecial',   ok: /[^A-Za-z0-9]/.test(password) },
+  ];
   const strengthColors = ['', 'bg-red-400', 'bg-amber-400', 'bg-[#1AAA3F]/70', 'bg-[#1AAA3F]'];
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError('');
     if (password !== confirm) {
-      setError('Les mots de passe ne correspondent pas.');
+      setError(t('auth.errors.mismatch'));
       return;
     }
-    if (strength < 2) {
-      setError('Votre mot de passe est trop faible.');
+    if (password.length < 8) {
+      setError(t('auth.errors.tooShort'));
+      return;
+    }
+    if (!/[A-Z]/.test(password)) {
+      setError(t('auth.errors.needsUppercase'));
+      return;
+    }
+    if (!/[0-9]/.test(password)) {
+      setError(t('auth.errors.needsDigit'));
       return;
     }
     setLoading(true);
@@ -47,7 +67,7 @@ export default function ReinitialiserMotDePassePage() {
       setError(
         err instanceof Error
           ? err.message
-          : 'Le lien est invalide ou a expiré. Demandez-en un nouveau.'
+          : t('resetPassword.resetError')
       );
     } finally {
       setLoading(false);
@@ -61,22 +81,34 @@ export default function ReinitialiserMotDePassePage() {
           <div className="w-24 h-24 bg-[#EEFFF2] rounded-full flex items-center justify-center mx-auto mb-6">
             <i className="ri-checkbox-circle-line text-[#1AAA3F] text-5xl"></i>
           </div>
-          <h1 className="text-2xl font-bold text-[#00272B] mb-3">Mot de passe mis à jour !</h1>
-          <p className="text-[#00272B]/60 text-sm mb-8">Votre mot de passe a été réinitialisé avec succès. Vous pouvez maintenant vous connecter.</p>
+          <h1 className="text-2xl font-bold text-[#00272B] mb-3">{t('resetPassword.successTitle')}</h1>
+          <p className="text-[#00272B]/60 text-sm mb-8">{t('resetPassword.successHint')}</p>
           <div className="flex flex-col gap-3">
-            <button
-              onClick={() => navigate('/connexion')}
-              className="w-full py-3.5 bg-[#1AAA3F] text-white text-sm font-semibold rounded-xl hover:bg-[#158f35] transition-all cursor-pointer whitespace-nowrap flex items-center justify-center gap-2"
-            >
-              <i className="ri-login-circle-line"></i>
-              <span>Se connecter (Admin)</span>
-            </button>
-            <button
-              onClick={() => navigate('/espace-client/connexion')}
-              className="w-full py-3.5 border-2 border-[#00272B]/20 text-[#00272B] text-sm font-semibold rounded-xl hover:bg-gray-50 transition-all cursor-pointer whitespace-nowrap"
-            >
-              Connexion espace client
-            </button>
+            {accountType === 'client' ? (
+              <button
+                onClick={() => navigate('/espace-client/connexion')}
+                className="w-full py-3.5 bg-[#1AAA3F] text-white text-sm font-semibold rounded-xl hover:bg-[#158f35] transition-all cursor-pointer whitespace-nowrap flex items-center justify-center gap-2"
+              >
+                <i className="ri-login-circle-line"></i>
+                <span>{t('auth.signIn')}</span>
+              </button>
+            ) : (
+              <button
+                onClick={() => navigate('/connexion')}
+                className="w-full py-3.5 bg-[#1AAA3F] text-white text-sm font-semibold rounded-xl hover:bg-[#158f35] transition-all cursor-pointer whitespace-nowrap flex items-center justify-center gap-2"
+              >
+                <i className="ri-login-circle-line"></i>
+                <span>{accountType === 'admin' ? t('auth.signIn') : t('resetPassword.adminLogin')}</span>
+              </button>
+            )}
+            {!accountType && (
+              <button
+                onClick={() => navigate('/espace-client/connexion')}
+                className="w-full py-3.5 border-2 border-[#00272B]/20 text-[#00272B] text-sm font-semibold rounded-xl hover:bg-gray-50 transition-all cursor-pointer whitespace-nowrap"
+              >
+                {t('auth.clientLogin')}
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -102,15 +134,15 @@ export default function ReinitialiserMotDePassePage() {
             <i className="ri-key-2-line text-[#1AAA3F] text-3xl"></i>
           </div>
           <h2 className="text-3xl font-bold text-white mb-4">
-            Créez un nouveau<br /><span className="text-[#1AAA3F]">mot de passe sécurisé</span>
+            {t('resetPassword.titleLine1')}<br /><span className="text-[#1AAA3F]">{t('resetPassword.titleLine2')}</span>
           </h2>
           <div className="space-y-3 mt-8">
-            {['Au moins 8 caractères', 'Une majuscule', 'Un chiffre', 'Un caractère spécial'].map((tip, i) => (
-              <div key={i} className="flex items-center gap-2">
+            {rules.map(rule => (
+              <div key={rule.key} className="flex items-center gap-2">
                 <div className="w-5 h-5 bg-[#1AAA3F]/15 rounded-full flex items-center justify-center">
-                  <i className="ri-checkbox-blank-circle-line text-[#1AAA3F] text-xs"></i>
+                  <i className={`${rule.ok ? 'ri-checkbox-circle-fill' : 'ri-checkbox-blank-circle-line'} text-[#1AAA3F] text-xs`}></i>
                 </div>
-                <span className="text-white/60 text-sm">{tip}</span>
+                <span className="text-white/60 text-sm">{t(`resetPassword.${rule.key}`)}</span>
               </div>
             ))}
           </div>
@@ -127,13 +159,13 @@ export default function ReinitialiserMotDePassePage() {
           </div>
 
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-[#00272B] mb-2">Nouveau mot de passe</h1>
-            <p className="text-[#00272B]/50 text-sm">Choisissez un mot de passe fort pour sécuriser votre compte.</p>
+            <h1 className="text-3xl font-bold text-[#00272B] mb-2">{t('resetPassword.title')}</h1>
+            <p className="text-[#00272B]/50 text-sm">{t('resetPassword.hint')}</p>
           </div>
 
           {!token && (
             <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl mb-6">
-              <p className="text-sm text-amber-700"><i className="ri-error-warning-line mr-2"></i>Lien de réinitialisation invalide ou expiré. Veuillez refaire la demande.</p>
+              <p className="text-sm text-amber-700"><i className="ri-error-warning-line mr-2"></i>{t('resetPassword.invalidLink')}</p>
             </div>
           )}
 
@@ -146,7 +178,7 @@ export default function ReinitialiserMotDePassePage() {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-semibold text-[#00272B] mb-2">Nouveau mot de passe</label>
+              <label className="block text-sm font-semibold text-[#00272B] mb-2">{t('resetPassword.newPassword')}</label>
               <div className="relative">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center">
                   <i className="ri-lock-line text-[#00272B]/40"></i>
@@ -173,14 +205,14 @@ export default function ReinitialiserMotDePassePage() {
                     ))}
                   </div>
                   <p className={`text-xs font-medium ${strength <= 1 ? 'text-red-400' : strength === 2 ? 'text-amber-500' : 'text-[#1AAA3F]'}`}>
-                    {strengthLabels[strength]}
+                    {t(`auth.strength.${strengthKeys[strength]}`)}
                   </p>
                 </div>
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-[#00272B] mb-2">Confirmer le mot de passe</label>
+              <label className="block text-sm font-semibold text-[#00272B] mb-2">{t('auth.confirmPassword')}</label>
               <div className="relative">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center">
                   <i className="ri-lock-2-line text-[#00272B]/40"></i>
@@ -217,16 +249,16 @@ export default function ReinitialiserMotDePassePage() {
               className="w-full py-3.5 bg-[#1AAA3F] text-white text-sm font-semibold rounded-xl hover:bg-[#158f35] disabled:opacity-60 transition-all flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap"
             >
               {loading ? (
-                <><i className="ri-loader-4-line animate-spin"></i><span>Mise à jour...</span></>
+                <><i className="ri-loader-4-line animate-spin"></i><span>{t('resetPassword.submitting')}</span></>
               ) : (
-                <><i className="ri-shield-keyhole-line"></i><span>Réinitialiser mon mot de passe</span></>
+                <><i className="ri-shield-keyhole-line"></i><span>{t('resetPassword.submit')}</span></>
               )}
             </button>
           </form>
 
           <div className="mt-6 text-center">
-            <Link to="/connexion" className="text-sm text-[#00272B]/40 hover:text-[#1AAA3F] transition-colors">
-              <i className="ri-arrow-left-line mr-1"></i>Retour à la connexion
+            <Link to={accountType === 'admin' ? '/connexion' : '/espace-client/connexion'} className="text-sm text-[#00272B]/40 hover:text-[#1AAA3F] transition-colors">
+              <i className="ri-arrow-left-line mr-1"></i>{t('auth.backToLogin')}
             </Link>
           </div>
         </div>

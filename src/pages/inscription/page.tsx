@@ -1,5 +1,7 @@
 import { useState, FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation, Trans } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { authService } from '../../services/auth.service';
 import { ApiError } from '../../services/apiClient';
 
@@ -10,9 +12,9 @@ const STEP1_FIELDS = ['email', 'phone', 'first_name', 'last_name'];
  * Le backend renvoie 409 si l'email existe, ou 400 avec
  * `errors: [{ field, message }]` si la validation échoue.
  */
-function parseRegisterError(err: unknown): { message: string; fields: string[] } {
+function parseRegisterError(err: unknown, t: TFunction): { message: string; fields: string[] } {
   if (!(err instanceof ApiError)) {
-    return { message: 'Impossible de joindre le serveur. Réessayez dans un instant.', fields: [] };
+    return { message: t('auth.errors.network'), fields: [] };
   }
   if (err.status === 409) return { message: err.message, fields: ['email'] };
 
@@ -40,6 +42,7 @@ interface RegisterForm {
 }
 
 export default function InscriptionPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -64,7 +67,7 @@ export default function InscriptionPage() {
 
   const strength = getStrength(form.password);
   const strengthColors = ['', 'bg-red-400', 'bg-amber-400', 'bg-[#1AAA3F]/70', 'bg-[#1AAA3F]'];
-  const strengthLabels = ['', 'Faible', 'Moyen', 'Bon', 'Excellent'];
+  const strengthKeys = ['', 'weak', 'medium', 'good', 'excellent'];
 
   const handleStep1 = (e: FormEvent) => {
     e.preventDefault();
@@ -76,15 +79,15 @@ export default function InscriptionPage() {
     e.preventDefault();
     setError('');
     if (form.password !== form.confirm) {
-      setError('Les mots de passe ne correspondent pas.');
+      setError(t('auth.errors.mismatch'));
       return;
     }
     if (form.password.length < 8) {
-      setError('Le mot de passe doit contenir au moins 8 caractères.');
+      setError(t('auth.errors.tooShort'));
       return;
     }
     if (strength < 2) {
-      setError('Votre mot de passe est trop faible.');
+      setError(t('auth.errors.tooWeak'));
       return;
     }
     setLoading(true);
@@ -99,7 +102,7 @@ export default function InscriptionPage() {
       });
       navigate('/confirmation-email', { state: { email: form.email.trim() } });
     } catch (err) {
-      const { message, fields } = parseRegisterError(err);
+      const { message, fields } = parseRegisterError(err, t);
       setError(message);
       // Email déjà pris ou champ invalide de l'étape 1 : on y ramène l'utilisateur
       if (fields.some(f => STEP1_FIELDS.includes(f))) setStep(1);
@@ -127,18 +130,18 @@ export default function InscriptionPage() {
         <div className="relative z-10">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#1AAA3F]/20 rounded-full mb-6">
             <div className="w-2 h-2 bg-[#1AAA3F] rounded-full animate-pulse"></div>
-            <span className="text-[#1AAA3F] text-sm font-medium">Espace Client SMALIM</span>
+            <span className="text-[#1AAA3F] text-sm font-medium">{t('register.badge')}</span>
           </div>
           <h2 className="text-4xl font-bold text-white mb-4 leading-tight">
-            Rejoignez notre<br /><span className="text-[#1AAA3F]">espace client</span>
+            {t('register.titleLine1')}<br /><span className="text-[#1AAA3F]">{t('register.titleLine2')}</span>
           </h2>
-          <p className="text-white/50 text-sm mb-8">Accédez à vos commandes, devis, factures et machines depuis un seul espace.</p>
+          <p className="text-white/50 text-sm mb-8">{t('register.subtitle')}</p>
           <div className="space-y-3">
             {[
-              { icon: 'ri-shopping-bag-3-line', text: 'Suivi de vos commandes en temps réel' },
-              { icon: 'ri-file-list-3-line', text: 'Devis et factures en ligne' },
-              { icon: 'ri-tools-line', text: 'Gestion de votre parc machines' },
-              { icon: 'ri-customer-service-2-line', text: 'Support SAV dédié' },
+              { icon: 'ri-shopping-bag-3-line', text: t('register.featureOrders') },
+              { icon: 'ri-file-list-3-line', text: t('register.featureQuotes') },
+              { icon: 'ri-tools-line', text: t('register.featureMachines') },
+              { icon: 'ri-customer-service-2-line', text: t('register.featureSupport') },
             ].map((item, i) => (
               <div key={i} className="flex items-center gap-3">
                 <div className="w-9 h-9 bg-[#1AAA3F]/15 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -155,8 +158,8 @@ export default function InscriptionPage() {
             <i className="ri-shield-check-line text-[#1AAA3F]"></i>
           </div>
           <div>
-            <p className="text-white text-sm font-medium">Données protégées</p>
-            <p className="text-white/40 text-xs">Connexion chiffrée SSL · Conformité RGPD</p>
+            <p className="text-white text-sm font-medium">{t('register.dataTitle')}</p>
+            <p className="text-white/40 text-xs">{t('register.dataHint')}</p>
           </div>
         </div>
       </div>
@@ -176,7 +179,7 @@ export default function InscriptionPage() {
                   step >= s ? 'bg-[#1AAA3F] text-white' : 'bg-gray-100 text-gray-400'
                 }`}>{s}</div>
                 <span className={`text-xs font-medium ${step >= s ? 'text-[#1AAA3F]' : 'text-gray-400'}`}>
-                  {s === 1 ? 'Informations' : 'Sécurité'}
+                  {s === 1 ? t('register.stepInfo') : t('register.stepSecurity')}
                 </span>
                 {s < 2 && <div className={`h-px w-8 ${step > s ? 'bg-[#1AAA3F]' : 'bg-gray-200'}`}></div>}
               </div>
@@ -185,10 +188,10 @@ export default function InscriptionPage() {
 
           <div className="mb-6">
             <h1 className="text-2xl font-bold text-[#00272B] mb-1">
-              {step === 1 ? 'Créer votre compte' : 'Définir votre mot de passe'}
+              {step === 1 ? t('register.step1Title') : t('register.step2Title')}
             </h1>
             <p className="text-[#00272B]/50 text-sm">
-              {step === 1 ? 'Renseignez vos informations pour créer votre compte.' : 'Choisissez un mot de passe sécurisé.'}
+              {step === 1 ? t('register.step1Hint') : t('register.step2Hint')}
             </p>
           </div>
 
@@ -203,19 +206,19 @@ export default function InscriptionPage() {
             <form onSubmit={handleStep1} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-[#00272B] mb-1.5">Prénom <span className="text-red-500">*</span></label>
+                  <label className="block text-sm font-semibold text-[#00272B] mb-1.5">{t('register.firstName')} <span className="text-red-500">*</span></label>
                   <input type="text" required value={form.firstName} onChange={e => update('firstName', e.target.value)}
                     placeholder="Jean" className="w-full h-11 px-4 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#1AAA3F] focus:ring-2 focus:ring-[#1AAA3F]/10 transition-all" />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-[#00272B] mb-1.5">Nom <span className="text-red-500">*</span></label>
+                  <label className="block text-sm font-semibold text-[#00272B] mb-1.5">{t('register.lastName')} <span className="text-red-500">*</span></label>
                   <input type="text" required value={form.lastName} onChange={e => update('lastName', e.target.value)}
                     placeholder="Diop" className="w-full h-11 px-4 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#1AAA3F] focus:ring-2 focus:ring-[#1AAA3F]/10 transition-all" />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-[#00272B] mb-1.5">Adresse email <span className="text-red-500">*</span></label>
+                <label className="block text-sm font-semibold text-[#00272B] mb-1.5">{t('auth.email')} <span className="text-red-500">*</span></label>
                 <div className="relative">
                   <div className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 flex items-center justify-center">
                     <i className="ri-mail-line text-[#00272B]/35 text-sm"></i>
@@ -226,7 +229,7 @@ export default function InscriptionPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-[#00272B] mb-1.5">Téléphone <span className="text-red-500">*</span></label>
+                <label className="block text-sm font-semibold text-[#00272B] mb-1.5">{t('register.phone')} <span className="text-red-500">*</span></label>
                 <div className="relative">
                   <div className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 flex items-center justify-center">
                     <i className="ri-phone-line text-[#00272B]/35 text-sm"></i>
@@ -237,19 +240,19 @@ export default function InscriptionPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-[#00272B] mb-1.5">Entreprise / Raison sociale</label>
+                <label className="block text-sm font-semibold text-[#00272B] mb-1.5">{t('register.company')}</label>
                 <div className="relative">
                   <div className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 flex items-center justify-center">
                     <i className="ri-building-2-line text-[#00272B]/35 text-sm"></i>
                   </div>
                   <input type="text" value={form.company} onChange={e => update('company', e.target.value)}
-                    placeholder="Votre entreprise (optionnel)" className="w-full h-11 pl-10 pr-4 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#1AAA3F] focus:ring-2 focus:ring-[#1AAA3F]/10 transition-all" />
+                    placeholder={t('register.companyPlaceholder')} className="w-full h-11 pl-10 pr-4 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#1AAA3F] focus:ring-2 focus:ring-[#1AAA3F]/10 transition-all" />
                 </div>
               </div>
 
               <button type="submit"
                 className="w-full h-11 bg-[#1AAA3F] text-white text-sm font-semibold rounded-xl hover:bg-[#158f35] transition-all flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap mt-2">
-                <span>Continuer</span>
+                <span>{t('register.continue')}</span>
                 <i className="ri-arrow-right-line"></i>
               </button>
             </form>
@@ -258,7 +261,7 @@ export default function InscriptionPage() {
           {step === 2 && (
             <form onSubmit={handleStep2} className="space-y-4">
               <div>
-                <label className="block text-sm font-semibold text-[#00272B] mb-1.5">Mot de passe <span className="text-red-500">*</span></label>
+                <label className="block text-sm font-semibold text-[#00272B] mb-1.5">{t('auth.password')} <span className="text-red-500">*</span></label>
                 <div className="relative">
                   <div className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 flex items-center justify-center">
                     <i className="ri-lock-line text-[#00272B]/35 text-sm"></i>
@@ -279,14 +282,14 @@ export default function InscriptionPage() {
                       ))}
                     </div>
                     <p className={`text-xs font-medium ${strength <= 1 ? 'text-red-400' : strength === 2 ? 'text-amber-500' : 'text-[#1AAA3F]'}`}>
-                      {strengthLabels[strength]}
+                      {t(`auth.strength.${strengthKeys[strength]}`)}
                     </p>
                   </div>
                 )}
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-[#00272B] mb-1.5">Confirmer le mot de passe <span className="text-red-500">*</span></label>
+                <label className="block text-sm font-semibold text-[#00272B] mb-1.5">{t('auth.confirmPassword')} <span className="text-red-500">*</span></label>
                 <div className="relative">
                   <div className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 flex items-center justify-center">
                     <i className="ri-lock-2-line text-[#00272B]/35 text-sm"></i>
@@ -305,21 +308,27 @@ export default function InscriptionPage() {
                 <input type="checkbox" checked={form.acceptTerms} onChange={e => update('acceptTerms', e.target.checked)}
                   required className="w-4 h-4 mt-0.5 rounded border-gray-300 accent-[#1AAA3F] cursor-pointer flex-shrink-0" />
                 <span className="text-xs text-[#00272B]/60 leading-relaxed">
-                  J&apos;accepte les <a href="#" className="text-[#1AAA3F] hover:underline">conditions générales de vente</a> et la <a href="#" className="text-[#1AAA3F] hover:underline">politique de confidentialité</a> de SMALIM.
+                  <Trans
+                    i18nKey="register.acceptTerms"
+                    components={{
+                      terms: <a href="#" className="text-[#1AAA3F] hover:underline" />,
+                      privacy: <a href="#" className="text-[#1AAA3F] hover:underline" />,
+                    }}
+                  />
                 </span>
               </label>
 
               <div className="flex gap-3 pt-2">
                 <button type="button" onClick={() => setStep(1)}
                   className="flex-1 h-11 border-2 border-gray-200 text-[#00272B] text-sm font-semibold rounded-xl hover:bg-gray-50 transition-all cursor-pointer whitespace-nowrap">
-                  Retour
+                  {t('register.back')}
                 </button>
                 <button type="submit" disabled={loading}
                   className="flex-1 h-11 bg-[#1AAA3F] text-white text-sm font-semibold rounded-xl hover:bg-[#158f35] disabled:opacity-60 transition-all flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap">
                   {loading ? (
-                    <><i className="ri-loader-4-line animate-spin"></i><span>Création...</span></>
+                    <><i className="ri-loader-4-line animate-spin"></i><span>{t('register.submitting')}</span></>
                   ) : (
-                    <><i className="ri-user-add-line"></i><span>Créer mon compte</span></>
+                    <><i className="ri-user-add-line"></i><span>{t('register.submit')}</span></>
                   )}
                 </button>
               </div>
@@ -328,11 +337,11 @@ export default function InscriptionPage() {
 
           <div className="mt-6 text-center space-y-2">
             <p className="text-sm text-[#00272B]/50">
-              Déjà un compte ?{' '}
-              <Link to="/espace-client/connexion" className="text-[#1AAA3F] hover:underline font-medium">Se connecter</Link>
+              {t('register.alreadyAccount')}{' '}
+              <Link to="/espace-client/connexion" className="text-[#1AAA3F] hover:underline font-medium">{t('auth.signIn')}</Link>
             </p>
             <Link to="/" className="inline-flex items-center gap-1 text-xs text-[#00272B]/30 hover:text-[#1AAA3F] transition-colors">
-              <i className="ri-arrow-left-line"></i> Retour au site
+              <i className="ri-arrow-left-line"></i> {t('auth.backToSite')}
             </Link>
           </div>
         </div>
