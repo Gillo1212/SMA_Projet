@@ -64,7 +64,7 @@ export default function InscriptionPage() {
   };
 
   return (
-    <div className="min-h-screen flex font-['Inter']">
+    <div className="min-h-screen flex">
       {/* Left branding */}
       <div className="hidden lg:flex lg:w-1/2 bg-[#00272B] flex-col justify-between p-12 relative overflow-hidden">
         <div className="absolute inset-0 opacity-5">
@@ -75,7 +75,7 @@ export default function InscriptionPage() {
 
         <div className="relative z-10">
           <Link to="/">
-            <img src="https://static.readdy.ai/image/1aadd1df13f4328f806374f408610489/60a62dc5b844546eccd3f93680ad2ab4.png" alt="SMALIM" className="h-14 w-auto" />
+            <img src="/images/brand/logo-corporate.png" alt="SMALIM" className="h-14 w-auto" />
           </Link>
         </div>
 
@@ -120,7 +120,7 @@ export default function InscriptionPage() {
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-white overflow-y-auto">
         <div className="w-full max-w-md py-8">
           <div className="lg:hidden mb-8">
-            <Link to="/"><img src="https://static.readdy.ai/image/1aadd1df13f4328f806374f408610489/60a62dc5b844546eccd3f93680ad2ab4.png" alt="SMALIM" className="h-10 w-auto" /></Link>
+            <Link to="/"><img src="/images/brand/logo-corporate.png" alt="SMALIM" className="h-10 w-auto" /></Link>
           </div>
 
           {/* Steps indicator */}

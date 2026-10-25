@@ -24,18 +24,18 @@ export default function ClientConnexionPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#f0f9f4] to-[#e8f5ee] font-['Inter'] px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#f0f9f4] to-[#e8f5ee] px-4">
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
           <Link to="/">
             <img
-              src="https://static.readdy.ai/image/1aadd1df13f4328f806374f408610489/60a62dc5b844546eccd3f93680ad2ab4.png"
+              src="/images/brand/logo-corporate.png"
               alt="SMALIM"
               className="h-12 w-auto mx-auto mb-4"
             />
           </Link>
-          <h1 className="text-2xl font-bold text-[#00272B]">Espace Client</h1>
+          <h1 className="text-2xl font-bold text-[#00272B]">Espace client</h1>
           <p className="text-sm text-[#00272B]/50 mt-1">Suivez vos commandes et gérez votre compte</p>
         </div>
 

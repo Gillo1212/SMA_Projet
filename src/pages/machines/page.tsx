@@ -4,228 +4,158 @@ import { Link } from 'react-router-dom';
 import Navbar from '../home/components/Navbar';
 import Footer from '../home/components/Footer';
 import CTABanner from '../../components/feature/CTABanner';
-import { machineTypes, paymentMethods, capacityFilters } from '../../mocks/machines';
+import PageHero from '../../components/feature/PageHero';
 import { useMachines } from '../../hooks/useMachines';
 
 export default function MachinesPage() {
   const { t } = useTranslation();
   const [selectedType, setSelectedType] = useState('all');
   const [selectedPayment, setSelectedPayment] = useState('all');
-  const [selectedCapacity, setSelectedCapacity] = useState('all');
   const [search, setSearch] = useState('');
 
   const { machines, isLoading, error } = useMachines();
+
+  // Les identifiants correspondent à Machine['type'] (voir machines.service)
+  const machineTypes = [
+    { id: 'all', name: t('machines.typeAll') },
+    { id: 'cafe', name: t('machines.typeCafe') },
+    { id: 'snacks', name: t('machines.typeSnacks') },
+  ];
+  const paymentMethods = [
+    { id: 'all', name: t('machines.paymentAll') },
+    { id: 'wave', name: 'Wave' },
+    { id: 'orange', name: 'Orange Money' },
+    { id: 'carte', name: t('machines.paymentCard') },
+    { id: 'especes', name: t('machines.paymentCash') },
+  ];
 
   const filteredMachines = machines.filter(machine => {
     const typeMatch = selectedType === 'all' || machine.type === selectedType;
     const paymentMatch = selectedPayment === 'all' || machine.paymentMethods.includes(selectedPayment);
     const searchMatch = !search || machine.name.toLowerCase().includes(search.toLowerCase());
-    let capacityMatch = true;
-    if (selectedCapacity === 'small') {
-      capacityMatch = machine.id.includes('compact') || machine.id.includes('eco');
-    } else if (selectedCapacity === 'medium') {
-      capacityMatch = machine.id.includes('200') || machine.id.includes('250');
-    } else if (selectedCapacity === 'large') {
-      capacityMatch = machine.id.includes('300') || machine.id.includes('500');
-    }
-    return typeMatch && paymentMatch && capacityMatch && searchMatch;
+    return typeMatch && paymentMatch && searchMatch;
   });
 
+  const resetFilters = () => { setSelectedType('all'); setSelectedPayment('all'); setSearch(''); };
+
+  const fieldClass = 'w-full h-11 bg-white border border-[#00272B]/15 rounded-md px-3 text-sm text-[#00272B] focus:outline-none focus:border-[#0D8C2E] transition-colors';
+
   return (
-    <div className="min-h-screen bg-[#EEFFF2]">
+    <div className="min-h-screen bg-white">
       <Navbar />
 
-      {/* Hero Section */}
-      <div className="relative h-[280px] sm:h-[400px] overflow-hidden">
-        <div className="absolute inset-0">
-          <img
-            src="https://readdy.ai/api/search-image?query=modern%20professional%20vending%20machines%20showroom%2C%20variety%20of%20sleek%20contemporary%20automatic%20distributors%2C%20bright%20clean%20business%20environment%2C%20professional%20display%2C%20Senegal%20corporate%20setting&width=1920&height=800&seq=machines-hero-001&orientation=landscape"
-            alt="Nos Machines"
-            className="w-full h-full object-cover object-center"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black/40"></div>
-        </div>
+      <PageHero
+        eyebrow={t('machines.heroEyebrow')}
+        title={t('machines.heroTitle')}
+        titleAccent={t('machines.heroAccent')}
+        subtitle={t('machines.heroSubtitle')}
+      />
 
-        <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-20 flex flex-col justify-center items-center text-center">
-          <h1 className="text-2xl sm:text-5xl lg:text-6xl font-bold text-white mb-3 sm:mb-6">
-            Nos Distributeurs Automatiques
-          </h1>
-          <p className="text-sm sm:text-xl text-white/90 max-w-2xl">
-            Solutions professionnelles pour tous vos besoins : café, snacks, boissons. Paiement Wave &amp; Orange Money.
-          </p>
-        </div>
-      </div>
-
-      {/* Filters Section */}
-      <div className="sticky top-20 z-40 bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-20 py-4 sm:py-6">
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-6">
-            {/* Search */}
-            <div className="flex-1">
-              <label className="block text-xs sm:text-sm font-semibold text-[#00272B] mb-1 sm:mb-2">{t('machines.search')}</label>
+      {/* Filtres */}
+      <div className="sticky top-20 z-40 bg-white border-b border-[#00272B]/10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-end">
+            <label className="lg:col-span-4 block">
+              <span className="eyebrow block text-[#00272B]/50 mb-1.5">{t('machines.search')}</span>
               <input
                 type="text"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder={t('machines.searchPlaceholder')}
-                className="w-full h-10 sm:h-12 bg-[#EEFFF2] border border-gray-200 rounded-lg px-3 sm:px-4 text-sm text-[#00272B] focus:outline-none focus:border-[#1AAA3F] transition-colors"
+                className={fieldClass}
               />
-            </div>
-
-            {/* Type Filter */}
-            <div className="flex-1">
-              <label className="block text-xs sm:text-sm font-semibold text-[#00272B] mb-1 sm:mb-2">{t('machines.machineType')}</label>
-              <select
-                value={selectedType}
-                onChange={(e) => setSelectedType(e.target.value)}
-                className="w-full h-10 sm:h-12 bg-[#EEFFF2] border border-gray-200 rounded-lg px-3 sm:px-4 text-sm text-[#00272B] focus:outline-none focus:border-[#1AAA3F] transition-colors cursor-pointer"
-              >
-                {machineTypes.map(type => (
-                  <option key={type.id} value={type.id}>{type.name}</option>
-                ))}
+            </label>
+            <label className="lg:col-span-3 block">
+              <span className="eyebrow block text-[#00272B]/50 mb-1.5">{t('machines.machineType')}</span>
+              <select value={selectedType} onChange={(e) => setSelectedType(e.target.value)} className={`${fieldClass} cursor-pointer`}>
+                {machineTypes.map(type => <option key={type.id} value={type.id}>{type.name}</option>)}
               </select>
-            </div>
-
-            {/* Payment Filter */}
-            <div className="flex-1">
-              <label className="block text-xs sm:text-sm font-semibold text-[#00272B] mb-1 sm:mb-2">{t('machines.paymentMode')}</label>
-              <select
-                value={selectedPayment}
-                onChange={(e) => setSelectedPayment(e.target.value)}
-                className="w-full h-10 sm:h-12 bg-[#EEFFF2] border border-gray-200 rounded-lg px-3 sm:px-4 text-sm text-[#00272B] focus:outline-none focus:border-[#1AAA3F] transition-colors cursor-pointer"
-              >
-                {paymentMethods.map(method => (
-                  <option key={method.id} value={method.id}>{method.name}</option>
-                ))}
+            </label>
+            <label className="lg:col-span-3 block">
+              <span className="eyebrow block text-[#00272B]/50 mb-1.5">{t('machines.paymentMode')}</span>
+              <select value={selectedPayment} onChange={(e) => setSelectedPayment(e.target.value)} className={`${fieldClass} cursor-pointer`}>
+                {paymentMethods.map(method => <option key={method.id} value={method.id}>{method.name}</option>)}
               </select>
-            </div>
-
-            {/* Capacity Filter */}
-            <div className="flex-1">
-              <label className="block text-xs sm:text-sm font-semibold text-[#00272B] mb-1 sm:mb-2">{t('machines.capacity')}</label>
-              <select
-                value={selectedCapacity}
-                onChange={(e) => setSelectedCapacity(e.target.value)}
-                className="w-full h-10 sm:h-12 bg-[#EEFFF2] border border-gray-200 rounded-lg px-3 sm:px-4 text-sm text-[#00272B] focus:outline-none focus:border-[#1AAA3F] transition-colors cursor-pointer"
-              >
-                {capacityFilters.map(capacity => (
-                  <option key={capacity.id} value={capacity.id}>{capacity.name}</option>
-                ))}
-              </select>
-            </div>
-
-            {/* Compare Button */}
-            <div className="flex items-end">
-              <Link
-                to="/machines/comparateur"
-                className="w-full sm:w-auto h-10 sm:h-12 px-6 sm:px-8 bg-[#00272B] text-white text-sm font-semibold rounded-lg hover:bg-[#00272B]/90 transition-colors flex items-center justify-center whitespace-nowrap cursor-pointer"
-              >
-                <i className="ri-scales-line text-lg mr-2"></i>
-                Comparateur
-              </Link>
-            </div>
+            </label>
+            <Link
+              to="/machines/comparateur"
+              className="lg:col-span-2 h-11 px-5 border border-[#00272B] text-[#00272B] text-sm font-semibold rounded-md hover:bg-[#00272B] hover:text-white transition-colors flex items-center justify-center gap-2 whitespace-nowrap"
+            >
+              <i className="ri-scales-line"></i>
+              {t('machines.compare')}
+            </Link>
           </div>
         </div>
       </div>
 
-      {/* Machines Grid */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-20 py-8 sm:py-16">
-
-        {/* Loading state */}
+      {/* Grille */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-12 sm:py-16">
         {isLoading && (
           <div className="flex items-center justify-center py-20">
-            <div className="w-12 h-12 border-4 border-[#1AAA3F] border-t-transparent rounded-full animate-spin"></div>
+            <div className="w-10 h-10 border-2 border-[#0D8C2E] border-t-transparent rounded-full animate-spin"></div>
           </div>
         )}
 
-        {/* Error state */}
         {error && !isLoading && (
           <div className="text-center py-20">
-            <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
-              <i className="ri-error-warning-line text-4xl text-red-400"></i>
-            </div>
-            <h3 className="text-2xl font-bold text-[#00272B] mb-3">{t('machines.loadError')}</h3>
-            <p className="text-[#00272B]/60 mb-2">{error}</p>
+            <h3 className="text-2xl text-[#00272B] mb-3">{t('machines.loadError')}</h3>
+            <p className="text-[#00272B]/60">{error}</p>
           </div>
         )}
 
-        {/* Results */}
         {!isLoading && !error && (
           <>
-            <div className="flex items-center justify-between mb-6 sm:mb-8">
-              <p className="text-sm text-[#00272B]/60">
-                {filteredMachines.length} machine{filteredMachines.length > 1 ? 's' : ''} trouvée{filteredMachines.length > 1 ? 's' : ''}
-              </p>
-            </div>
+            <p className="text-sm text-[#00272B]/60 mb-8">{t('machines.count', { count: filteredMachines.length })}</p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredMachines.map(machine => (
                 <Link
                   key={machine.id}
                   to={`/machines/${machine.slug}`}
-                  className="group bg-white rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer"
+                  className="group flex flex-col bg-white rounded-2xl border border-[#00272B]/10 overflow-hidden hover:border-[#00272B]/25 hover:shadow-[0_20px_40px_-24px_rgba(0,39,43,0.35)] transition-all"
                 >
-                  {/* Image */}
-                  <div className="relative h-80 overflow-hidden bg-gray-50">
+                  <div className="relative h-80 bg-white flex items-center justify-center p-6">
                     {machine.image ? (
                       <img
                         src={machine.image}
                         alt={machine.name}
-                        className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                        className="max-h-full w-auto object-contain group-hover:scale-[1.03] transition-transform duration-500"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gray-100">
-                        <i className="ri-store-line text-6xl text-gray-300"></i>
-                      </div>
+                      <i className="ri-store-line text-6xl text-[#00272B]/15"></i>
                     )}
-                    {machine.badge && (
-                      <div className="absolute top-4 right-4 px-4 py-2 bg-[#1AAA3F] text-white text-xs font-bold rounded-full">
-                        {machine.badge}
-                      </div>
-                    )}
-                    <div className="absolute top-4 left-4 px-4 py-2 bg-white/95 backdrop-blur-sm text-[#00272B] text-xs font-semibold rounded-full">
+                    <span className="absolute top-4 left-4 px-3 py-1 bg-[#F6F3EC] text-[#00272B] text-xs font-semibold rounded-full">
                       {machine.stock}
-                    </div>
+                    </span>
                   </div>
 
-                  {/* Content */}
-                  <div className="p-6">
-                    <div className="mb-3">
-                      <span className="text-xs font-semibold text-[#1AAA3F] uppercase tracking-wide">
-                        {machine.category}
-                      </span>
-                    </div>
+                  <div className="flex flex-col flex-1 p-6 border-t border-[#00272B]/8">
+                    <p className="eyebrow text-[#0D8C2E] mb-3">{machine.category}</p>
+                    <h3 className="text-2xl text-[#00272B] mb-3">{machine.name}</h3>
+                    <p className="text-sm text-[#00272B]/60 leading-relaxed mb-5 line-clamp-2">{machine.shortDescription}</p>
 
-                    <h3 className="text-xl font-bold text-[#00272B] mb-3 group-hover:text-[#1AAA3F] transition-colors">
-                      {machine.name}
-                    </h3>
-
-                    <p className="text-sm text-[#00272B]/60 mb-4 line-clamp-2">
-                      {machine.shortDescription}
-                    </p>
-
-                    {/* Payment Methods */}
-                    <div className="flex items-center gap-2 mb-4 flex-wrap">
+                    <div className="flex items-center gap-2 mb-6 flex-wrap">
                       {machine.paymentMethods.includes('wave') && (
-                        <div className="px-3 py-1 bg-[#EEFFF2] rounded-full text-xs font-medium text-[#00272B]">Wave</div>
+                        <span className="px-2.5 py-1 border border-[#00272B]/10 rounded-full text-xs text-[#00272B]/70">Wave</span>
                       )}
                       {machine.paymentMethods.includes('orange') && (
-                        <div className="px-3 py-1 bg-[#EEFFF2] rounded-full text-xs font-medium text-[#00272B]">Orange Money</div>
+                        <span className="px-2.5 py-1 border border-[#00272B]/10 rounded-full text-xs text-[#00272B]/70">Orange Money</span>
                       )}
                       {machine.paymentMethods.includes('carte') && (
-                        <div className="px-3 py-1 bg-[#EEFFF2] rounded-full text-xs font-medium text-[#00272B]">CB</div>
+                        <span className="px-2.5 py-1 border border-[#00272B]/10 rounded-full text-xs text-[#00272B]/70">{t('machines.paymentCard')}</span>
                       )}
                     </div>
 
-                    {/* Price & CTA */}
-                    <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                    <div className="mt-auto flex items-center justify-between pt-5 border-t border-[#00272B]/8">
                       <div>
-                        <div className="text-xs text-[#00272B]/40 mb-1">À partir de</div>
-                        <div className="text-2xl font-bold text-[#00272B]">{machine.priceDisplay}</div>
+                        <p className="text-xs text-[#00272B]/50">{machine.price > 0 ? t('common.from') : t('common.price')}</p>
+                        <p className="font-semibold text-[#00272B]">
+                          {machine.price > 0 ? machine.priceDisplay : t('common.onQuote')}
+                        </p>
                       </div>
-                      <div className="w-12 h-12 bg-[#1AAA3F] text-white rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <i className="ri-arrow-right-line text-xl"></i>
-                      </div>
+                      <span className="w-10 h-10 rounded-full border border-[#00272B]/15 flex items-center justify-center text-[#00272B] group-hover:bg-[#00272B] group-hover:text-white transition-colors">
+                        <i className="ri-arrow-right-up-line"></i>
+                      </span>
                     </div>
                   </div>
                 </Link>
@@ -234,16 +164,13 @@ export default function MachinesPage() {
 
             {filteredMachines.length === 0 && (
               <div className="text-center py-20">
-                <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <i className="ri-search-line text-4xl text-gray-400"></i>
-                </div>
-                <h3 className="text-2xl font-bold text-[#00272B] mb-3">{t('machines.empty')}</h3>
+                <h3 className="text-2xl text-[#00272B] mb-3">{t('machines.empty')}</h3>
                 <p className="text-[#00272B]/60 mb-8">{t('machines.emptyHint')}</p>
                 <button
-                  onClick={() => { setSelectedType('all'); setSelectedPayment('all'); setSelectedCapacity('all'); setSearch(''); }}
-                  className="px-6 py-3 bg-[#1AAA3F] text-white text-sm font-semibold rounded-lg hover:bg-[#158f35] transition-colors cursor-pointer whitespace-nowrap"
+                  onClick={resetFilters}
+                  className="px-6 py-3 bg-[#00272B] text-white text-sm font-semibold rounded-md hover:bg-[#0D8C2E] transition-colors"
                 >
-                  Réinitialiser les filtres
+                  {t('machines.reset')}
                 </button>
               </div>
             )}
@@ -252,12 +179,12 @@ export default function MachinesPage() {
       </div>
 
       <CTABanner
-        badge="Conseil gratuit"
-        title="Besoin d'aide pour choisir ?"
-        subtitle="Notre équipe d'experts est là pour vous conseiller et vous aider à trouver la machine idéale pour vos besoins."
+        badge={t('machines.ctaBadge')}
+        title={t('machines.ctaTitle')}
+        subtitle={t('machines.ctaSubtitle')}
         buttons={[
-          { label: 'Demander un devis', href: '/machines/devis', icon: 'ri-file-list-line', variant: 'white' },
-          { label: 'Nous contacter', href: '/contact', icon: 'ri-chat-1-line', variant: 'primary' },
+          { label: t('nav.quote'), href: '/machines/devis', icon: 'ri-file-list-3-line', variant: 'white' },
+          { label: t('nav.contact'), href: '/contact', icon: 'ri-chat-1-line', variant: 'primary' },
         ]}
       />
 

@@ -1,33 +1,39 @@
 /**
- * Traductions françaises — page d'accueil.
+ * Traductions françaises : page d'accueil.
  * Toute clé ajoutée ici doit l'être aussi dans `../en/home.ts`.
+ * Les clés `…Accent` sont affichées en italique dans la continuité du titre.
  */
 export default {
   home: {
     hero: {
-      // Découpé en trois lignes pour conserver les retours à la ligne du design
-      titleLine1: 'Mettre la Technologie',
-      titleLine2: "au Service d'une Alimentation",
-      titleLine3: 'Saine et Accessible',
+      eyebrow: 'Distribution automatique · Dakar, Sénégal',
+      title: "Mettre la technologie au service d'une alimentation",
+      titleAccent: 'saine et accessible',
       subtitle:
-        "Découvrez comment nos distributeurs automatiques intelligents révolutionnent l'accès à une alimentation saine",
-      ctaMachines: 'Découvrir nos Machines',
-      ctaProducts: 'Catalogue Produits',
+        'Machines à café, distributeurs de snacks et matières premières pour les entreprises, écoles, hôpitaux et hôtels. Installation, maintenance et paiement Wave ou Orange Money.',
+      ctaMachines: 'Découvrir nos machines',
+      ctaQuote: 'Demander un devis',
+      fact1: 'Installation et maintenance',
+      fact2: 'Paiement Wave et Orange Money',
+      fact3: 'Livraison partout au Sénégal',
     },
 
     machines: {
-      title: 'Nos Distributeurs',
-      titleSecondLine: 'Automatiques',
-      subtitle: 'Découvrez notre gamme complète de machines adaptées à tous les environnements professionnels et besoins spécifiques.',
-      seeAll: 'Voir Toutes les Machines',
+      eyebrow: 'Nos machines',
+      title: 'Une machine pour chaque',
+      titleAccent: 'espace de travail',
+      subtitle:
+        'Du comptoir de bureau au hall d’entreprise : machines à café instantané, distributeurs de café en grains et distributeurs de snacks.',
+      seeAll: 'Voir toutes les machines',
       delivery: 'Livraison',
     },
 
     cta: {
-      line1: 'COMMANDEZ VOS PRODUITS',
-      line2: 'EN LIGNE FACILEMENT',
-      line3: 'PAIEMENT MOBILE INTÉGRÉ',
-      button: 'ACCÉDER À LA BOUTIQUE',
+      eyebrow: 'Boutique en ligne',
+      title: 'Vos matières premières,',
+      titleAccent: 'livrées partout au Sénégal',
+      text: 'Café de Colombie, chocolats chauds et cappuccinos pour vos machines. Commande en ligne et paiement sécurisé avec Wave et Orange Money.',
+      button: 'Accéder à la boutique',
     },
   },
 };

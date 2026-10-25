@@ -56,7 +56,7 @@ export default function ReinitialiserMotDePassePage() {
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#f0f9f4] to-white font-['Inter'] px-4">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#f0f9f4] to-white px-4">
         <div className="w-full max-w-md text-center">
           <div className="w-24 h-24 bg-[#EEFFF2] rounded-full flex items-center justify-center mx-auto mb-6">
             <i className="ri-checkbox-circle-line text-[#1AAA3F] text-5xl"></i>
@@ -84,7 +84,7 @@ export default function ReinitialiserMotDePassePage() {
   }
 
   return (
-    <div className="min-h-screen flex font-['Inter']">
+    <div className="min-h-screen flex">
       {/* Left branding */}
       <div className="hidden lg:flex lg:w-1/2 bg-[#00272B] flex-col justify-between p-12 relative overflow-hidden">
         <div className="absolute inset-0 opacity-5">
@@ -94,7 +94,7 @@ export default function ReinitialiserMotDePassePage() {
         <div className="absolute bottom-1/3 left-0 w-1 h-48 bg-[#1AAA3F]"></div>
 
         <div className="relative z-10">
-          <Link to="/"><img src="https://static.readdy.ai/image/1aadd1df13f4328f806374f408610489/60a62dc5b844546eccd3f93680ad2ab4.png" alt="SMALIM" className="h-14 w-auto" /></Link>
+          <Link to="/"><img src="/images/brand/logo-corporate.png" alt="SMALIM" className="h-14 w-auto" /></Link>
         </div>
 
         <div className="relative z-10">
@@ -123,7 +123,7 @@ export default function ReinitialiserMotDePassePage() {
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-white">
         <div className="w-full max-w-md">
           <div className="lg:hidden mb-8">
-            <Link to="/"><img src="https://static.readdy.ai/image/1aadd1df13f4328f806374f408610489/60a62dc5b844546eccd3f93680ad2ab4.png" alt="SMALIM" className="h-10 w-auto" /></Link>
+            <Link to="/"><img src="/images/brand/logo-corporate.png" alt="SMALIM" className="h-10 w-auto" /></Link>
           </div>
 
           <div className="mb-8">

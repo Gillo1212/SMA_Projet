@@ -4,8 +4,10 @@
  */
 export default {
   products: {
-    title: 'Catalogue Produits',
-    subtitle: 'Découvrez notre sélection de produits pour vos distributeurs automatiques : café, snacks et boissons de qualité premium.',
+    eyebrow: 'Boutique',
+    title: 'Matières premières pour',
+    titleAccent: 'vos machines',
+    subtitle: 'Café de Colombie, chocolats chauds et cappuccinos sélectionnés pour les distributeurs et les machines à café instantané.',
     clearAll: 'Tout effacer',
     showResults: 'Voir les résultats',
     resetFilters: 'Réinitialiser les filtres',
@@ -38,7 +40,7 @@ export default {
     email: 'Email',
     emailDelay: 'Réponse sous 24h',
     address: 'Adresse',
-    formTitle: 'Envoyez-nous un Message',
+    formTitle: 'Envoyez-nous un message',
     namePlaceholder: 'Votre nom',
     emailPlaceholder: 'votre@email.com',
     phonePlaceholder: '+221 XX XXX XX XX',
@@ -53,11 +55,11 @@ export default {
     successHint: 'Nous vous répondrons dans les plus brefs délais.',
     errorTitle: "Erreur lors de l'envoi",
     errorHint: 'Veuillez réessayer ou nous contacter par téléphone.',
-    hoursTitle: "Horaires d'Ouverture",
+    hoursTitle: "Horaires d'ouverture",
     weekdays: 'Lundi - Vendredi',
     saturday: 'Samedi',
     sunday: 'Dimanche',
     closed: 'Fermé',
-    support247: 'Support Technique 24/7',
+    support247: 'Support technique 24/7',
   },
 };

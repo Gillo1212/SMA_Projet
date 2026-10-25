@@ -31,7 +31,7 @@ const statusDots: Record<string, string> = {
 
 /** Formate une évolution en % — masquée si le backend ne peut pas la calculer */
 function formatEvolution(value?: number): { label: string; positive: boolean } {
-  if (value === undefined) return { label: '—', positive: true };
+  if (value === undefined) return { label: '-', positive: true };
   return { label: `${value >= 0 ? '+' : ''}${value}%`, positive: value >= 0 };
 }
 

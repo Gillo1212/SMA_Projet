@@ -154,12 +154,12 @@ export default function CheckoutPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-white font-['Inter']">
+    <div className="min-h-screen bg-white">
       <Navbar />
 
       {/* Header */}
-      <section className="pt-24 sm:pt-32 pb-8 sm:pb-12 bg-[#EEFFF2]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-20">
+      <section className="pt-24 sm:pt-32 pb-8 sm:pb-12 bg-[#F6F3EC]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
           <h1 className="text-3xl sm:text-5xl font-bold text-[#00272B] mb-6 sm:mb-8">{t('checkout.title')}</h1>
 
           {/* Progress Steps */}
@@ -191,7 +191,7 @@ export default function CheckoutPage() {
 
       {/* Checkout Content */}
       <section className="py-8 sm:py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-12">
             {/* Forms */}
             <div className="lg:col-span-2">
@@ -253,7 +253,7 @@ export default function CheckoutPage() {
                         type="button"
                         onClick={() => setAccount(prev => ({ ...prev, createAccount: !prev.createAccount }))}
                         className={`w-full flex items-center justify-between p-4 transition-colors cursor-pointer ${
-                          account.createAccount ? 'bg-[#EEFFF2]' : 'bg-gray-50 hover:bg-gray-100'
+                          account.createAccount ? 'bg-[#F6F3EC]' : 'bg-gray-50 hover:bg-gray-100'
                         }`}
                       >
                         <div className="flex items-center gap-3">
@@ -340,7 +340,7 @@ export default function CheckoutPage() {
                         onClick={() => setDeliveryMode(key as DeliveryMode)}
                         className={`w-full p-6 border-2 rounded-xl flex items-center justify-between transition-all cursor-pointer ${
                           deliveryMode === key
-                            ? 'border-[#1AAA3F] bg-[#EEFFF2]'
+                            ? 'border-[#1AAA3F] bg-[#F6F3EC]'
                             : 'border-gray-200 hover:border-gray-300'
                         }`}
                       >
@@ -399,7 +399,7 @@ export default function CheckoutPage() {
                       onClick={() => setPaymentMethod('wave')}
                       className={`w-full p-6 border-2 rounded-xl transition-all cursor-pointer ${
                         paymentMethod === 'wave'
-                          ? 'border-[#1AAA3F] bg-[#EEFFF2]'
+                          ? 'border-[#1AAA3F] bg-[#F6F3EC]'
                           : 'border-gray-200 hover:border-gray-300'
                       }`}
                     >
@@ -445,7 +445,7 @@ export default function CheckoutPage() {
                       onClick={() => setPaymentMethod('orange_money')}
                       className={`w-full p-6 border-2 rounded-xl transition-all cursor-pointer ${
                         paymentMethod === 'orange_money'
-                          ? 'border-[#1AAA3F] bg-[#EEFFF2]'
+                          ? 'border-[#1AAA3F] bg-[#F6F3EC]'
                           : 'border-gray-200 hover:border-gray-300'
                       }`}
                     >

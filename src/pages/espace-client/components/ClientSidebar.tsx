@@ -34,7 +34,7 @@ export default function ClientSidebar({ onClose }: ClientSidebarProps) {
       <div className="px-6 py-5 border-b border-white/8 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2.5" onClick={handleNavClick}>
           <img
-            src="https://storage.readdy-site.link/project_files/aa6dbb4c-c575-457d-a3a9-db6ddc27815b/3d74ca1f-a6cc-43e7-855a-99e3c8431740_WhatsApp-Image-2026-03-27-at-15.12.28.jpeg?v=53fcf85bfc568db6576ce1dc1e8a0b9f"
+            src="/images/brand/logo-site.png"
             alt="SMALIM"
             className="h-8 w-auto object-contain"
           />

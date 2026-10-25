@@ -12,11 +12,10 @@ export default function Navbar() {
   const { getTotalItems } = useCart();
   const cartItemsCount = getTotalItems();
   const location = useLocation();
-  const isHome = location.pathname === '/';
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 50);
+    const handleScroll = () => setIsScrolled(window.scrollY > 10);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -31,8 +30,6 @@ export default function Navbar() {
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
-  const showSolid = isScrolled || !isHome;
-
   const navLinks = [
     { to: '/', label: t('nav.home') },
     { to: '/machines', label: t('nav.machines') },
@@ -42,78 +39,74 @@ export default function Navbar() {
     { to: '/contact', label: t('nav.contact') },
   ];
 
+  const isActive = (to: string) =>
+    to === '/' ? location.pathname === '/' : location.pathname.startsWith(to);
+
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-      showSolid ? 'bg-white border-b border-gray-100' : 'bg-[#00272B]/70 backdrop-blur-md'
+    <nav className={`fixed top-0 left-0 right-0 z-50 bg-white transition-shadow duration-300 ${
+      isScrolled ? 'shadow-[0_1px_0_rgba(0,39,43,0.08),0_8px_24px_-12px_rgba(0,39,43,0.15)]' : 'border-b border-[#00272B]/8'
     }`}>
-      <div className="max-w-7xl mx-auto px-6 lg:px-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <Link to="/" className="flex items-center flex-shrink-0">
-            <img src="https://storage.readdy-site.link/project_files/aa6dbb4c-c575-457d-a3a9-db6ddc27815b/3d74ca1f-a6cc-43e7-855a-99e3c8431740_WhatsApp-Image-2026-03-27-at-15.12.28.jpeg?v=53fcf85bfc568db6576ce1dc1e8a0b9f" alt="SMALIM" className="h-12 w-auto object-contain" />
+          <Link to="/" className="flex items-center flex-shrink-0" aria-label="SMALIM, accueil">
+            <img src="/images/brand/logo-horizontal.png" alt="SMALIM Corporate" className="h-9 sm:h-10 w-auto" />
           </Link>
 
           {/* Nav links desktop */}
-          <div className="hidden md:flex items-center space-x-1">
+          <div className="hidden lg:flex items-center gap-7">
             {navLinks.map(link => (
-              <Link key={link.to} to={link.to} className={`px-3 py-2 text-sm font-medium rounded-md transition-colors whitespace-nowrap ${
-                location.pathname === link.to
-                  ? showSolid ? 'text-[#0D8C2E] bg-[#0D8C2E]/8' : 'text-[#0D8C2E]'
-                  : showSolid ? 'text-[#00272B] hover:text-[#0D8C2E] hover:bg-gray-50' : 'text-white/90 hover:text-white hover:bg-white/10'
-              }`}>{link.label}</Link>
+              <Link
+                key={link.to}
+                to={link.to}
+                className={`eyebrow py-2 border-b transition-colors whitespace-nowrap ${
+                  isActive(link.to)
+                    ? 'text-[#00272B] border-[#00272B]'
+                    : 'text-[#00272B]/70 border-transparent hover:text-[#00272B]'
+                }`}
+              >
+                {link.label}
+              </Link>
             ))}
           </div>
 
           {/* Right actions */}
-          <div className="flex items-center space-x-2">
-            <LanguageSwitcher variant={showSolid ? 'dark' : 'light'} className="hidden sm:block" />
+          <div className="flex items-center gap-2">
+            <LanguageSwitcher variant="dark" className="hidden sm:block" />
 
             {/* Account dropdown */}
-            <div className="hidden md:block relative" ref={menuRef}>
+            <div className="hidden lg:block relative" ref={menuRef}>
               <button
                 onClick={() => setShowAccountMenu(v => !v)}
-                className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border transition-all whitespace-nowrap ${
-                  showSolid
-                    ? 'text-[#00272B] border-gray-200 hover:border-[#0D8C2E] hover:text-[#0D8C2E] bg-white'
-                    : 'text-white border-white/30 hover:border-white hover:bg-white/10'
-                }`}
+                aria-label={t('nav.myAccount')}
+                className="w-10 h-10 flex items-center justify-center rounded-full text-[#00272B] hover:bg-[#00272B]/5 transition-colors"
               >
-                <span className="w-4 h-4 flex items-center justify-center">
-                  <i className="ri-user-line text-sm"></i>
-                </span>
-                {t('nav.myAccount')}
-                <i className={`ri-arrow-down-s-line text-xs transition-transform ${showAccountMenu ? 'rotate-180' : ''}`}></i>
+                <i className="ri-user-line text-lg"></i>
               </button>
 
               {showAccountMenu && (
-                <div className="absolute right-0 top-full mt-2 w-52 bg-white rounded-2xl border border-gray-100 py-2 z-50">
-                  <div className="px-4 py-2 border-b border-gray-50 mb-1">
-                    <p className="text-xs font-semibold text-[#00272B]/40 uppercase tracking-wide">{t('nav.loginAs')}</p>
-                  </div>
+                <div className="absolute right-0 top-full mt-2 w-60 bg-white rounded-xl border border-[#00272B]/10 shadow-xl py-2 z-50">
+                  <p className="eyebrow px-4 py-2 text-[#00272B]/50">{t('nav.loginAs')}</p>
                   <Link
                     to="/espace-client/connexion"
                     onClick={() => setShowAccountMenu(false)}
-                    className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer"
+                    className="flex items-center gap-3 px-4 py-3 hover:bg-[#F6F3EC] transition-colors"
                   >
-                    <div className="w-8 h-8 bg-[#0D8C2E]/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <i className="ri-user-line text-[#0D8C2E] text-sm"></i>
-                    </div>
+                    <i className="ri-user-line text-[#0D8C2E]"></i>
                     <div>
                       <p className="text-sm font-semibold text-[#00272B]">{t('nav.clientArea')}</p>
-                      <p className="text-xs text-[#00272B]/40">{t('nav.clientAreaHint')}</p>
+                      <p className="text-xs text-[#00272B]/50">{t('nav.clientAreaHint')}</p>
                     </div>
                   </Link>
                   <Link
                     to="/connexion"
                     onClick={() => setShowAccountMenu(false)}
-                    className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer"
+                    className="flex items-center gap-3 px-4 py-3 hover:bg-[#F6F3EC] transition-colors"
                   >
-                    <div className="w-8 h-8 bg-[#00272B]/8 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <i className="ri-shield-user-line text-[#00272B]/60 text-sm"></i>
-                    </div>
+                    <i className="ri-shield-user-line text-[#00272B]/60"></i>
                     <div>
                       <p className="text-sm font-semibold text-[#00272B]">{t('nav.administration')}</p>
-                      <p className="text-xs text-[#00272B]/40">{t('nav.administrationHint')}</p>
+                      <p className="text-xs text-[#00272B]/50">{t('nav.administrationHint')}</p>
                     </div>
                   </Link>
                 </div>
@@ -121,24 +114,32 @@ export default function Navbar() {
             </div>
 
             {/* Cart */}
-            <Link to="/panier" className={`relative w-10 h-10 flex items-center justify-center rounded-lg transition-colors ${
-              showSolid ? 'text-[#00272B] hover:bg-gray-50 border border-gray-200' : 'text-white hover:bg-white/10 border border-white/20'
-            }`}>
-              <i className="ri-shopping-cart-line text-lg"></i>
+            <Link
+              to="/panier"
+              aria-label={t('cart.title')}
+              className="relative w-10 h-10 flex items-center justify-center rounded-full text-[#00272B] hover:bg-[#00272B]/5 transition-colors"
+            >
+              <i className="ri-shopping-bag-3-line text-lg"></i>
               {cartItemsCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#0D8C2E] text-white text-xs font-bold rounded-full flex items-center justify-center">{cartItemsCount}</span>
+                <span className="absolute top-0.5 right-0.5 min-w-[18px] h-[18px] px-1 bg-[#0D8C2E] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                  {cartItemsCount}
+                </span>
               )}
             </Link>
 
             {/* CTA */}
-            <Link to="/produits" className="hidden md:block px-5 py-2 bg-[#0D8C2E] text-white text-sm font-semibold rounded-lg hover:bg-[#0a7025] transition-colors whitespace-nowrap">
-              {t('nav.shop')}
+            <Link
+              to="/machines/devis"
+              className="hidden lg:inline-flex items-center ml-2 px-5 py-2.5 bg-[#00272B] text-white text-sm font-semibold rounded-md hover:bg-[#0D8C2E] transition-colors whitespace-nowrap"
+            >
+              {t('nav.quote')}
             </Link>
 
             {/* Mobile hamburger */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className={`md:hidden w-10 h-10 flex items-center justify-center rounded-lg transition-colors ${showSolid ? 'text-[#00272B] hover:bg-gray-50' : 'text-white hover:bg-white/10'}`}
+              aria-label="Menu"
+              className="lg:hidden w-10 h-10 flex items-center justify-center rounded-full text-[#00272B] hover:bg-[#00272B]/5 transition-colors"
             >
               <i className={`text-xl ${isMobileMenuOpen ? 'ri-close-line' : 'ri-menu-line'}`}></i>
             </button>
@@ -147,25 +148,38 @@ export default function Navbar() {
 
         {/* Mobile menu */}
         {isMobileMenuOpen && (
-          <div className="md:hidden bg-white border-t border-gray-100 py-4 space-y-1">
+          <div className="lg:hidden border-t border-[#00272B]/8 py-4">
             {navLinks.map(link => (
-              <Link key={link.to} to={link.to} onClick={() => setIsMobileMenuOpen(false)}
-                className={`block px-4 py-2.5 text-sm font-medium rounded-md mx-2 transition-colors ${location.pathname === link.to ? 'text-[#0D8C2E] bg-[#0D8C2E]/8' : 'text-[#00272B] hover:text-[#0D8C2E] hover:bg-gray-50'}`}>
+              <Link
+                key={link.to}
+                to={link.to}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={`eyebrow block px-2 py-3 ${isActive(link.to) ? 'text-[#0D8C2E]' : 'text-[#00272B]'}`}
+              >
                 {link.label}
               </Link>
             ))}
-            <div className="px-2 pt-2 flex flex-col gap-2">
-              <Link to="/espace-client/connexion" onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-[#0D8C2E] border border-[#0D8C2E]/30 rounded-lg hover:bg-[#0D8C2E]/5">
+            <div className="pt-3 mt-2 border-t border-[#00272B]/8 grid grid-cols-2 gap-2">
+              <Link
+                to="/espace-client/connexion"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-[#00272B] border border-[#00272B]/15 rounded-md"
+              >
                 <i className="ri-user-line"></i>{t('nav.clientArea')}
               </Link>
-              <Link to="/connexion" onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-[#00272B] border border-gray-200 rounded-lg hover:border-[#0D8C2E] hover:text-[#0D8C2E]">
+              <Link
+                to="/connexion"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-[#00272B] border border-[#00272B]/15 rounded-md"
+              >
                 <i className="ri-shield-user-line"></i>{t('nav.administration')}
               </Link>
-              <Link to="/produits" onClick={() => setIsMobileMenuOpen(false)}
-                className="block text-center py-2.5 bg-[#0D8C2E] text-white text-sm font-semibold rounded-lg hover:bg-[#0a7025]">
-                {t('nav.shop')}
+              <Link
+                to="/machines/devis"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="col-span-2 text-center py-3 bg-[#00272B] text-white text-sm font-semibold rounded-md"
+              >
+                {t('nav.quote')}
               </Link>
             </div>
           </div>

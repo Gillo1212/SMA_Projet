@@ -158,12 +158,12 @@ function normalizeMachine(raw: BackendClientMachine): ClientMachine {
   return {
     id: String(raw.id),
     nom: raw.machine_name ?? 'Machine',
-    type: raw.category_name ?? raw.brand ?? '—',
+    type: raw.category_name ?? raw.brand ?? '-',
     image: raw.image_url ?? '',
     numeroSerie: raw.serial_number ?? undefined,
     // Dates laissées en ISO : les pages calculent des échéances dessus
     dateInstallation: isoDate(raw.installation_date),
-    site: raw.location ?? '—',
+    site: raw.location ?? '-',
     statut: MACHINE_STATUS[raw.status] ?? 'Hors service',
     derniereMaintenance: isoDate(raw.last_service_date) || undefined,
     prochaineMaintenance: isoDate(raw.next_service_date),

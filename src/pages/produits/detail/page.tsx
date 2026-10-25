@@ -20,7 +20,7 @@ export default function ProductDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-white font-['Inter']">
+      <div className="min-h-screen bg-white">
         <Navbar />
         <div className="pt-32 pb-20">
           <LoadingState label="Chargement du produit…" />
@@ -32,7 +32,7 @@ export default function ProductDetailPage() {
 
   if (!product) {
     return (
-      <div className="min-h-screen bg-white font-['Inter'] flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <i className="ri-error-warning-line text-6xl text-gray-300 mb-6"></i>
           <h1 className="text-3xl font-bold text-[#00272B] mb-3">Produit non trouvé</h1>
@@ -85,12 +85,12 @@ export default function ProductDetailPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white font-['Inter']">
+    <div className="min-h-screen bg-white">
       <Navbar />
 
       {/* Breadcrumb */}
-      <section className="pt-32 pb-8 bg-[#EEFFF2]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-20">
+      <section className="pt-32 pb-8 bg-[#F6F3EC]">
+        <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="flex items-center space-x-2 text-sm">
             <Link to="/" className="text-gray-600 hover:text-[#1AAA3F]">Accueil</Link>
             <i className="ri-arrow-right-s-line text-gray-400"></i>
@@ -107,16 +107,20 @@ export default function ProductDetailPage() {
 
       {/* Product Detail */}
       <section className="py-16">
-        <div className="max-w-7xl mx-auto px-6 lg:px-20">
+        <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="grid lg:grid-cols-2 gap-16">
             {/* Image Gallery */}
             <div>
               <div className="aspect-square bg-gray-50 rounded-2xl overflow-hidden mb-6">
-                <img
-                  src={product.images[selectedImage]}
-                  alt={product.name}
-                  className="w-full h-full object-contain object-center p-12"
-                />
+                {product.images[selectedImage] ? (
+                  <img
+                    src={product.images[selectedImage]}
+                    alt={product.name}
+                    className="w-full h-full object-contain object-center p-12"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center"><i className="ri-image-line text-8xl text-gray-300"></i></div>
+                )}
               </div>
               
               {product.images.length > 1 && (
@@ -163,7 +167,7 @@ export default function ProductDetailPage() {
               <p className="text-base text-gray-600 mb-6">{product.format}</p>
 
               {/* Price */}
-              <div className="bg-[#EEFFF2] rounded-2xl p-6 mb-8">
+              <div className="bg-[#F6F3EC] rounded-2xl p-6 mb-8">
                 <div className="flex items-baseline space-x-3 mb-2">
                   <p className="text-4xl font-bold text-[#00272B]">
                     {discountedPrice.toLocaleString('fr-FR')} <span className="text-xl">FCFA</span>
@@ -187,7 +191,7 @@ export default function ProductDetailPage() {
                         key={index}
                         className={`p-4 rounded-xl border-2 text-center transition-all ${
                           quantity >= vd.quantity
-                            ? 'border-[#1AAA3F] bg-[#EEFFF2]'
+                            ? 'border-[#1AAA3F] bg-[#F6F3EC]'
                             : 'border-gray-200'
                         }`}
                       >
@@ -274,7 +278,7 @@ export default function ProductDetailPage() {
 
               {/* Success Message */}
               {showSuccessMessage && (
-                <div className="mb-6 p-4 bg-[#EEFFF2] border border-[#1AAA3F] rounded-xl flex items-center space-x-3">
+                <div className="mb-6 p-4 bg-[#F6F3EC] border border-[#1AAA3F] rounded-xl flex items-center space-x-3">
                   <i className="ri-checkbox-circle-fill text-2xl text-[#1AAA3F]"></i>
                   <div className="flex-1">
                     <p className="text-sm font-semibold text-[#1AAA3F]">Produit ajouté au panier !</p>
@@ -307,7 +311,7 @@ export default function ProductDetailPage() {
                   Description
                 </button>
                 <button className="pb-4 px-2 border-b-2 border-transparent text-base font-semibold text-gray-400 hover:text-[#00272B] transition-colors whitespace-nowrap">
-                  Ingrédients & Allergènes
+                  Ingrédients et allergènes
                 </button>
                 <button className="pb-4 px-2 border-b-2 border-transparent text-base font-semibold text-gray-400 hover:text-[#00272B] transition-colors whitespace-nowrap">
                   Compatibilité
@@ -322,7 +326,7 @@ export default function ProductDetailPage() {
                   {product.description}
                 </p>
 
-                <div className="bg-[#EEFFF2] rounded-2xl p-8 mb-8">
+                <div className="bg-[#F6F3EC] rounded-2xl p-8 mb-8">
                   <h4 className="text-lg font-semibold text-[#00272B] mb-4">Ingrédients</h4>
                   <p className="text-sm text-gray-700 mb-6">{product.ingredients}</p>
 
@@ -375,11 +379,15 @@ export default function ProductDetailPage() {
                     className="group bg-white rounded-2xl border border-gray-100 hover:border-[#1AAA3F] hover:shadow-lg transition-all duration-300 overflow-hidden"
                   >
                     <div className="aspect-square bg-gray-50 overflow-hidden">
-                      <img
-                        src={relatedProduct.images[0]}
-                        alt={relatedProduct.name}
-                        className="w-full h-full object-contain object-center p-6 group-hover:scale-105 transition-transform duration-300"
-                      />
+                      {relatedProduct.images[0] ? (
+                        <img
+                          src={relatedProduct.images[0]}
+                          alt={relatedProduct.name}
+                          className="w-full h-full object-contain object-center p-6 group-hover:scale-105 transition-transform duration-300"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center"><i className="ri-image-line text-6xl text-gray-300"></i></div>
+                      )}
                     </div>
                     <div className="p-6">
                       <p className="text-xs text-[#1AAA3F] font-semibold mb-2">{relatedProduct.brand}</p>

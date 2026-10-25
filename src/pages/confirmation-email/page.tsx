@@ -36,12 +36,12 @@ export default function ConfirmationEmailPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#f0f9f4] to-white font-['Inter'] px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#f0f9f4] to-white px-4">
       <div className="w-full max-w-md text-center">
         {/* Logo */}
         <div className="mb-10">
           <Link to="/">
-            <img src="https://static.readdy.ai/image/1aadd1df13f4328f806374f408610489/60a62dc5b844546eccd3f93680ad2ab4.png" alt="SMALIM" className="h-12 w-auto mx-auto" />
+            <img src="/images/brand/logo-corporate.png" alt="SMALIM" className="h-12 w-auto mx-auto" />
           </Link>
         </div>
 

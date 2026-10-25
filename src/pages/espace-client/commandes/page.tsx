@@ -65,7 +65,7 @@ export default function ClientCommandesPage() {
                 </div>
                 <span className={`text-xs font-medium px-2.5 py-1 rounded-full border flex-shrink-0 ml-2 ${statusColors[order.statut]}`}>{order.statut}</span>
               </div>
-              <p className="text-xs text-[#00272B]/60 truncate">{order.produits || '—'}</p>
+              <p className="text-xs text-[#00272B]/60 truncate">{order.produits || '-'}</p>
               <p className="text-sm font-bold text-[#00272B] mt-1">{order.montant.toLocaleString('fr-FR')} FCFA</p>
             </div>
           ))}

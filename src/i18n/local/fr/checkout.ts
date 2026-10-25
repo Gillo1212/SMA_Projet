@@ -88,7 +88,7 @@ export default {
   paymentReturn: {
     checking: 'Vérification du paiement…',
     checkingHint:
-      'Nous attendons la confirmation de votre prestataire. Cela prend généralement quelques secondes — ne fermez pas cette page.',
+      'Nous attendons la confirmation de votre prestataire. Cela prend généralement quelques secondes : ne fermez pas cette page.',
     successTitle: 'Paiement confirmé',
     successHint: 'Merci ! Votre commande est confirmée et sa préparation va commencer.',
     trackOrder: 'Suivre ma commande',

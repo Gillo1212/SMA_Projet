@@ -1,43 +1,45 @@
+import { useTranslation } from 'react-i18next';
+
 export default function Testimonials() {
+  const { t } = useTranslation();
   const testimonials = [
-    { id: 1, name: 'Amadou Diallo', company: 'Directeur, TechHub Dakar', avatar: '#FF6B6B', content: 'Les machines SMA ont transformé notre espace de coworking. Nos membres apprécient particulièrement la possibilité de payer avec Wave et Orange Money. Service impeccable !', rating: 5 },
-    { id: 2, name: 'Fatou Sall', company: 'Responsable RH, Sonatel', avatar: '#4ECDC4', content: 'Installation rapide et professionnelle. Les distributeurs fonctionnent parfaitement et le service après-vente est très réactif. Nos employés sont ravis.', rating: 5 },
-    { id: 3, name: 'Moussa Ndiaye', company: 'Gérant, Hôtel Teranga', avatar: '#95E1D3', content: 'Excellente qualité des produits et des machines. La gestion du stock est simplifiée et les rapports de vente sont très détaillés.', rating: 5 },
-    { id: 4, name: 'Aïssatou Ba', company: 'Directrice, Clinique Mermoz', avatar: '#F38181', content: 'Parfait pour notre établissement de santé. Les machines sont silencieuses, hygiéniques et offrent une grande variété de produits sains.', rating: 5 },
-    { id: 5, name: 'Ibrahima Sarr', company: 'PDG, Groupe Industriel Sénégalais', avatar: '#AA96DA', content: 'Nous avons équipé nos 5 sites avec SMA. La centralisation de la gestion et les statistiques en temps réel sont des atouts majeurs.', rating: 5 },
-    { id: 6, name: 'Mariama Cissé', company: 'Responsable Achats, Université Cheikh Anta Diop', avatar: '#FCBAD3', content: 'Solution idéale pour notre campus. Les étudiants adorent la facilité de paiement mobile et la diversité des produits proposés.', rating: 5 },
+    { id: 1, name: 'Amadou Diallo', company: 'Directeur, TechHub Dakar', content: t('testimonials.t1') },
+    { id: 2, name: 'Fatou Sall', company: 'Responsable RH, Sonatel', content: t('testimonials.t2') },
+    { id: 3, name: 'Moussa Ndiaye', company: 'Gérant, Hôtel Teranga', content: t('testimonials.t3') },
+    { id: 4, name: 'Aïssatou Ba', company: 'Directrice, Clinique Mermoz', content: t('testimonials.t4') },
+    { id: 5, name: 'Ibrahima Sarr', company: 'PDG, Groupe Industriel Sénégalais', content: t('testimonials.t5') },
+    { id: 6, name: 'Mariama Cissé', company: 'Responsable achats, Université Cheikh Anta Diop', content: t('testimonials.t6') },
   ];
 
+  const initials = (name: string) => name.split(' ').map(part => part[0]).join('').slice(0, 2);
+
   return (
-    <section className="py-16 sm:py-24 bg-[#F5F5F5]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-20">
-        <div className="mb-10 sm:mb-16">
-          <div className="inline-block px-5 py-2 bg-[#EEFFF2] text-[#0D8C2E] text-sm font-semibold rounded-full mb-5 sm:mb-6">
-            TÉMOIGNAGES CLIENTS
-          </div>
-          <h2 className="text-3xl sm:text-5xl md:text-6xl font-bold text-black">
-            Ce Que Disent<br />Nos Clients Professionnels
+    <section className="py-20 sm:py-28 bg-[#F6F3EC]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
+        <div className="mb-12 sm:mb-16 max-w-2xl">
+          <p className="eyebrow text-[#0D8C2E] mb-5">{t('testimonials.eyebrow')}</p>
+          <h2 className="text-4xl sm:text-5xl text-[#00272B]">
+            {t('testimonials.titleLine1')}{' '}
+            <em className="italic text-[#0D8C2E]">{t('testimonials.titleLine2')}</em>
           </h2>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {testimonials.map((testimonial) => (
-            <div key={testimonial.id} className="bg-white rounded-2xl p-6 sm:p-8">
-              <div className="flex items-center mb-5 sm:mb-6">
-                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center text-white font-bold text-base sm:text-lg mr-4" style={{ backgroundColor: testimonial.avatar }}>
-                  {testimonial.name.charAt(0)}
-                </div>
-                <div>
-                  <div className="font-semibold text-base sm:text-lg text-black">{testimonial.name}</div>
-                  <div className="text-xs sm:text-sm text-[#666666]">@{testimonial.company}</div>
-                </div>
-              </div>
-              <p className="text-sm sm:text-base text-[#4A4A4A] leading-relaxed mb-5 sm:mb-6">« {testimonial.content} »</p>
-              <div className="flex space-x-1">
-                {[...Array(testimonial.rating)].map((_, i) => (
-                  <i key={i} className="ri-star-fill text-[#0D8C2E] text-base sm:text-lg"></i>
-                ))}
-              </div>
-            </div>
+            <figure key={testimonial.id} className="bg-white rounded-2xl p-8 flex flex-col">
+              <span className="font-serif text-6xl leading-[0.8] h-9 text-[#1AAA3F]/50" aria-hidden="true">“</span>
+              <blockquote className="text-[15px] text-[#00272B]/80 leading-relaxed mb-8">
+                {testimonial.content}
+              </blockquote>
+              <figcaption className="mt-auto flex items-center gap-4 pt-6 border-t border-[#00272B]/8">
+                <span className="w-11 h-11 rounded-full bg-[#00272B] text-white text-sm font-semibold flex items-center justify-center">
+                  {initials(testimonial.name)}
+                </span>
+                <span>
+                  <span className="block font-semibold text-[#00272B]">{testimonial.name}</span>
+                  <span className="block text-sm text-[#00272B]/55">{testimonial.company}</span>
+                </span>
+              </figcaption>
+            </figure>
           ))}
         </div>
       </div>

@@ -4,30 +4,33 @@ import { Link } from 'react-router-dom';
 export default function CTASection() {
   const { t } = useTranslation();
   return (
-    <section className="relative py-36 overflow-hidden">
-      <div className="absolute inset-0">
-        <img
-          src="https://readdy.ai/api/search-image?query=variety%20of%20premium%20products%20in%20vending%20machine%2C%20coffee%20packages%20snacks%20and%20beverages%20displayed%20beautifully%2C%20colorful%20product%20assortment%2C%20professional%20commercial%20photography%2C%20warm%20inviting%20lighting%2C%20organized%20shelves&width=1920&height=1080&seq=cta-sma-008&orientation=landscape"
-          alt="Produits SMA"
-          className="w-full h-full object-cover object-center"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0D8C2E]/85 via-[#0D8C2E]/65 to-transparent"></div>
-      </div>
-      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-20 text-center">
-        <h2 className="text-6xl md:text-7xl font-extrabold text-white mb-6 tracking-wide" style={{ letterSpacing: '2px' }}>
-          {t('home.cta.line1')}<br />{t('home.cta.line2')}<br />{t('home.cta.line3')}
-        </h2>
-        <p className="text-xl md:text-2xl text-white font-light mb-14 max-w-3xl mx-auto leading-relaxed">
-          Café, snacks, boissons et bien plus encore. Livraison rapide partout au Sénégal.<br />
-          Paiement sécurisé avec Wave et Orange Money.
-        </p>
-        <Link to="/produits" className="inline-flex items-center bg-black text-white font-semibold text-base rounded-full overflow-hidden hover:scale-105 transition-transform whitespace-nowrap">
-          <div className="w-16 h-16 bg-[#0D8C2E] flex items-center justify-center">
-            <i className="ri-shopping-cart-line text-white text-2xl"></i>
+    <section className="px-4 sm:px-6 lg:px-10 pb-20 sm:pb-28 bg-white">
+      <div
+        className="max-w-7xl mx-auto rounded-3xl bg-[#00272B] overflow-hidden"
+        style={{ backgroundImage: 'radial-gradient(ellipse 55% 80% at 80% 100%, rgba(26,170,63,0.25), transparent 70%)' }}
+      >
+        <div className="grid lg:grid-cols-12 items-center gap-10 px-8 sm:px-14 pt-14 lg:py-16">
+          <div className="lg:col-span-6">
+            <p className="eyebrow text-[#4FD07A] mb-5">{t('home.cta.eyebrow')}</p>
+            <h2 className="text-4xl sm:text-5xl text-white mb-6">
+              {t('home.cta.title')}{' '}
+              <em className="italic text-[#4FD07A]">{t('home.cta.titleAccent')}</em>
+            </h2>
+            <p className="text-base sm:text-lg text-white/70 leading-relaxed mb-10 max-w-lg">{t('home.cta.text')}</p>
+            <Link
+              to="/produits"
+              className="inline-flex items-center gap-2 px-7 py-4 bg-white text-[#00272B] font-semibold rounded-md hover:bg-[#EEFFF2] transition-colors"
+            >
+              {t('home.cta.button')}
+              <i className="ri-arrow-right-line"></i>
+            </Link>
           </div>
-          <span className="px-8">{t('home.cta.button')}</span>
-          <i className="ri-arrow-right-up-line text-2xl mr-6"></i>
-        </Link>
+          <div className="lg:col-span-6 relative h-[300px] sm:h-[380px]" aria-hidden="true">
+            <img src="/images/cutouts/kingsmill-vanilla.webp" alt="" className="absolute bottom-0 left-[2%] h-[78%] w-auto drop-shadow-[0_18px_24px_rgba(0,0,0,0.4)]" />
+            <img src="/images/cutouts/craft-roasters.webp" alt="" className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[96%] w-auto z-10 drop-shadow-[0_22px_30px_rgba(0,0,0,0.45)]" />
+            <img src="/images/cutouts/kingsmill-hot-chocolate.webp" alt="" className="absolute bottom-0 right-[2%] h-[80%] w-auto drop-shadow-[0_18px_24px_rgba(0,0,0,0.4)]" />
+          </div>
+        </div>
       </div>
     </section>
   );

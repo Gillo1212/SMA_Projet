@@ -52,7 +52,7 @@ export default function AdminLayout() {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#F5F7F5] font-['Inter']">
+    <div className="flex h-screen overflow-hidden bg-[#F5F7F5]">
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div

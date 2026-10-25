@@ -44,11 +44,11 @@ export default function ConfirmationPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white font-['Inter']">
+    <div className="min-h-screen bg-white">
       <Navbar />
 
       {/* Success Header */}
-      <section className="pt-32 pb-16 bg-gradient-to-br from-[#EEFFF2] to-[#E6F7FF]">
+      <section className="pt-32 pb-16 bg-gradient-to-br from-[#F6F3EC] to-[#E6F7FF]">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <div className="w-24 h-24 bg-[#1AAA3F] rounded-full flex items-center justify-center mx-auto mb-8">
             <i className="ri-checkbox-circle-line text-6xl text-white"></i>
@@ -123,7 +123,7 @@ export default function ConfirmationPage() {
                 </div>
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Statut</p>
-                  <div className="inline-flex items-center space-x-2 px-4 py-2 bg-[#EEFFF2] rounded-lg">
+                  <div className="inline-flex items-center space-x-2 px-4 py-2 bg-[#F6F3EC] rounded-lg">
                     <i className="ri-checkbox-circle-fill text-[#1AAA3F]"></i>
                     <span className="text-sm font-semibold text-[#1AAA3F]">Paiement confirmé</span>
                   </div>
@@ -133,7 +133,7 @@ export default function ConfirmationPage() {
               <button
                 onClick={handleDownloadInvoice}
                 disabled={downloading}
-                className="w-full h-12 border-2 border-[#1AAA3F] text-[#1AAA3F] text-sm font-semibold rounded-xl hover:bg-[#EEFFF2] transition-colors cursor-pointer flex items-center justify-center space-x-2 whitespace-nowrap disabled:opacity-60"
+                className="w-full h-12 border-2 border-[#1AAA3F] text-[#1AAA3F] text-sm font-semibold rounded-xl hover:bg-[#F6F3EC] transition-colors cursor-pointer flex items-center justify-center space-x-2 whitespace-nowrap disabled:opacity-60"
               >
                 {downloading ? (
                   <i className="ri-loader-4-line text-lg animate-spin"></i>

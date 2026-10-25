@@ -57,7 +57,7 @@ export default function PanierPage() {
 
   if (items.length === 0) {
     return (
-      <div className="min-h-screen bg-white font-['Inter']">
+      <div className="min-h-screen bg-white">
         <Navbar />
         <section className="pt-32 pb-20 min-h-screen flex items-center justify-center">
           <div className="text-center">
@@ -83,12 +83,12 @@ export default function PanierPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white font-['Inter']">
+    <div className="min-h-screen bg-white">
       <Navbar />
 
       {/* Header */}
-      <section className="pt-24 sm:pt-32 pb-8 sm:pb-12 bg-[#EEFFF2]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-20">
+      <section className="pt-24 sm:pt-32 pb-8 sm:pb-12 bg-[#F6F3EC]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
           <h1 className="text-3xl sm:text-5xl font-bold text-[#00272B] mb-3 sm:mb-4">{t('cart.title')}</h1>
           <p className="text-sm sm:text-base text-gray-600">
             {items.length} article{items.length > 1 ? 's' : ''} dans votre panier
@@ -98,7 +98,7 @@ export default function PanierPage() {
 
       {/* Cart Content */}
       <section className="py-8 sm:py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-12">
             {/* Cart Items */}
             <div className="lg:col-span-2">
@@ -180,7 +180,7 @@ export default function PanierPage() {
                           </div>
 
                           {discount > 0 && (
-                            <div className="mt-2 inline-block px-3 py-1 bg-[#EEFFF2] text-[#1AAA3F] text-xs font-semibold rounded-lg">
+                            <div className="mt-2 inline-block px-3 py-1 bg-[#F6F3EC] text-[#1AAA3F] text-xs font-semibold rounded-lg">
                               -{discount}% de réduction
                             </div>
                           )}
@@ -249,7 +249,7 @@ export default function PanierPage() {
                     </p>
                   )}
                   {appliedPromo && (
-                    <div className="mt-3 flex items-center justify-between p-3 bg-[#EEFFF2] rounded-lg">
+                    <div className="mt-3 flex items-center justify-between p-3 bg-[#F6F3EC] rounded-lg">
                       <div className="flex items-center space-x-2">
                         <i className="ri-checkbox-circle-fill text-[#1AAA3F]"></i>
                         <span className="text-sm font-semibold text-[#1AAA3F]">

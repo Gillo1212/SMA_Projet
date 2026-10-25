@@ -48,7 +48,7 @@ export default function BlogDetailPage() {
       <Navbar />
       
       {/* Hero Article */}
-      <section className="pt-32 pb-12 bg-gradient-to-br from-[#EEFFF2] to-white">
+      <section className="pt-32 pb-12 bg-gradient-to-br from-[#F6F3EC] to-white">
         <div className="max-w-5xl mx-auto px-6 lg:px-12">
           <Link 
             to="/blog" 
@@ -105,7 +105,7 @@ export default function BlogDetailPage() {
 
       {/* Contenu + Sidebar */}
       <section className="py-12 bg-white">
-        <div className="max-w-7xl mx-auto px-6 lg:px-20">
+        <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="grid lg:grid-cols-3 gap-12">
             {/* Contenu principal */}
             <div className="lg:col-span-2">

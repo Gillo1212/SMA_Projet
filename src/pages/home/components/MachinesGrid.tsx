@@ -13,58 +13,62 @@ export default function MachinesGrid() {
   if (isLoading || featured.length === 0) return null;
 
   return (
-    <section className="py-16 sm:py-32 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-20">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 sm:mb-16">
-          <h2 className="text-3xl sm:text-5xl font-bold text-black mb-4 md:mb-0">
-            {t('home.machines.title')}<br />{t('home.machines.titleSecondLine')}
-          </h2>
-          <p className="text-sm sm:text-base text-[#666666] max-w-md leading-relaxed">
+    <section className="py-20 sm:py-28 bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
+        <div className="grid lg:grid-cols-12 gap-6 items-end mb-12 sm:mb-16">
+          <div className="lg:col-span-7">
+            <p className="eyebrow text-[#0D8C2E] mb-5">{t('home.machines.eyebrow')}</p>
+            <h2 className="text-4xl sm:text-5xl text-[#00272B]">
+              {t('home.machines.title')}{' '}
+              <em className="italic text-[#0D8C2E]">{t('home.machines.titleAccent')}</em>
+            </h2>
+          </div>
+          <p className="lg:col-span-5 text-base text-[#00272B]/65 leading-relaxed">
             {t('home.machines.subtitle')}
           </p>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+
+        <div className={`grid grid-cols-1 sm:grid-cols-2 gap-6 ${featured.length >= 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-3'}`}>
           {featured.map((machine) => (
-            <div key={machine.id} className="bg-white rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group">
-              <div className="relative h-64 sm:h-80 overflow-hidden">
+            <Link
+              key={machine.id}
+              to={`/machines/${machine.slug}`}
+              className="group flex flex-col bg-white rounded-2xl border border-[#00272B]/10 overflow-hidden hover:border-[#00272B]/25 hover:shadow-[0_20px_40px_-24px_rgba(0,39,43,0.35)] transition-all"
+            >
+              <div className="h-72 bg-white flex items-center justify-center p-6">
                 <img
                   src={machine.image}
                   alt={machine.name}
-                  className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                  className="max-h-full w-auto object-contain group-hover:scale-[1.03] transition-transform duration-500"
                 />
-                <div className="absolute top-4 right-4 bg-[#0D8C2E] text-white px-3 py-1 rounded-xl text-xs font-semibold">
-                  {t('common.from')} {machine.priceDisplay}
+              </div>
+              <div className="flex flex-col flex-1 p-6 border-t border-[#00272B]/8">
+                <p className="eyebrow text-[#0D8C2E] mb-3">{machine.category}</p>
+                <h3 className="text-2xl text-[#00272B] mb-3">{machine.name}</h3>
+                <p className="text-sm text-[#00272B]/60 leading-relaxed mb-6 line-clamp-2">{machine.shortDescription}</p>
+                <div className="mt-auto flex items-center justify-between pt-5 border-t border-[#00272B]/8">
+                  <div>
+                    <p className="text-xs text-[#00272B]/50">{t('common.price')}</p>
+                    <p className="font-semibold text-[#00272B]">
+                      {machine.price > 0 ? machine.priceDisplay : t('common.onQuote')}
+                    </p>
+                  </div>
+                  <span className="w-10 h-10 rounded-full border border-[#00272B]/15 flex items-center justify-center text-[#00272B] group-hover:bg-[#00272B] group-hover:text-white transition-colors">
+                    <i className="ri-arrow-right-up-line"></i>
+                  </span>
                 </div>
               </div>
-              <div className="p-4 sm:p-6">
-                <h3 className="text-xl sm:text-2xl font-semibold text-black mb-3 sm:mb-4">{machine.name}</h3>
-                <div className="space-y-2 mb-4 sm:mb-6">
-                  <div className="flex items-start text-xs sm:text-sm text-[#666666]">
-                    <i className="ri-checkbox-circle-fill text-[#0D8C2E] mr-2 mt-0.5"></i>
-                    <span>{machine.category}</span>
-                  </div>
-                  <div className="flex items-start text-xs sm:text-sm text-[#666666]">
-                    <i className="ri-checkbox-circle-fill text-[#0D8C2E] mr-2 mt-0.5"></i>
-                    <span>{t('home.machines.delivery')} : {machine.deliveryTime}</span>
-                  </div>
-                  <div className="flex items-start text-xs sm:text-sm text-[#666666]">
-                    <i className="ri-checkbox-circle-fill text-[#0D8C2E] mr-2 mt-0.5"></i>
-                    <span>{machine.stock}</span>
-                  </div>
-                </div>
-                <Link
-                  to={`/machines/${machine.slug}`}
-                  className="block w-full py-2.5 sm:py-3 text-center border-2 border-[#0D8C2E] text-[#0D8C2E] font-semibold rounded-lg hover:bg-[#0D8C2E] hover:text-white transition-colors text-sm whitespace-nowrap"
-                >
-                  {t('common.seeDetails')}
-                </Link>
-              </div>
-            </div>
+            </Link>
           ))}
         </div>
-        <div className="text-center mt-8 sm:mt-12">
-          <Link to="/machines" className="inline-block px-8 py-3 bg-[#00272B] text-white font-semibold rounded-lg hover:bg-[#003840] transition-colors whitespace-nowrap">
+
+        <div className="mt-12 text-center">
+          <Link
+            to="/machines"
+            className="inline-flex items-center gap-2 px-7 py-3.5 bg-[#00272B] text-white font-semibold rounded-md hover:bg-[#0D8C2E] transition-colors"
+          >
             {t('home.machines.seeAll')}
+            <i className="ri-arrow-right-line"></i>
           </Link>
         </div>
       </div>

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Navbar from '../home/components/Navbar';
 import Footer from '../home/components/Footer';
+import PageHero from '../../components/feature/PageHero';
 import CTABanner from '../../components/feature/CTABanner';
 
 export default function ContactPage() {
@@ -65,48 +66,38 @@ export default function ContactPage() {
     <div className="min-h-screen bg-white">
       <Navbar />
       
-      {/* Hero Section */}
-      <section className="pt-24 sm:pt-32 pb-10 sm:pb-16 bg-gradient-to-br from-[#EEFFF2] to-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-20">
-          <div className="text-center max-w-4xl mx-auto">
-            <div className="inline-block px-5 py-2 bg-[#FFF4F0] text-[#1AAA3F] text-sm font-semibold rounded-full mb-5 sm:mb-6">
-              CONTACTEZ-NOUS
-            </div>
-            <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold text-[#00272B] mb-4 sm:mb-6 leading-tight">
-              Parlons de Votre Projet
-            </h1>
-            <p className="text-base sm:text-xl text-[#4A4A4A] leading-relaxed">
-              Notre équipe est à votre écoute pour répondre à toutes vos questions et vous accompagner
-            </p>
-          </div>
-        </div>
-      </section>
+      <PageHero
+        eyebrow="Contactez-nous"
+        title="Parlons de"
+        titleAccent="votre projet"
+        subtitle="Notre équipe est à votre écoute pour répondre à vos questions et vous accompagner dans le choix et l'installation de vos machines."
+      />
 
       {/* Contact Info Cards */}
       <section className="py-8 sm:py-12 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-8">
-            <div className="bg-[#EEFFF2] rounded-2xl p-6 sm:p-8 text-center">
-              <div className="w-14 h-14 sm:w-16 sm:h-16 bg-[#1AAA3F] rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-5">
-                <i className="ri-phone-line text-2xl sm:text-3xl text-white"></i>
+            <div className="border border-[#00272B]/10 rounded-2xl p-6 sm:p-8 text-center">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 border border-[#00272B]/15 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-5">
+                <i className="ri-phone-line text-xl sm:text-2xl text-[#0D8C2E]"></i>
               </div>
               <h3 className="text-lg sm:text-xl font-bold text-[#00272B] mb-2 sm:mb-3">{t('contact.phone')}</h3>
               <p className="text-sm sm:text-base text-[#4A4A4A] mb-1">+221 33 123 45 67</p>
               <p className="text-sm sm:text-base text-[#4A4A4A]">+221 77 123 45 67</p>
               <p className="text-xs sm:text-sm text-[#4A4A4A] mt-2 sm:mt-3">{t('contact.phoneHours')}</p>
             </div>
-            <div className="bg-[#EEFFF2] rounded-2xl p-6 sm:p-8 text-center">
-              <div className="w-14 h-14 sm:w-16 sm:h-16 bg-[#25A9F2] rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-5">
-                <i className="ri-mail-line text-2xl sm:text-3xl text-white"></i>
+            <div className="border border-[#00272B]/10 rounded-2xl p-6 sm:p-8 text-center">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 border border-[#00272B]/15 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-5">
+                <i className="ri-mail-line text-xl sm:text-2xl text-[#0D8C2E]"></i>
               </div>
               <h3 className="text-lg sm:text-xl font-bold text-[#00272B] mb-2 sm:mb-3">{t('contact.email')}</h3>
               <p className="text-sm sm:text-base text-[#4A4A4A] mb-1">contact@sma-senegal.com</p>
               <p className="text-sm sm:text-base text-[#4A4A4A]">commercial@sma-senegal.com</p>
               <p className="text-xs sm:text-sm text-[#4A4A4A] mt-2 sm:mt-3">{t('contact.emailDelay')}</p>
             </div>
-            <div className="bg-[#EEFFF2] rounded-2xl p-6 sm:p-8 text-center">
-              <div className="w-14 h-14 sm:w-16 sm:h-16 bg-[#1AAA3F] rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-5">
-                <i className="ri-map-pin-line text-2xl sm:text-3xl text-white"></i>
+            <div className="border border-[#00272B]/10 rounded-2xl p-6 sm:p-8 text-center">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 border border-[#00272B]/15 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-5">
+                <i className="ri-map-pin-line text-xl sm:text-2xl text-[#0D8C2E]"></i>
               </div>
               <h3 className="text-lg sm:text-xl font-bold text-[#00272B] mb-2 sm:mb-3">{t('contact.address')}</h3>
               <p className="text-sm sm:text-base text-[#4A4A4A] mb-1">Zone Industrielle de Dakar</p>
@@ -119,7 +110,7 @@ export default function ContactPage() {
 
       {/* Formulaire + Carte */}
       <section className="py-12 sm:py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-16">
             {/* Formulaire */}
             <div>
@@ -250,7 +241,7 @@ export default function ContactPage() {
 
             {/* Carte + Horaires */}
             <div>
-              <div className="bg-[#EEFFF2] rounded-2xl p-6 sm:p-8 mb-6 sm:mb-8">
+              <div className="bg-[#F6F3EC] rounded-2xl p-6 sm:p-8 mb-6 sm:mb-8">
                 <h3 className="text-2xl font-bold text-[#00272B] mb-6">{t('contact.hoursTitle')}</h3>
                 
                 <div className="space-y-4">

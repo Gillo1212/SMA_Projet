@@ -13,7 +13,18 @@
 import { apiClient } from './apiClient';
 import { USE_MOCK, MOCK_DELAY, ENDPOINTS } from '../config/api';
 import { blogArticles, blogCategories } from '../mocks/blog';
-import { formatDate, fullName, normalizeCategory } from './normalize';
+import { fullName, normalizeCategory } from './normalize';
+
+function toISODate(value: unknown): string {
+  if (!value) return '';
+  const d = new Date(value as string);
+  return isNaN(d.getTime()) ? '' : d.toISOString().slice(0, 10);
+}
+
+/** Le compte technique « Super Admin » n'a pas à apparaître comme auteur public */
+function publicAuthor(name: string): string {
+  return !name || /^super admin$/i.test(name.trim()) ? 'Équipe SMALIM' : name;
+}
 import type { BlogPost, BlogListParams, BlogStatus, Category } from '../types/models';
 
 function delay(ms: number): Promise<void> {
@@ -53,8 +64,9 @@ function normalizeArticle(raw: BackendArticle): BlogPost {
     category: raw.category_slug ?? '',
     categoryName: raw.category_name ?? undefined,
     categoryId: raw.category_id != null ? String(raw.category_id) : undefined,
-    date: formatDate(raw.published_at ?? raw.created_at),
-    author: fullName(raw.author_first, raw.author_last) || 'SMALIM',
+    // Date ISO (AAAA-MM-JJ), comme les mocks : les pages la formatent à l'affichage
+    date: toISODate(raw.published_at ?? raw.created_at),
+    author: publicAuthor(fullName(raw.author_first, raw.author_last)),
     authorRole: 'Rédaction',
     readTime: `${raw.read_time ?? 5} min`,
     image: raw.image_url ?? '',

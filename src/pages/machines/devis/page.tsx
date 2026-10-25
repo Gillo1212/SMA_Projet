@@ -92,7 +92,7 @@ export default function DevisPage() {
 
   if (isLoading || error) {
     return (
-      <div className="min-h-screen bg-[#EEFFF2]">
+      <div className="min-h-screen bg-[#F6F3EC]">
         <Navbar />
         <div className="pt-32 pb-20">
           {isLoading
@@ -106,7 +106,7 @@ export default function DevisPage() {
 
   if (isSubmitted) {
     return (
-      <div className="min-h-screen bg-[#EEFFF2]">
+      <div className="min-h-screen bg-[#F6F3EC]">
         <Navbar />
         
         <div className="pt-32 pb-20">
@@ -117,7 +117,7 @@ export default function DevisPage() {
               </div>
               
               <h1 className="text-3xl font-bold text-[#00272B] mb-4">
-                Demande de Devis Envoyée !
+                Demande de devis envoyée !
               </h1>
               
               <p className="text-lg text-[#00272B]/70 mb-8">
@@ -125,7 +125,7 @@ export default function DevisPage() {
               </p>
 
               {formData.rdv && (
-                <div className="p-6 bg-[#EEFFF2] rounded-lg mb-8">
+                <div className="p-6 bg-[#F6F3EC] rounded-lg mb-8">
                   <h3 className="text-sm font-semibold text-[#00272B] mb-3">Rendez-vous programmé</h3>
                   <div className="flex items-center justify-center gap-4 text-sm text-[#00272B]">
                     <div className="flex items-center gap-2">
@@ -141,7 +141,7 @@ export default function DevisPage() {
                 </div>
               )}
 
-              <div className="p-6 bg-[#EEFFF2] rounded-lg mb-8">
+              <div className="p-6 bg-[#F6F3EC] rounded-lg mb-8">
                 <h3 className="text-sm font-semibold text-[#00272B] mb-4">Récapitulatif de votre demande</h3>
                 <div className="space-y-3">
                   {selectedMachineObjects.map(machine => (
@@ -187,11 +187,11 @@ export default function DevisPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#EEFFF2]">
+    <div className="min-h-screen bg-[#F6F3EC]">
       <Navbar />
       
       <div className="pt-32 pb-20">
-        <div className="max-w-7xl mx-auto px-6 lg:px-20">
+        <div className="max-w-7xl mx-auto px-6 lg:px-10">
           {/* Header */}
           <div className="mb-12">
             <Link to="/machines" className="inline-flex items-center gap-2 text-sm text-[#00272B]/60 hover:text-[#1AAA3F] transition-colors mb-6">
@@ -200,7 +200,7 @@ export default function DevisPage() {
             </Link>
             
             <h1 className="text-4xl lg:text-5xl font-bold text-[#00272B] mb-4">
-              Demander un Devis Gratuit
+              Demander un devis gratuit
             </h1>
             <p className="text-lg text-[#00272B]/70">
               Remplissez ce formulaire et notre équipe vous contactera rapidement avec une offre personnalisée
@@ -214,10 +214,10 @@ export default function DevisPage() {
                 {/* Personal Info */}
                 <div>
                   <h2 className="text-xl font-bold text-[#00272B] mb-6 flex items-center gap-3">
-                    <div className="w-10 h-10 bg-[#EEFFF2] rounded-lg flex items-center justify-center">
+                    <div className="w-10 h-10 bg-[#F6F3EC] rounded-lg flex items-center justify-center">
                       <i className="ri-user-line text-[#1AAA3F]"></i>
                     </div>
-                    Vos Informations
+                    Vos informations
                   </h2>
                   
                   <div className="grid md:grid-cols-2 gap-6">
@@ -231,7 +231,7 @@ export default function DevisPage() {
                         value={formData.nom}
                         onChange={handleChange}
                         required
-                        className="w-full h-12 bg-[#EEFFF2] border border-gray-200 rounded-lg px-4 text-sm text-[#00272B] focus:outline-none focus:border-[#1AAA3F] transition-colors"
+                        className="w-full h-12 bg-[#F6F3EC] border border-gray-200 rounded-lg px-4 text-sm text-[#00272B] focus:outline-none focus:border-[#1AAA3F] transition-colors"
                         placeholder="Amadou Diallo"
                       />
                     </div>
@@ -246,7 +246,7 @@ export default function DevisPage() {
                         value={formData.entreprise}
                         onChange={handleChange}
                         required
-                        className="w-full h-12 bg-[#EEFFF2] border border-gray-200 rounded-lg px-4 text-sm text-[#00272B] focus:outline-none focus:border-[#1AAA3F] transition-colors"
+                        className="w-full h-12 bg-[#F6F3EC] border border-gray-200 rounded-lg px-4 text-sm text-[#00272B] focus:outline-none focus:border-[#1AAA3F] transition-colors"
                         placeholder="Mon Entreprise SARL"
                       />
                     </div>
@@ -261,7 +261,7 @@ export default function DevisPage() {
                         value={formData.email}
                         onChange={handleChange}
                         required
-                        className="w-full h-12 bg-[#EEFFF2] border border-gray-200 rounded-lg px-4 text-sm text-[#00272B] focus:outline-none focus:border-[#1AAA3F] transition-colors"
+                        className="w-full h-12 bg-[#F6F3EC] border border-gray-200 rounded-lg px-4 text-sm text-[#00272B] focus:outline-none focus:border-[#1AAA3F] transition-colors"
                         placeholder="amadou@exemple.sn"
                       />
                     </div>
@@ -276,7 +276,7 @@ export default function DevisPage() {
                         value={formData.telephone}
                         onChange={handleChange}
                         required
-                        className="w-full h-12 bg-[#EEFFF2] border border-gray-200 rounded-lg px-4 text-sm text-[#00272B] focus:outline-none focus:border-[#1AAA3F] transition-colors"
+                        className="w-full h-12 bg-[#F6F3EC] border border-gray-200 rounded-lg px-4 text-sm text-[#00272B] focus:outline-none focus:border-[#1AAA3F] transition-colors"
                         placeholder="+221 77 123 45 67"
                       />
                     </div>
@@ -286,10 +286,10 @@ export default function DevisPage() {
                 {/* Machine Selection */}
                 <div>
                   <h2 className="text-xl font-bold text-[#00272B] mb-6 flex items-center gap-3">
-                    <div className="w-10 h-10 bg-[#EEFFF2] rounded-lg flex items-center justify-center">
+                    <div className="w-10 h-10 bg-[#F6F3EC] rounded-lg flex items-center justify-center">
                       <i className="ri-vip-crown-line text-[#1AAA3F]"></i>
                     </div>
-                    Machine(s) Souhaitée(s) *
+                    Machine(s) souhaitée(s) *
                   </h2>
                   
                   <div className="grid md:grid-cols-2 gap-4">
@@ -300,7 +300,7 @@ export default function DevisPage() {
                         onClick={() => handleMachineToggle(machine.slug)}
                         className={`flex items-center gap-4 p-4 rounded-lg border-2 transition-all text-left ${
                           formData.machines.includes(machine.slug)
-                            ? 'border-[#1AAA3F] bg-[#EEFFF2]'
+                            ? 'border-[#1AAA3F] bg-[#F6F3EC]'
                             : 'border-gray-200 hover:border-gray-300'
                         }`}
                       >
@@ -333,7 +333,7 @@ export default function DevisPage() {
                     value={formData.quantite}
                     onChange={handleChange}
                     required
-                    className="w-full h-12 bg-[#EEFFF2] border border-gray-200 rounded-lg px-4 text-sm text-[#00272B] focus:outline-none focus:border-[#1AAA3F] transition-colors cursor-pointer"
+                    className="w-full h-12 bg-[#F6F3EC] border border-gray-200 rounded-lg px-4 text-sm text-[#00272B] focus:outline-none focus:border-[#1AAA3F] transition-colors cursor-pointer"
                   >
                     {[1, 2, 3, 4, 5, 10, 15, 20, 25, 30].map(num => (
                       <option key={num} value={num}>{num} unité{num > 1 ? 's' : ''}</option>
@@ -351,7 +351,7 @@ export default function DevisPage() {
                     value={formData.message}
                     onChange={handleChange}
                     rows={5}
-                    className="w-full bg-[#EEFFF2] border border-gray-200 rounded-lg p-4 text-sm text-[#00272B] focus:outline-none focus:border-[#1AAA3F] transition-colors resize-none"
+                    className="w-full bg-[#F6F3EC] border border-gray-200 rounded-lg p-4 text-sm text-[#00272B] focus:outline-none focus:border-[#1AAA3F] transition-colors resize-none"
                     placeholder="Parlez-nous de votre projet, vos besoins spécifiques, vos contraintes..."
                   />
                 </div>
@@ -359,10 +359,10 @@ export default function DevisPage() {
                 {/* RDV */}
                 <div>
                   <h2 className="text-xl font-bold text-[#00272B] mb-6 flex items-center gap-3">
-                    <div className="w-10 h-10 bg-[#EEFFF2] rounded-lg flex items-center justify-center">
+                    <div className="w-10 h-10 bg-[#F6F3EC] rounded-lg flex items-center justify-center">
                       <i className="ri-calendar-line text-[#1AAA3F]"></i>
                     </div>
-                    Prise de Rendez-vous (Optionnel)
+                    Prise de rendez-vous (facultatif)
                   </h2>
                   
                   <div className="flex items-start gap-3 mb-4">
@@ -390,7 +390,7 @@ export default function DevisPage() {
                           value={formData.rdvDate}
                           onChange={handleChange}
                           min={new Date().toISOString().split('T')[0]}
-                          className="w-full h-12 bg-[#EEFFF2] border border-gray-200 rounded-lg px-4 text-sm text-[#00272B] focus:outline-none focus:border-[#1AAA3F] transition-colors cursor-pointer"
+                          className="w-full h-12 bg-[#F6F3EC] border border-gray-200 rounded-lg px-4 text-sm text-[#00272B] focus:outline-none focus:border-[#1AAA3F] transition-colors cursor-pointer"
                         />
                       </div>
                       <div>
@@ -401,7 +401,7 @@ export default function DevisPage() {
                           name="rdvTime"
                           value={formData.rdvTime}
                           onChange={handleChange}
-                          className="w-full h-12 bg-[#EEFFF2] border border-gray-200 rounded-lg px-4 text-sm text-[#00272B] focus:outline-none focus:border-[#1AAA3F] transition-colors cursor-pointer"
+                          className="w-full h-12 bg-[#F6F3EC] border border-gray-200 rounded-lg px-4 text-sm text-[#00272B] focus:outline-none focus:border-[#1AAA3F] transition-colors cursor-pointer"
                         >
                           <option value="">Sélectionner</option>
                           <option value="09:00">09:00</option>
@@ -442,7 +442,7 @@ export default function DevisPage() {
                 
                 {formData.machines.length === 0 ? (
                   <div className="text-center py-8">
-                    <div className="w-16 h-16 bg-[#EEFFF2] rounded-full flex items-center justify-center mx-auto mb-4">
+                    <div className="w-16 h-16 bg-[#F6F3EC] rounded-full flex items-center justify-center mx-auto mb-4">
                       <i className="ri-shopping-cart-line text-3xl text-[#1AAA3F]"></i>
                     </div>
                     <p className="text-sm text-[#00272B]/60">
@@ -487,7 +487,7 @@ export default function DevisPage() {
                   </>
                 )}
 
-                <div className="mt-8 p-4 bg-[#EEFFF2] rounded-lg">
+                <div className="mt-8 p-4 bg-[#F6F3EC] rounded-lg">
                   <h4 className="text-sm font-semibold text-[#00272B] mb-3">Nos garanties</h4>
                   <div className="space-y-2">
                     <div className="flex items-center gap-2 text-xs text-[#00272B]">

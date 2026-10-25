@@ -43,7 +43,7 @@ export default function ClientLayout() {
   const pageTitle = pageTitles[location.pathname] ?? 'Espace Client';
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#F5F7F5] font-['Inter']">
+    <div className="flex h-screen overflow-hidden bg-[#F5F7F5]">
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div

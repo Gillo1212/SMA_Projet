@@ -82,7 +82,7 @@ export default function PaiementRetourPage() {
   const orderLabel = status?.orderNumber ? `${t('checkout.orderLabel')} ${status.orderNumber}` : null;
 
   return (
-    <div className="min-h-screen bg-white font-['Inter']">
+    <div className="min-h-screen bg-white">
       <Navbar />
 
       <div className="pt-32 pb-24">

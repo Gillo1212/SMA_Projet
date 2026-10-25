@@ -29,7 +29,7 @@ export default function ConnexionPage() {
   };
 
   return (
-    <div className="min-h-screen flex font-['Inter']">
+    <div className="min-h-screen flex">
       {/* Left Branding */}
       <div className="hidden lg:flex lg:w-1/2 bg-[#00272B] flex-col justify-between p-12 relative overflow-hidden">
         <div className="absolute inset-0 opacity-5">
@@ -44,7 +44,7 @@ export default function ConnexionPage() {
         <div className="relative z-10">
           <Link to="/">
             <img
-              src="https://static.readdy.ai/image/1aadd1df13f4328f806374f408610489/60a62dc5b844546eccd3f93680ad2ab4.png"
+              src="/images/brand/logo-corporate.png"
               alt="SMALIM"
               className="h-14 w-auto"
             />
@@ -54,7 +54,7 @@ export default function ConnexionPage() {
         <div className="relative z-10">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#1AAA3F]/20 rounded-full mb-6">
             <div className="w-2 h-2 bg-[#1AAA3F] rounded-full animate-pulse"></div>
-            <span className="text-[#1AAA3F] text-sm font-medium">Espace Administration</span>
+            <span className="text-[#1AAA3F] text-sm font-medium">Espace administration</span>
           </div>
           <h2 className="text-4xl font-bold text-white mb-4 leading-tight">
             Gérez votre activité<br />
@@ -97,7 +97,7 @@ export default function ConnexionPage() {
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-white">
         <div className="w-full max-w-md">
           <div className="lg:hidden mb-8">
-            <Link to="/"><img src="https://static.readdy.ai/image/1aadd1df13f4328f806374f408610489/60a62dc5b844546eccd3f93680ad2ab4.png" alt="SMALIM" className="h-10 w-auto" /></Link>
+            <Link to="/"><img src="/images/brand/logo-corporate.png" alt="SMALIM" className="h-10 w-auto" /></Link>
           </div>
 
           <div className="mb-8">

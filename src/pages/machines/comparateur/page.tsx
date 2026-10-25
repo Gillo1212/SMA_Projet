@@ -40,10 +40,10 @@ export default function ComparateurPage() {
     { key: 'weight', label: 'Poids', format: (m: Machine) => m.specifications.weight },
     { key: 'payment', label: 'Paiements', format: (m: Machine) => (
       <div className="flex flex-wrap gap-2 justify-center">
-        {m.paymentMethods.includes('wave') && <span className="px-2 py-1 bg-[#EEFFF2] rounded text-xs">Wave</span>}
-        {m.paymentMethods.includes('orange') && <span className="px-2 py-1 bg-[#EEFFF2] rounded text-xs">Orange</span>}
-        {m.paymentMethods.includes('carte') && <span className="px-2 py-1 bg-[#EEFFF2] rounded text-xs">CB</span>}
-        {m.paymentMethods.includes('especes') && <span className="px-2 py-1 bg-[#EEFFF2] rounded text-xs">Espèces</span>}
+        {m.paymentMethods.includes('wave') && <span className="px-2 py-1 bg-[#F6F3EC] rounded text-xs">Wave</span>}
+        {m.paymentMethods.includes('orange') && <span className="px-2 py-1 bg-[#F6F3EC] rounded text-xs">Orange</span>}
+        {m.paymentMethods.includes('carte') && <span className="px-2 py-1 bg-[#F6F3EC] rounded text-xs">CB</span>}
+        {m.paymentMethods.includes('especes') && <span className="px-2 py-1 bg-[#F6F3EC] rounded text-xs">Espèces</span>}
       </div>
     )},
     { key: 'maintenance', label: 'Maintenance incluse', format: (m: Machine) => (
@@ -57,7 +57,7 @@ export default function ComparateurPage() {
 
   if (isLoading || error) {
     return (
-      <div className="min-h-screen bg-[#EEFFF2]">
+      <div className="min-h-screen bg-[#F6F3EC]">
         <Navbar />
         <div className="pt-32 pb-20">
           {isLoading
@@ -70,11 +70,11 @@ export default function ComparateurPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#EEFFF2]">
+    <div className="min-h-screen bg-[#F6F3EC]">
       <Navbar />
 
       <div className="pt-32 pb-20">
-        <div className="max-w-7xl mx-auto px-6 lg:px-20">
+        <div className="max-w-7xl mx-auto px-6 lg:px-10">
           {/* Header */}
           <div className="mb-12">
             <Link to="/machines" className="inline-flex items-center gap-2 text-sm text-[#00272B]/60 hover:text-[#1AAA3F] transition-colors mb-6">
@@ -83,7 +83,7 @@ export default function ComparateurPage() {
             </Link>
             
             <h1 className="text-4xl lg:text-5xl font-bold text-[#00272B] mb-4">
-              Comparateur de Machines
+              Comparateur de machines
             </h1>
             <p className="text-lg text-[#00272B]/70">
               Comparez jusqu'à 5 machines pour trouver celle qui correspond le mieux à vos besoins
@@ -124,7 +124,7 @@ export default function ComparateurPage() {
                       addMachine(machine.id);
                       setShowSelector(false);
                     }}
-                    className="flex items-center gap-4 p-4 bg-[#EEFFF2] rounded-lg hover:bg-[#1AAA3F]/10 transition-colors text-left cursor-pointer"
+                    className="flex items-center gap-4 p-4 bg-[#F6F3EC] rounded-lg hover:bg-[#1AAA3F]/10 transition-colors text-left cursor-pointer"
                   >
                     <div className="w-16 h-16 bg-white rounded-lg overflow-hidden flex-shrink-0">
                       <img 
@@ -147,7 +147,7 @@ export default function ComparateurPage() {
           {/* Comparison Table */}
           {comparedMachines.length === 0 ? (
             <div className="text-center py-20 bg-white rounded-2xl">
-              <div className="w-20 h-20 bg-[#EEFFF2] rounded-full flex items-center justify-center mx-auto mb-6">
+              <div className="w-20 h-20 bg-[#F6F3EC] rounded-full flex items-center justify-center mx-auto mb-6">
                 <i className="ri-scales-line text-4xl text-[#1AAA3F]"></i>
               </div>
               <h3 className="text-2xl font-bold text-[#00272B] mb-3">Aucune machine sélectionnée</h3>
@@ -165,7 +165,7 @@ export default function ComparateurPage() {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-gray-100">
-                      <th className="p-6 text-left text-sm font-semibold text-[#00272B] bg-[#EEFFF2] sticky left-0 z-10">
+                      <th className="p-6 text-left text-sm font-semibold text-[#00272B] bg-[#F6F3EC] sticky left-0 z-10">
                         Critères
                       </th>
                       {comparedMachines.map(machine => (
@@ -198,7 +198,7 @@ export default function ComparateurPage() {
                   </thead>
                   <tbody>
                     {comparisonCriteria.map((criterion, index) => (
-                      <tr key={criterion.key} className={index % 2 === 0 ? 'bg-white' : 'bg-[#EEFFF2]/30'}>
+                      <tr key={criterion.key} className={index % 2 === 0 ? 'bg-white' : 'bg-[#F6F3EC]/30'}>
                         <td className="p-6 text-sm font-semibold text-[#00272B] sticky left-0 z-10 bg-inherit">
                           {criterion.label}
                         </td>

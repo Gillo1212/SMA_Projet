@@ -37,13 +37,13 @@ export default function PaiementSimulationPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0f172a] flex items-center justify-center px-4 font-['Inter']">
+    <div className="min-h-screen bg-[#0f172a] flex items-center justify-center px-4">
       <div className="w-full max-w-md bg-white rounded-2xl p-8">
 
         <div className="flex items-center gap-2 px-3 py-1.5 bg-amber-50 border border-amber-200 rounded-lg mb-6">
           <i className="ri-tools-line text-amber-600 text-sm"></i>
           <p className="text-xs font-semibold text-amber-700">
-            Simulateur de paiement — développement
+            Simulateur de paiement (développement)
           </p>
         </div>
 
@@ -62,7 +62,7 @@ export default function PaiementSimulationPage() {
           <div className="flex justify-between gap-4">
             <span className="text-xs text-[#00272B]/40 flex-shrink-0">Référence</span>
             <span className="text-xs font-mono text-[#00272B]/70 break-all text-right">
-              {reference || '—'}
+              {reference || '-'}
             </span>
           </div>
         </div>

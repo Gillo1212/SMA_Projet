@@ -4,8 +4,10 @@
  */
 export default {
   products: {
-    title: 'Product Catalogue',
-    subtitle: 'Browse our selection of products for your vending machines: premium coffee, snacks and drinks.',
+    eyebrow: 'Shop',
+    title: 'Supplies for',
+    titleAccent: 'your machines',
+    subtitle: 'Colombian coffee, hot chocolates and cappuccinos selected for vending machines and instant coffee machines.',
     clearAll: 'Clear all',
     showResults: 'Show results',
     resetFilters: 'Reset filters',
@@ -38,7 +40,7 @@ export default {
     email: 'Email',
     emailDelay: 'Reply within 24h',
     address: 'Address',
-    formTitle: 'Send us a Message',
+    formTitle: 'Send us a message',
     namePlaceholder: 'Your name',
     emailPlaceholder: 'you@email.com',
     phonePlaceholder: '+221 XX XXX XX XX',
@@ -53,11 +55,11 @@ export default {
     successHint: 'We will get back to you as soon as possible.',
     errorTitle: 'Sending failed',
     errorHint: 'Please try again or contact us by phone.',
-    hoursTitle: 'Opening Hours',
+    hoursTitle: 'Opening hours',
     weekdays: 'Monday - Friday',
     saturday: 'Saturday',
     sunday: 'Sunday',
     closed: 'Closed',
-    support247: '24/7 Technical Support',
+    support247: '24/7 technical support',
   },
 };

@@ -42,7 +42,7 @@ function normalizeClient(raw: BackendClient): Client {
   return {
     id: String(raw.id),
     nom: fullName(raw.first_name, raw.last_name),
-    entreprise: raw.company_name ?? '—',
+    entreprise: raw.company_name ?? '-',
     email: raw.email,
     telephone: raw.phone ?? '',
     ville: raw.city ?? '',

@@ -88,7 +88,7 @@ export default function ClientMachinesPage() {
                   </div>
                   <div className="p-3 bg-gray-50 rounded-xl">
                     <p className="text-xs text-[#00272B]/40 mb-0.5">N° de série</p>
-                    <p className="text-sm font-bold text-[#00272B] truncate">{machine.numeroSerie ?? '—'}</p>
+                    <p className="text-sm font-bold text-[#00272B] truncate">{machine.numeroSerie ?? '-'}</p>
                   </div>
                 </div>
 

@@ -97,7 +97,7 @@ export default function ClientDashboardPage() {
                 <div key={order.id} className="flex items-center justify-between py-3 border-b border-gray-50 last:border-0">
                   <div className="flex-1 min-w-0 mr-3">
                     <p className="text-sm font-semibold text-[#00272B]">{order.reference}</p>
-                    <p className="text-xs text-[#00272B]/40 truncate">{order.produits || '—'}</p>
+                    <p className="text-xs text-[#00272B]/40 truncate">{order.produits || '-'}</p>
                     <p className="text-xs text-[#00272B]/30">{order.date}</p>
                   </div>
                   <div className="text-right flex-shrink-0">

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import Navbar from '../home/components/Navbar';
 import Footer from '../home/components/Footer';
+import PageHero from '../../components/feature/PageHero';
 import { useProducts } from '../../hooks/useProducts';
 import { LoadingState, ErrorState } from '../../components/feature/AsyncState';
 
@@ -120,7 +121,7 @@ export default function ProductsPage() {
   // Navbar et Footer restent affichés : seule la zone catalogue change d'état
   if (isLoading || error) {
     return (
-      <div className="min-h-screen bg-white font-['Inter']">
+      <div className="min-h-screen bg-white">
         <Navbar />
         <div className="pt-32 pb-20">
           {isLoading
@@ -133,46 +134,39 @@ export default function ProductsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white font-['Inter']">
+    <div className="min-h-screen bg-white">
       <Navbar />
 
-      {/* Hero Section */}
-      <section className="relative pt-24 sm:pt-32 pb-12 sm:pb-20 bg-gradient-to-br from-[#EEFFF2] to-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-20">
-          <div className="text-center max-w-3xl mx-auto">
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold text-[#00272B] mb-4 sm:mb-6">
-              {t('products.title')}
-            </h1>
-            <p className="text-base sm:text-lg text-gray-600 mb-6 sm:mb-8">
-              {t('products.subtitle')}
-            </p>
-
-            {/* Search Bar */}
-            <div className="relative max-w-2xl mx-auto">
-              <input
-                type="text"
-                placeholder={t('products.searchPlaceholder')}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-12 sm:h-16 pl-12 sm:pl-16 pr-6 rounded-xl border-2 border-gray-200 focus:border-[#1AAA3F] focus:outline-none text-sm sm:text-base transition-all"
-              />
-              <i className="ri-search-line absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 text-xl sm:text-2xl text-gray-400"></i>
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery('')}
-                  className="absolute right-4 sm:right-6 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors cursor-pointer"
-                >
-                  <i className="ri-close-line text-xl text-gray-500"></i>
-                </button>
-              )}
-            </div>
-          </div>
+      <PageHero
+        eyebrow={t('products.eyebrow')}
+        title={t('products.title')}
+        titleAccent={t('products.titleAccent')}
+        subtitle={t('products.subtitle')}
+      >
+        <div className="relative max-w-xl">
+          <input
+            type="text"
+            placeholder={t('products.searchPlaceholder')}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full h-14 pl-12 pr-12 rounded-md bg-white text-[#00272B] placeholder-[#00272B]/40 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[#4FD07A]"
+          />
+          <i className="ri-search-line absolute left-4 top-1/2 -translate-y-1/2 text-xl text-[#00272B]/40"></i>
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              aria-label="Effacer"
+              className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#00272B]/5 transition-colors cursor-pointer"
+            >
+              <i className="ri-close-line text-xl text-[#00272B]/50"></i>
+            </button>
+          )}
         </div>
-      </section>
+      </PageHero>
 
       {/* Main Content */}
       <section className="py-8 sm:py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
           {/* Mobile filter button */}
           <div className="flex items-center justify-between mb-4 lg:hidden">
             <p className="text-sm text-gray-600">
@@ -180,7 +174,7 @@ export default function ProductsPage() {
             </p>
             <button
               onClick={() => setShowFilters(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-[#EEFFF2] border border-[#1AAA3F]/30 rounded-lg text-sm font-semibold text-[#00272B] cursor-pointer"
+              className="flex items-center gap-2 px-4 py-2 bg-[#F6F3EC] border border-[#1AAA3F]/30 rounded-lg text-sm font-semibold text-[#00272B] cursor-pointer"
             >
               <i className="ri-filter-line text-[#1AAA3F]"></i>
               {t('products.filters')}
@@ -202,7 +196,7 @@ export default function ProductsPage() {
                   </button>
                 </div>
                 <div className="p-4">
-                  <div className="bg-[#EEFFF2] rounded-2xl p-6">
+                  <div className="bg-[#F6F3EC] rounded-2xl p-6">
                     {activeFiltersCount > 0 && (
                       <button onClick={clearAllFilters} className="text-sm text-[#1AAA3F] hover:underline cursor-pointer mb-4 block">
                         {t('products.clearAll')}
@@ -251,7 +245,7 @@ export default function ProductsPage() {
           <div className="flex gap-8 lg:gap-12">
             {/* Filters Sidebar - Desktop only */}
             <aside className="w-80 flex-shrink-0 sticky top-32 self-start hidden lg:block">
-              <div className="bg-[#EEFFF2] rounded-2xl p-8">
+              <div className="bg-[#F6F3EC] rounded-2xl p-8">
                 <div className="flex items-center justify-between mb-8">
                   <h3 className="text-xl font-bold text-[#00272B]">{t('products.filters')}</h3>
                   {activeFiltersCount > 0 && (
@@ -317,6 +311,7 @@ export default function ProductsPage() {
                   )}
 
                   {/* Compatibility Filter */}
+                  {machines.length > 0 && (
                   <div>
                     <h4 className="text-sm font-semibold text-[#00272B] mb-4">{t('products.compatibility')}</h4>
                     <div className="space-y-2">
@@ -328,6 +323,7 @@ export default function ProductsPage() {
                       ))}
                     </div>
                   </div>
+                  )}
 
                   {/* Availability Filter */}
                   <div>
@@ -370,10 +366,14 @@ export default function ProductsPage() {
                       to={`/produits/${product.id}`}
                       className="group bg-white rounded-2xl border border-gray-100 hover:border-[#1AAA3F] hover:shadow-lg transition-all duration-300 overflow-hidden"
                     >
-                      <div className="relative aspect-square bg-gray-50 overflow-hidden">
-                        <img src={product.images[0]} alt={product.name} className="w-full h-full object-contain object-center p-6 group-hover:scale-105 transition-transform duration-300" />
-                        {product.isNew && <div className="absolute top-4 left-4 px-3 py-1 bg-[#25A9F2] text-white text-xs font-semibold rounded-full">{t('products.badgeNew')}</div>}
-                        {product.isPopular && <div className="absolute top-4 right-4 px-3 py-1 bg-[#1AAA3F] text-white text-xs font-semibold rounded-full">{t('products.badgePopular')}</div>}
+                      <div className="relative aspect-square bg-white overflow-hidden">
+                        {product.images[0] ? (
+                          <img src={product.images[0]} alt={product.name} className="w-full h-full object-contain object-center p-6 group-hover:scale-105 transition-transform duration-300" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center"><i className="ri-image-line text-6xl text-gray-300"></i></div>
+                        )}
+                        {product.isNew && <div className="absolute top-4 left-4 px-3 py-1 bg-[#F6F3EC] text-[#00272B] text-xs font-semibold rounded-full">{t('products.badgeNew')}</div>}
+                        {product.isPopular && <div className="absolute top-4 right-4 px-3 py-1 bg-[#00272B] text-white text-xs font-semibold rounded-full">{t('products.badgePopular')}</div>}
                         {!product.isAvailable && (
                           <div className="absolute inset-0 bg-white/90 flex items-center justify-center">
                             <span className="text-sm font-semibold text-gray-500">{t('products.outOfStock')}</span>
@@ -390,8 +390,8 @@ export default function ProductsPage() {
                           <p className="text-lg sm:text-2xl font-bold text-[#00272B]">
                             {product.price.toLocaleString('fr-FR')} <span className="text-xs sm:text-base">FCFA</span>
                           </p>
-                          <div className="w-10 h-10 bg-[#EEFFF2] rounded-full flex items-center justify-center group-hover:bg-[#1AAA3F] transition-colors">
-                            <i className="ri-arrow-right-line text-xl text-[#1AAA3F] group-hover:text-white transition-colors"></i>
+                          <div className="w-10 h-10 border border-[#00272B]/15 rounded-full flex items-center justify-center group-hover:bg-[#00272B] transition-colors">
+                            <i className="ri-arrow-right-up-line text-[#00272B] group-hover:text-white transition-colors"></i>
                           </div>
                         </div>
 

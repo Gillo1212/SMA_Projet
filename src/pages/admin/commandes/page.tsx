@@ -146,7 +146,7 @@ export default function AdminCommandesPage() {
                       <p className="text-xs text-[#00272B]/40">{cmd.email}</p>
                     </td>
                     <td className="px-6 py-4">
-                      <p className="text-sm text-[#00272B]/70 max-w-40 truncate">{cmd.produits || '—'}</p>
+                      <p className="text-sm text-[#00272B]/70 max-w-40 truncate">{cmd.produits || '-'}</p>
                     </td>
                     <td className="px-6 py-4">
                       <span className={`text-sm font-medium ${paiementColors[cmd.paiement] ?? 'text-[#00272B]/60'}`}>{cmd.paiement}</span>
