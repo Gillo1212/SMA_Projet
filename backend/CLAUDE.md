@@ -165,6 +165,14 @@ Voir `.env.example`, section Paiement : `BACKEND_URL`, `WAVE_API_KEY`, `WAVE_WEB
 
 > Les URL et formats de payload des deux prestataires proviennent de leur documentation publique. **À confirmer avec la documentation de votre contrat marchand** avant la mise en production : ces intégrations n'ont pas été testées contre les API réelles.
 
+## Paramètres de la plateforme
+
+- Table `settings` (clé → valeur), lue via `services/settings.service.js`. **Seules les clés déclarées dans `DEFINITIONS` sont acceptées**, chacune avec une valeur par défaut et un validateur : pour ajouter un paramètre, le déclarer là.
+- `getShopConfig()` fournit les règles de calcul d'une commande : `taxRate` (en %), `delivery.{pickup,standard,express}.{enabled,fee}`, `freeShippingThreshold` (0 = désactivé, livraison standard uniquement).
+- Routes : `GET /api/settings/public` (public), `GET /api/settings` (admin), `PUT /api/settings` (`super_admin`, `admin`). Codes promo : CRUD `/api/promo-codes`.
+- `orders.create` fige `delivery_mode` et `tax_rate` sur la commande : changer un paramètre ne réécrit pas l'historique.
+- Le frontend réplique le calcul dans `frontend/src/utils/orderTotals.ts` : toute modification de la formule doit être faite **des deux côtés**.
+
 ## Uploads de fichiers
 
 - Middleware : `multer`

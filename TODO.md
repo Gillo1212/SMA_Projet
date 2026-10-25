@@ -23,7 +23,18 @@ Périmètre décidé le 2026-10-25 : **site public + espace client**. Le portail
   - `machines.service.ts` fabrique des libellés en français : « Sur devis », « Populaire », niveaux de stock.
   - Les données du catalogue (noms, descriptions, catégories, délais) sont en français dans la base.
 
-## 2 bis. Panier : montants incohérents avec le backend (bug)
+## 2 bis. ~~Panier : montants incohérents avec le backend~~ ✅ fait le 2026-10-25
+
+- TVA, 3 modes de livraison (actif / tarif) et seuil de livraison standard offerte sont réglables dans **Admin → Paramètres → TVA & livraison**. Codes promo gérés dans **Admin → Paramètres → Codes promo**.
+- Panier et checkout calculent comme le backend (`frontend/src/utils/orderTotals.ts`), le code promo est validé par l'API et transmis à la commande, le checkout exige un compte client.
+- Vérifié de bout en bout dans Chrome : réglage admin → panier → checkout express + code promo → commande en base identique au franc près.
+- **Restent dans la page Paramètres** :
+  - Onglet **Administrateurs** : appelle `/api/settings/admins`, qui n'existe pas (liste fictive). Seule `POST /api/auth/admin/register` existe.
+  - Onglet **Email & SMTP** : non relié (signalé dans l'onglet) ; la config SMTP est dans le `.env`.
+  - Onglet **Notifications** : enregistré en base, mais aucun code backend ne lit encore ces préférences.
+  - Onglet **Entreprise** : enregistré, mais le site public affiche toujours les coordonnées codées en dur (voir §3).
+
+## Ancien constat (2 bis), pour mémoire
 
 - `pages/panier/page.tsx` offre la livraison au-delà de 50 000 FCFA, et la fiche produit l'annonce (« Livraison gratuite dès 50 000 FCFA »). **Le backend ne connaît pas cette règle** : il facture 0 / 2 500 / 5 000 FCFA selon le mode (`DELIVERY_FEES` dans `orders.controller.js`). Le client voit un total dans le panier, puis un autre au checkout.
 - Le panier valide les codes promo avec une liste codée en dur (`BIENVENUE10`, `SMA2026`, `FIRST20`) au lieu d'appeler l'API. (Le message d'erreur, qui affichait les codes valides, est maintenant générique.)
