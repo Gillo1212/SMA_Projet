@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useOrders, useOrder } from '../../../hooks/useOrders';
 import { LoadingState, ErrorState, EmptyState } from '../../../components/feature/AsyncState';
-import type { OrderStatus } from '../../../types/models';
+import type { Order, OrderStatus } from '../../../types/models';
 
 const ALL_STATUTS: OrderStatus[] = [
   'En attente',
@@ -30,6 +30,12 @@ const paiementColors: Record<string, string> = {
   'Carte bancaire': 'text-violet-600',
   'Espèces': 'text-emerald-600',
   'Non renseigné': 'text-[#00272B]/40',
+};
+
+const DELIVERY_LABELS: Record<NonNullable<Order['modeLivraison']>, string> = {
+  pickup: 'Retrait en magasin',
+  standard: 'Livraison standard',
+  express: 'Livraison express',
 };
 
 export default function AdminCommandesPage() {
@@ -223,10 +229,30 @@ export default function AdminCommandesPage() {
               )}
             </div>
 
-            {selected.adresseLivraison && (
+            {(selected.adresseLivraison || selected.modeLivraison) && (
               <div className="p-3 bg-gray-50 rounded-xl">
                 <p className="text-xs text-[#00272B]/40 mb-1">Livraison</p>
-                <p className="text-sm text-[#00272B]/70">{selected.adresseLivraison}</p>
+                {selected.modeLivraison && (
+                  <p className="text-sm font-semibold text-[#00272B] mb-1">
+                    {DELIVERY_LABELS[selected.modeLivraison]}
+                    {selected.fraisLivraison !== undefined && (
+                      <span className="font-normal text-[#00272B]/50">
+                        {' · '}{selected.fraisLivraison > 0 ? `${selected.fraisLivraison.toLocaleString('fr-FR')} F` : 'offerte'}
+                      </span>
+                    )}
+                  </p>
+                )}
+                {selected.adresseLivraison && <p className="text-sm text-[#00272B]/70">{selected.adresseLivraison}</p>}
+              </div>
+            )}
+
+            {selected.codePromo && (
+              <div className="p-3 bg-gray-50 rounded-xl">
+                <p className="text-xs text-[#00272B]/40 mb-1">Code promo</p>
+                <p className="text-sm text-[#00272B]">
+                  <span className="font-mono font-semibold">{selected.codePromo}</span>
+                  {!!selected.remise && <span className="text-[#00272B]/50"> · -{selected.remise.toLocaleString('fr-FR')} F</span>}
+                </p>
               </div>
             )}
 

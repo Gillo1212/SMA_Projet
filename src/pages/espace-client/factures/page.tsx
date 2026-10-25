@@ -50,6 +50,8 @@ export default function ClientFacturesPage() {
         description: inv.description,
         type: inv.type,
         montant: inv.montant,
+        montantHT: inv.montantHT,
+        tauxTVA: inv.tauxTVA,
         statut: inv.statut,
         clientName: `${client?.prenom ?? ''} ${client?.nom ?? ''}`.trim(),
         clientEmail: client?.email ?? '',

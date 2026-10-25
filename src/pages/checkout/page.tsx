@@ -1,11 +1,16 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Navbar from '../home/components/Navbar';
 import Footer from '../home/components/Footer';
 import { useCart } from '../../contexts/CartContext';
+import { useClientAuth } from '../../contexts/ClientAuthContext';
+import { useShopConfig } from '../../hooks/useShopConfig';
 import { ordersService } from '../../services/orders.service';
 import { paymentsService } from '../../services/payments.service';
+import { shopService } from '../../services/shop.service';
+import { computeTotals, defaultDeliveryMode, DELIVERY_MODES } from '../../utils/orderTotals';
+import type { DeliveryMode } from '../../types/models';
 
 interface ShippingAddress {
   firstName: string;
@@ -18,19 +23,14 @@ interface ShippingAddress {
   country: string;
 }
 
-interface AccountCreation {
-  createAccount: boolean;
-  password: string;
-  confirmPassword: string;
-}
-
-type DeliveryMode = 'pickup' | 'standard' | 'express';
 type PaymentMethod = 'wave' | 'orange_money';
 
 export default function CheckoutPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { items, getSubtotal, getDiscount, clearCart } = useCart();
+  const { items, getSubtotal, getDiscount, clearCart, promo, setPromo } = useCart();
+  const { client, isAuthenticated, isLoading: authLoading } = useClientAuth();
+  const { config } = useShopConfig();
 
   const [currentStep, setCurrentStep] = useState(1);
   
@@ -45,45 +45,52 @@ export default function CheckoutPage() {
     country: 'Sénégal',
   });
 
-  const [account, setAccount] = useState<AccountCreation>({
-    createAccount: false,
-    password: '',
-    confirmPassword: '',
-  });
-  const [showPwd, setShowPwd] = useState(false);
-  const [pwdError, setPwdError] = useState('');
-
   const [deliveryMode, setDeliveryMode] = useState<DeliveryMode>('standard');
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('wave');
   const [placingOrder, setPlacingOrder] = useState(false);
   const [orderError, setOrderError] = useState<string | null>(null);
+  const [promoNotice, setPromoNotice] = useState<string | null>(null);
 
-  const TVA_RATE = 0.18;
-
-  const deliveryOptions = {
-    pickup: { label: t('checkout.delivery.pickup'), price: 0, delay: t('checkout.delivery.pickupDelay') },
-    standard: { label: t('checkout.delivery.standard'), price: 2500, delay: t('checkout.delivery.standardDelay') },
-    express: { label: t('checkout.delivery.express'), price: 5000, delay: t('checkout.delivery.expressDelay') },
-  };
+  // Seuls les modes activés dans le back-office sont proposés
+  const enabledModes = DELIVERY_MODES.filter(m => config.delivery[m].enabled);
+  useEffect(() => {
+    if (!config.delivery[deliveryMode].enabled) setDeliveryMode(defaultDeliveryMode(config));
+  }, [config, deliveryMode]);
 
   const subtotal = getSubtotal();
-  const shippingCost = deliveryOptions[deliveryMode].price;
-  const tva = subtotal * TVA_RATE;
-  const total = subtotal + shippingCost + tva;
+  const totals = computeTotals(config, subtotal, promo, deliveryMode);
+  const shippingCost = totals.shipping ?? 0;
+
+  // Pré-remplit l'adresse avec le profil, une seule fois
+  const prefilled = useRef(false);
+  useEffect(() => {
+    if (!client || prefilled.current) return;
+    prefilled.current = true;
+    setShippingAddress(prev => ({
+      ...prev,
+      firstName: prev.firstName || client.prenom || '',
+      lastName: prev.lastName || client.nom || '',
+      email: prev.email || client.email || '',
+      phone: prev.phone || client.telephone || '',
+      address: prev.address || client.adresse || '',
+      city: prev.city || client.ville || '',
+    }));
+  }, [client]);
+
+  // Le code a été validé au panier : on revérifie qu'il s'applique toujours
+  // (expiration, quota, minimum de commande) avant de l'envoyer.
+  const promoChecked = useRef(false);
+  useEffect(() => {
+    if (!promo || promoChecked.current || !isAuthenticated) return;
+    promoChecked.current = true;
+    shopService.validatePromo(promo.code, subtotal).catch(() => {
+      setPromo(null);
+      setPromoNotice(t('checkout.promoRemoved', { code: promo.code }));
+    });
+  }, [promo, subtotal, isAuthenticated, setPromo, t]);
 
   const handleAddressSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setPwdError('');
-    if (account.createAccount) {
-      if (account.password.length < 8) {
-        setPwdError(t('checkout.account.errorTooShort'));
-        return;
-      }
-      if (account.password !== account.confirmPassword) {
-        setPwdError(t('checkout.account.errorMismatch'));
-        return;
-      }
-    }
     setCurrentStep(2);
   };
 
@@ -112,6 +119,7 @@ export default function CheckoutPage() {
           quantity: item.quantity,
         })),
         paiement: paymentMethod === 'wave' ? 'Wave' : 'Orange Money',
+        promoCode: promo?.code,
         adresseLivraison: {
           first_name: shippingAddress.firstName,
           last_name: shippingAddress.lastName,
@@ -145,6 +153,54 @@ export default function CheckoutPage() {
     navigate('/panier');
     return null;
   }
+
+  // La création de commande exige un compte client (POST /orders authentifié)
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <i className="ri-loader-4-line text-3xl text-[#1AAA3F] animate-spin"></i>
+      </div>
+    );
+  }
+  if (!isAuthenticated) {
+    const loginUrl = `/espace-client/connexion?redirect=${encodeURIComponent('/checkout')}`;
+    return (
+      <div className="min-h-screen bg-white">
+        <Navbar />
+        <section className="pt-32 pb-20 px-4">
+          <div className="max-w-md mx-auto text-center bg-[#F6F3EC] rounded-2xl p-8 sm:p-10">
+            <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-6">
+              <i className="ri-user-line text-3xl text-[#1AAA3F]"></i>
+            </div>
+            <h1 className="text-2xl font-bold text-[#00272B] mb-3">{t('checkout.login.title')}</h1>
+            <p className="text-sm text-gray-600 mb-8">{t('checkout.login.hint')}</p>
+            <div className="flex flex-col gap-3">
+              <Link
+                to={loginUrl}
+                className="w-full h-12 bg-[#1AAA3F] text-white text-sm font-semibold rounded-xl hover:bg-[#158f35] transition-colors flex items-center justify-center gap-2"
+              >
+                <i className="ri-login-circle-line"></i>
+                {t('checkout.login.signIn')}
+              </Link>
+              <Link
+                to="/inscription"
+                className="w-full h-12 border-2 border-[#00272B]/15 text-[#00272B] text-sm font-semibold rounded-xl hover:bg-white transition-colors flex items-center justify-center"
+              >
+                {t('checkout.login.register')}
+              </Link>
+              <Link to="/panier" className="text-sm text-[#00272B]/50 hover:text-[#1AAA3F] mt-2">
+                {t('checkout.backToCart')}
+              </Link>
+            </div>
+          </div>
+        </section>
+        <Footer />
+      </div>
+    );
+  }
+
+  const deliveryLabel = (mode: DeliveryMode) => t(`checkout.delivery.${mode}`);
+  const deliveryDelay = (mode: DeliveryMode) => t(`checkout.delivery.${mode}Delay`);
 
   const steps = [
     { number: 1, label: t('checkout.steps.address'), icon: 'ri-map-pin-line' },
@@ -247,80 +303,6 @@ export default function CheckoutPage() {
                       </div>
                     </div>
 
-                    {/* Account creation section */}
-                    <div className="border border-gray-200 rounded-xl overflow-hidden">
-                      <button
-                        type="button"
-                        onClick={() => setAccount(prev => ({ ...prev, createAccount: !prev.createAccount }))}
-                        className={`w-full flex items-center justify-between p-4 transition-colors cursor-pointer ${
-                          account.createAccount ? 'bg-[#F6F3EC]' : 'bg-gray-50 hover:bg-gray-100'
-                        }`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className={`w-5 h-5 rounded flex items-center justify-center border-2 transition-all ${
-                            account.createAccount ? 'bg-[#1AAA3F] border-[#1AAA3F]' : 'border-gray-300'
-                          }`}>
-                            {account.createAccount && <i className="ri-check-line text-white text-xs"></i>}
-                          </div>
-                          <div className="text-left">
-                            <p className="text-sm font-semibold text-[#00272B]">{t('checkout.account.title')}</p>
-                            <p className="text-xs text-[#00272B]/50">{t('checkout.account.hint')}</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-xs text-[#1AAA3F] font-medium bg-[#1AAA3F]/10 px-2 py-0.5 rounded-full">{t('checkout.delivery.free')}</span>
-                          <i className={`ri-arrow-down-s-line text-[#00272B]/40 transition-transform ${account.createAccount ? 'rotate-180' : ''}`}></i>
-                        </div>
-                      </button>
-
-                      {account.createAccount && (
-                        <div className="p-4 border-t border-gray-200 bg-white space-y-4">
-                          {pwdError && (
-                            <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
-                              <i className="ri-error-warning-line text-red-500 text-sm flex-shrink-0"></i>
-                              <p className="text-red-600 text-xs">{pwdError}</p>
-                            </div>
-                          )}
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                              <label className="text-sm font-semibold text-[#00272B] mb-2 block">{t('checkout.account.password')} <span className="text-red-500">*</span></label>
-                              <div className="relative">
-                                <input
-                                  type={showPwd ? 'text' : 'password'}
-                                  value={account.password}
-                                  onChange={e => setAccount(prev => ({ ...prev, password: e.target.value }))}
-                                  placeholder={t('checkout.account.passwordPlaceholder')}
-                                  className="w-full h-11 px-4 pr-10 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-[#1AAA3F]"
-                                />
-                                <button type="button" onClick={() => setShowPwd(v => !v)}
-                                  className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center text-[#00272B]/40 cursor-pointer">
-                                  <i className={showPwd ? 'ri-eye-off-line text-sm' : 'ri-eye-line text-sm'}></i>
-                                </button>
-                              </div>
-                            </div>
-                            <div>
-                              <label className="text-sm font-semibold text-[#00272B] mb-2 block">{t('checkout.account.confirm')} <span className="text-red-500">*</span></label>
-                              <input
-                                type="password"
-                                value={account.confirmPassword}
-                                onChange={e => setAccount(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                                placeholder={t('checkout.account.confirmPlaceholder')}
-                                className={`w-full h-11 px-4 border rounded-lg text-sm focus:outline-none transition-all ${
-                                  account.confirmPassword.length > 0
-                                    ? account.password === account.confirmPassword ? 'border-[#1AAA3F]' : 'border-red-300'
-                                    : 'border-gray-300 focus:border-[#1AAA3F]'
-                                }`}
-                              />
-                            </div>
-                          </div>
-                          <p className="text-xs text-[#00272B]/40 flex items-center gap-1.5">
-                            <i className="ri-shield-check-line text-[#1AAA3F]"></i>
-                            Votre compte sera créé avec l&apos;email saisi ci-dessus.
-                          </p>
-                        </div>
-                      )}
-                    </div>
-
                     <button type="submit" className="w-full h-14 bg-[#1AAA3F] text-white text-base font-semibold rounded-xl hover:bg-[#158f35] transition-colors cursor-pointer flex items-center justify-center space-x-2 whitespace-nowrap">
                       <span>{t('checkout.address.continue')}</span>
                       <i className="ri-arrow-right-line text-xl"></i>
@@ -334,10 +316,12 @@ export default function CheckoutPage() {
                 <div className="bg-white border border-gray-200 rounded-2xl p-8">
                   <h2 className="text-2xl font-bold text-[#00272B] mb-6">{t('checkout.delivery.title')}</h2>
                   <div className="space-y-4 mb-8">
-                    {Object.entries(deliveryOptions).map(([key, option]) => (
+                    {enabledModes.map(key => {
+                      const fee = computeTotals(config, subtotal, promo, key).shipping ?? 0;
+                      return (
                       <button
                         key={key}
-                        onClick={() => setDeliveryMode(key as DeliveryMode)}
+                        onClick={() => setDeliveryMode(key)}
                         className={`w-full p-6 border-2 rounded-xl flex items-center justify-between transition-all cursor-pointer ${
                           deliveryMode === key
                             ? 'border-[#1AAA3F] bg-[#F6F3EC]'
@@ -355,19 +339,20 @@ export default function CheckoutPage() {
                             )}
                           </div>
                           <div className="text-left">
-                            <p className="text-base font-bold text-[#00272B]">{option.label}</p>
-                            <p className="text-sm text-gray-600">{option.delay}</p>
+                            <p className="text-base font-bold text-[#00272B]">{deliveryLabel(key)}</p>
+                            <p className="text-sm text-gray-600">{deliveryDelay(key)}</p>
                           </div>
                         </div>
                         <p className="text-xl font-bold text-[#00272B]">
-                          {option.price === 0 ? (
+                          {fee === 0 ? (
                             <span className="text-[#1AAA3F]">{t('checkout.delivery.free')}</span>
                           ) : (
-                            `${option.price.toLocaleString('fr-FR')} FCFA`
+                            `${fee.toLocaleString('fr-FR')} FCFA`
                           )}
                         </p>
                       </button>
-                    ))}
+                      );
+                    })}
                   </div>
 
                   <div className="flex space-x-4">
@@ -543,7 +528,7 @@ export default function CheckoutPage() {
                       </button>
                     </div>
                     <p className="text-sm text-gray-700">
-                      {deliveryOptions[deliveryMode].label} - {deliveryOptions[deliveryMode].delay}
+                      {deliveryLabel(deliveryMode)} - {deliveryDelay(deliveryMode)}
                     </p>
                   </div>
 
@@ -559,7 +544,9 @@ export default function CheckoutPage() {
                       </button>
                     </div>
                     <p className="text-sm text-gray-700">
-                      {paymentMethod === 'wave' ? 'Wave - Paiement mobile' : 'Orange Money - WebPay'}
+                      {paymentMethod === 'wave'
+                        ? `Wave - ${t('checkout.payment.waveSubtitle')}`
+                        : `Orange Money - ${t('checkout.payment.orangeSubtitle')}`}
                     </p>
                   </div>
 
@@ -616,7 +603,7 @@ export default function CheckoutPage() {
                           <p className="text-sm font-semibold text-[#00272B] mb-1">
                             {item.product.name}
                           </p>
-                          <p className="text-xs text-gray-600 mb-2">Quantité: {item.quantity}</p>
+                          <p className="text-xs text-gray-600 mb-2">{t('checkout.summary.quantity', { count: item.quantity })}</p>
                           <p className="text-sm font-bold text-[#00272B]">
                             {lineTotal.toLocaleString('fr-FR')} FCFA
                           </p>
@@ -628,12 +615,23 @@ export default function CheckoutPage() {
 
                 {/* Price Breakdown */}
                 <div className="space-y-4 mb-6 pb-6 border-b border-gray-300">
+                  {promoNotice && (
+                    <p className="text-xs text-amber-700 bg-amber-50 border border-amber-100 rounded-lg p-3">{promoNotice}</p>
+                  )}
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-700">{t('checkout.summary.subtotal')}</span>
                     <span className="font-semibold text-[#00272B]">
-                      {subtotal.toLocaleString('fr-FR')} FCFA
+                      {totals.subtotal.toLocaleString('fr-FR')} FCFA
                     </span>
                   </div>
+                  {promo && totals.discount > 0 && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-700">{t('checkout.summary.discount', { code: promo.code })}</span>
+                      <span className="font-semibold text-[#1AAA3F]">
+                        -{totals.discount.toLocaleString('fr-FR')} FCFA
+                      </span>
+                    </div>
+                  )}
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-700">{t('checkout.summary.shipping')}</span>
                     <span className="font-semibold text-[#00272B]">
@@ -645,9 +643,9 @@ export default function CheckoutPage() {
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-700">{t('checkout.summary.vat')} (18%)</span>
+                    <span className="text-gray-700">{t('checkout.summary.vat')} ({config.taxRate} %)</span>
                     <span className="font-semibold text-[#00272B]">
-                      {tva.toLocaleString('fr-FR')} FCFA
+                      {totals.tax.toLocaleString('fr-FR')} FCFA
                     </span>
                   </div>
                 </div>
@@ -656,7 +654,7 @@ export default function CheckoutPage() {
                 <div className="flex justify-between mb-6">
                   <span className="text-xl font-bold text-[#00272B]">{t('checkout.summary.total')}</span>
                   <span className="text-3xl font-bold text-[#00272B]">
-                    {total.toLocaleString('fr-FR')} <span className="text-lg">FCFA</span>
+                    {totals.total.toLocaleString('fr-FR')} <span className="text-lg">FCFA</span>
                   </span>
                 </div>
 

@@ -15,12 +15,12 @@ export default function EntrepriseSettings({ settings, onSave }: Props) {
     app_country: settings.app_country || 'Sénégal',
     app_website: settings.app_website || '',
     app_description: settings.app_description || '',
-    tva_rate: settings.tva_rate || '18',
     currency: settings.currency || 'XOF',
     timezone: settings.timezone || 'Africa/Dakar',
   });
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -29,10 +29,13 @@ export default function EntrepriseSettings({ settings, onSave }: Props) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
+    setError(null);
     try {
       await onSave(form);
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Enregistrement impossible.');
     } finally {
       setSaving(false);
     }
@@ -128,27 +131,19 @@ export default function EntrepriseSettings({ settings, onSave }: Props) {
             <i className="ri-percent-line text-amber-600 text-lg"></i>
           </div>
           <div>
-            <h3 className="text-sm font-bold text-[#00272B]">Paramètres fiscaux</h3>
-            <p className="text-xs text-[#00272B]/40">TVA, devise et fuseau horaire</p>
+            <h3 className="text-sm font-bold text-[#00272B]">Devise et fuseau horaire</h3>
+            <p className="text-xs text-[#00272B]/40">Le taux de TVA se règle dans l&apos;onglet « TVA &amp; livraison »</p>
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <div>
-            <label className="block text-xs font-semibold text-[#00272B]/60 mb-1.5">Taux TVA (%)</label>
-            <input
-              type="number" name="tva_rate" value={form.tva_rate} onChange={handleChange} min="0" max="100"
-              className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:border-[#1AAA3F] text-[#00272B]"
-            />
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div>
             <label className="block text-xs font-semibold text-[#00272B]/60 mb-1.5">Devise</label>
             <select
               name="currency" value={form.currency} onChange={handleChange}
               className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:border-[#1AAA3F] text-[#00272B] cursor-pointer bg-white"
             >
+              {/* Wave et Orange Money n'encaissent qu'en francs CFA */}
               <option value="XOF">XOF - Franc CFA (BCEAO)</option>
-              <option value="EUR">EUR - Euro</option>
-              <option value="USD">USD - Dollar américain</option>
             </select>
           </div>
           <div>
@@ -166,6 +161,7 @@ export default function EntrepriseSettings({ settings, onSave }: Props) {
         </div>
       </div>
 
+      {error && <p className="text-sm text-red-600 text-right">{error}</p>}
       <div className="flex justify-end">
         <button
           type="submit" disabled={saving}

@@ -52,6 +52,10 @@ interface BackendOrder {
   payment_method?: string | null;
   payment_status?: string;
   shipping_address?: string | Record<string, unknown> | null;
+  delivery_mode?: 'pickup' | 'standard' | 'express' | null;
+  shipping_amount?: number | string;
+  promo_code?: string | null;
+  discount_amount?: number | string;
   notes?: string | null;
   created_at?: string;
   first_name?: string | null;
@@ -98,6 +102,10 @@ function normalizeOrder(raw: BackendOrder): Order {
     paiementStatut: toPaymentStatus(raw.payment_status),
     date: formatDate(raw.created_at),
     adresseLivraison: formatAddress(raw.shipping_address),
+    modeLivraison: raw.delivery_mode ?? undefined,
+    fraisLivraison: raw.shipping_amount != null ? toNumber(raw.shipping_amount) : undefined,
+    codePromo: raw.promo_code ?? undefined,
+    remise: raw.discount_amount != null ? toNumber(raw.discount_amount) : undefined,
     note: raw.notes ?? undefined,
   };
 }

@@ -1,15 +1,19 @@
 import { useState } from 'react';
 import { useSettings } from '../../../hooks/useSettings';
 import EntrepriseSettings from './components/EntrepriseSettings';
+import CommerceSettings from './components/CommerceSettings';
+import PromoCodesSettings from './components/PromoCodesSettings';
 import EmailSettings from './components/EmailSettings';
 import NotificationsSettings from './components/NotificationsSettings';
 import SecuritySettings from './components/SecuritySettings';
 import AdminsSettings from './components/AdminsSettings';
 
-type Tab = 'entreprise' | 'email' | 'notifications' | 'securite' | 'admins';
+type Tab = 'entreprise' | 'commerce' | 'promo' | 'email' | 'notifications' | 'securite' | 'admins';
 
 const tabs: { id: Tab; label: string; icon: string }[] = [
   { id: 'entreprise', label: 'Entreprise', icon: 'ri-building-line' },
+  { id: 'commerce', label: 'TVA & livraison', icon: 'ri-truck-line' },
+  { id: 'promo', label: 'Codes promo', icon: 'ri-coupon-3-line' },
   { id: 'email', label: 'Email & SMTP', icon: 'ri-mail-settings-line' },
   { id: 'notifications', label: 'Notifications', icon: 'ri-notification-line' },
   { id: 'securite', label: 'Sécurité', icon: 'ri-lock-line' },
@@ -18,7 +22,7 @@ const tabs: { id: Tab; label: string; icon: string }[] = [
 
 export default function ParametresPage() {
   const [activeTab, setActiveTab] = useState<Tab>('entreprise');
-  const { settings, admins, isLoading, updateSettings, createAdmin, toggleAdmin, deleteAdmin } = useSettings();
+  const { settings, admins, isLoading, error, refetch, updateSettings, createAdmin, toggleAdmin, deleteAdmin } = useSettings();
 
   if (isLoading) {
     return (
@@ -26,6 +30,19 @@ export default function ParametresPage() {
         <div className="flex flex-col items-center gap-3">
           <i className="ri-loader-4-line text-3xl text-[#1AAA3F] animate-spin"></i>
           <p className="text-sm text-[#00272B]/50">Chargement des paramètres…</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-red-50 border border-red-100 rounded-2xl p-6 flex items-start gap-3">
+        <i className="ri-error-warning-line text-red-500 text-xl"></i>
+        <div>
+          <p className="text-sm font-semibold text-red-700">Impossible de charger les paramètres</p>
+          <p className="text-xs text-red-600/80 mt-0.5">{error}</p>
+          <button onClick={refetch} className="mt-3 text-xs font-semibold text-red-700 underline cursor-pointer">Réessayer</button>
         </div>
       </div>
     );
@@ -58,6 +75,10 @@ export default function ParametresPage() {
         {activeTab === 'entreprise' && (
           <EntrepriseSettings settings={settings} onSave={updateSettings} />
         )}
+        {activeTab === 'commerce' && (
+          <CommerceSettings settings={settings} onSave={updateSettings} />
+        )}
+        {activeTab === 'promo' && <PromoCodesSettings />}
         {activeTab === 'email' && (
           <EmailSettings settings={settings} onSave={updateSettings} />
         )}

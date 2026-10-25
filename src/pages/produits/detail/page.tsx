@@ -6,6 +6,7 @@ import Footer from '../../home/components/Footer';
 import { useProduct, useProducts } from '../../../hooks/useProducts';
 import { LoadingState } from '../../../components/feature/AsyncState';
 import { useCart } from '../../../contexts/CartContext';
+import { useShopConfig } from '../../../hooks/useShopConfig';
 
 export default function ProductDetailPage() {
   const { t } = useTranslation();
@@ -15,6 +16,9 @@ export default function ProductDetailPage() {
   // Sert à résoudre les produits liés référencés par le détail
   const { products } = useProducts();
   const { addToCart } = useCart();
+  const { config } = useShopConfig();
+  const freeShippingFrom =
+    config.delivery.standard.enabled && config.freeShippingThreshold > 0 ? config.freeShippingThreshold : null;
 
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -299,7 +303,11 @@ export default function ProductDetailPage() {
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div className="flex items-center space-x-3 text-gray-600">
                   <i className="ri-truck-line text-xl text-[#1AAA3F]"></i>
-                  <span>{t('productDetail.freeShipping')}</span>
+                  <span>
+                    {freeShippingFrom
+                      ? t('productDetail.freeShipping', { amount: freeShippingFrom.toLocaleString('fr-FR') })
+                      : t('productDetail.deliveryChoice')}
+                  </span>
                 </div>
                 <div className="flex items-center space-x-3 text-gray-600">
                   <i className="ri-shield-check-line text-xl text-[#1AAA3F]"></i>

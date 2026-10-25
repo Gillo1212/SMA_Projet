@@ -1,4 +1,6 @@
 import { apiClient } from './apiClient';
+import { USE_MOCK, ENDPOINTS } from '../config/api';
+import type { PromoCode } from '../types/models';
 
 export interface AdminUser {
   id: number;
@@ -19,19 +21,85 @@ export interface CreateAdminData {
   role: string;
 }
 
+/** Champs d'un code promo, côté formulaire (null = pas de limite) */
+export interface PromoCodeInput {
+  code: string;
+  type: PromoCode['type'];
+  value: number;
+  minOrderAmount: number | null;
+  maxUses: number | null;
+  expiresAt: string | null;
+  isActive: boolean;
+}
+
+function normalizePromo(raw: Record<string, any>): PromoCode {
+  return {
+    id: Number(raw.id),
+    code: raw.code,
+    type: raw.type,
+    value: Number(raw.value),
+    minOrderAmount: raw.min_order_amount != null ? Number(raw.min_order_amount) : null,
+    maxUses: raw.max_uses != null ? Number(raw.max_uses) : null,
+    usesCount: Number(raw.uses_count ?? 0),
+    isActive: Boolean(Number(raw.is_active)),
+    expiresAt: raw.expires_at ?? null,
+    createdAt: raw.created_at,
+  };
+}
+
+function denormalizePromo(input: Partial<PromoCodeInput>) {
+  const out: Record<string, unknown> = {};
+  if (input.code !== undefined) out.code = input.code;
+  if (input.type !== undefined) out.type = input.type;
+  if (input.value !== undefined) out.value = input.value;
+  if (input.minOrderAmount !== undefined) out.min_order_amount = input.minOrderAmount;
+  if (input.maxUses !== undefined) out.max_uses = input.maxUses;
+  if (input.expiresAt !== undefined) out.expires_at = input.expiresAt;
+  if (input.isActive !== undefined) out.is_active = input.isActive;
+  return out;
+}
+
 export const settingsService = {
+  /**
+   * Paramètres de la plateforme. Avec l'API branchée, une erreur remonte :
+   * afficher des valeurs fictives laisserait croire qu'elles sont en vigueur.
+   */
   async getSettings(): Promise<Record<string, string>> {
-    try {
-      const data = await apiClient.get<{ success: boolean; settings: Record<string, string> }>('/settings');
-      return (data as { success: boolean; settings: Record<string, string> }).settings || {};
-    } catch {
+    if (USE_MOCK) {
       const { mockSettings } = await import('../mocks/settings');
       return mockSettings;
     }
+    const data = await apiClient.get<{ settings: Record<string, string> }>(ENDPOINTS.SETTINGS.LIST);
+    return data.settings ?? {};
   },
 
-  async updateSettings(updates: Record<string, string>): Promise<void> {
-    await apiClient.put('/settings', updates);
+  /** Enregistre un lot de paramètres ; renvoie l'ensemble à jour */
+  async updateSettings(updates: Record<string, string>): Promise<Record<string, string>> {
+    const data = await apiClient.put<{ settings: Record<string, string> }>(ENDPOINTS.SETTINGS.UPDATE, updates);
+    return data.settings ?? updates;
+  },
+
+  // ── Codes promo ──────────────────────────────────────────────────────────
+
+  async getPromoCodes(): Promise<PromoCode[]> {
+    const rows = await apiClient.get<Record<string, any>[]>(ENDPOINTS.PROMO_CODES.LIST);
+    return rows.map(normalizePromo);
+  },
+
+  async createPromoCode(input: PromoCodeInput): Promise<PromoCode> {
+    const raw = await apiClient.post<Record<string, any>>(ENDPOINTS.PROMO_CODES.CREATE, denormalizePromo(input));
+    return normalizePromo(raw);
+  },
+
+  async updatePromoCode(id: number, input: Partial<PromoCodeInput>): Promise<PromoCode> {
+    const raw = await apiClient.patch<Record<string, any>>(ENDPOINTS.PROMO_CODES.UPDATE(id), denormalizePromo(input));
+    return normalizePromo(raw);
+  },
+
+  /** Un code déjà utilisé est désactivé par le backend au lieu d'être supprimé */
+  async deletePromoCode(id: number): Promise<{ deactivated: boolean }> {
+    const res = await apiClient.delete<{ deactivated?: boolean }>(ENDPOINTS.PROMO_CODES.DELETE(id));
+    return { deactivated: Boolean(res?.deactivated) };
   },
 
   async getAdmins(): Promise<AdminUser[]> {

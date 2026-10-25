@@ -58,7 +58,12 @@ export interface InvoiceData {
   date: string;
   description: string;
   type: string;
+  /** Montant TTC */
   montant: number;
+  /** Montant HT enregistré sur la facture (recalculé depuis le TTC s'il manque) */
+  montantHT?: number;
+  /** Taux de TVA de la facture, en % */
+  tauxTVA?: number;
   statut: string;
   clientName: string;
   clientEmail?: string;
@@ -106,7 +111,8 @@ export function generateInvoicePDF(invoice: InvoiceData) {
   y = row(doc, 'Client', invoice.clientName, y, true);
   if (invoice.clientCompany) y = row(doc, 'Entreprise', invoice.clientCompany, y);
   if (invoice.clientEmail) y = row(doc, 'Email', invoice.clientEmail, y);
-  y = row(doc, 'Date de facturation', new Date(invoice.date).toLocaleDateString('fr-FR'), y);
+  // La date arrive déjà formatée (jj/mm/aaaa) : new Date() ne la lirait pas
+  y = row(doc, 'Date de facturation', invoice.date, y);
   y = row(doc, 'Type', invoice.type, y);
   y += 6;
 
@@ -120,11 +126,12 @@ export function generateInvoicePDF(invoice: InvoiceData) {
   doc.setTextColor(...DARK);
   doc.text('Description', 16, y + 5);
   doc.text('Montant HT', 130, y + 5);
-  doc.text('TVA (18%)', 156, y + 5);
+  const rate = invoice.tauxTVA ?? 18;
+  doc.text(`TVA (${rate.toLocaleString('fr-FR')}%)`, 156, y + 5);
   doc.text('Total TTC', 178, y + 5);
 
   y += 18;
-  const ht = Math.round(invoice.montant / 1.18);
+  const ht = invoice.montantHT || Math.round(invoice.montant / (1 + rate / 100));
   const tva = invoice.montant - ht;
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(60, 70, 70);

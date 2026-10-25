@@ -4,6 +4,8 @@
  */
 export default {
   checkout: {
+    backToCart: 'Back to cart',
+    promoRemoved: 'Code {{code}} no longer applies to this order and has been removed.',
     back: 'Back',
     edit: 'Edit',
     title: 'Complete my order',
@@ -37,15 +39,11 @@ export default {
       continue: 'Continue to delivery',
     },
 
-    account: {
-      title: 'Create a SMALIM account',
-      hint: 'Track your orders, access your invoices and quotes',
-      password: 'Password',
-      passwordPlaceholder: 'Min. 8 characters',
-      confirm: 'Confirm',
-      confirmPlaceholder: 'Repeat the password',
-      errorTooShort: 'The password must be at least 8 characters long.',
-      errorMismatch: 'The passwords do not match.',
+    login: {
+      title: 'Sign in to place your order',
+      hint: 'Your order is linked to your customer area, where you can track delivery and find your invoices. Your cart is kept.',
+      signIn: 'Sign in',
+      register: 'Create an account',
     },
 
     delivery: {
@@ -86,6 +84,8 @@ export default {
       vat: 'VAT',
       total: 'Total',
       secure: '100% secure payment',
+      quantity: 'Quantity: {{count}}',
+      discount: 'Discount ({{code}})',
     },
   },
 

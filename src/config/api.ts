@@ -112,7 +112,17 @@ export const ENDPOINTS = {
   SETTINGS: {
     LIST:   '/settings',
     UPDATE: '/settings',
+    /** Public : TVA et livraison, pour que le panier affiche le montant facturé */
+    PUBLIC: '/settings/public',
     ADMINS: '/settings/admins',
+  },
+
+  // ── Codes promo (back-office) ─────────────────────────────
+  PROMO_CODES: {
+    LIST:   '/promo-codes',
+    CREATE: '/promo-codes',
+    UPDATE: (id: number) => `/promo-codes/${id}`,
+    DELETE: (id: number) => `/promo-codes/${id}`,
   },
 
   // ── Paiements ─────────────────────────────────────────────

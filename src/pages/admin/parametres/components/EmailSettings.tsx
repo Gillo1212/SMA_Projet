@@ -57,7 +57,10 @@ export default function EmailSettings({ settings, onSave }: Props) {
           <i className="ri-information-line text-amber-600"></i>
         </div>
         <p className="text-xs text-amber-700 leading-relaxed">
-          Ces paramètres sont utilisés pour l&apos;envoi des emails de confirmation, de devis et de notifications. Pour Gmail, utilisez un <strong>mot de passe d&apos;application</strong> (pas votre mot de passe habituel).
+          <strong>Formulaire non relié pour l&apos;instant.</strong> L&apos;envoi des emails utilise la configuration du fichier
+          <code className="mx-1">.env</code> du serveur (<code>SMTP_HOST</code>, <code>SMTP_PORT</code>, <code>SMTP_USER</code>,
+          <code className="ml-1">SMTP_PASS</code>) : modifiez-la puis redémarrez le backend. Pour Gmail, utilisez un
+          <strong> mot de passe d&apos;application</strong> (pas votre mot de passe habituel).
         </p>
       </div>
 
@@ -149,7 +152,7 @@ export default function EmailSettings({ settings, onSave }: Props) {
 
       <div className="flex items-center justify-between">
         <button
-          type="button" onClick={handleTest} disabled={testStatus === 'testing'}
+          type="button" onClick={handleTest} disabled title="Non relié : la configuration SMTP est dans le .env du serveur"
           className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 text-sm font-medium rounded-lg text-[#00272B]/60 hover:bg-gray-50 transition-colors disabled:opacity-60 whitespace-nowrap cursor-pointer"
         >
           {testStatus === 'testing' && <i className="ri-loader-4-line animate-spin text-[#1AAA3F]"></i>}
@@ -160,7 +163,7 @@ export default function EmailSettings({ settings, onSave }: Props) {
         </button>
 
         <button
-          type="submit" disabled={saving}
+          type="submit" disabled title="Configuration SMTP gérée dans le fichier .env du serveur"
           className="flex items-center gap-2 px-6 py-2.5 bg-[#1AAA3F] text-white text-sm font-semibold rounded-lg hover:bg-[#148a33] transition-colors disabled:opacity-60 whitespace-nowrap cursor-pointer"
         >
           {saving ? <i className="ri-loader-4-line animate-spin"></i> : <i className="ri-save-line"></i>}

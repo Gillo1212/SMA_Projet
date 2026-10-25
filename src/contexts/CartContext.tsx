@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import type { Product } from '../types/models';
+import type { AppliedPromo, Product } from '../types/models';
 
 export interface CartItem {
   product: Product;
@@ -15,21 +15,37 @@ interface CartContextType {
   getTotalItems: () => number;
   getSubtotal: () => number;
   getDiscount: (productId: string, quantity: number) => number;
+  /** Code promo validé au panier, transmis à la commande par le checkout */
+  promo: AppliedPromo | null;
+  setPromo: (promo: AppliedPromo | null) => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 const CART_STORAGE_KEY = 'sma_cart';
+const PROMO_STORAGE_KEY = 'sma_cart_promo';
+
+function readStored<T>(key: string, fallback: T): T {
+  try {
+    const stored = localStorage.getItem(key);
+    return stored ? (JSON.parse(stored) as T) : fallback;
+  } catch {
+    return fallback;
+  }
+}
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>(() => {
-    const stored = localStorage.getItem(CART_STORAGE_KEY);
-    return stored ? JSON.parse(stored) : [];
-  });
+  const [items, setItems] = useState<CartItem[]>(() => readStored(CART_STORAGE_KEY, []));
+  const [promo, setPromo] = useState<AppliedPromo | null>(() => readStored(PROMO_STORAGE_KEY, null));
 
   useEffect(() => {
     localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
   }, [items]);
+
+  useEffect(() => {
+    if (promo) localStorage.setItem(PROMO_STORAGE_KEY, JSON.stringify(promo));
+    else localStorage.removeItem(PROMO_STORAGE_KEY);
+  }, [promo]);
 
   const addToCart = (product: Product, quantity: number) => {
     setItems(prevItems => {
@@ -68,6 +84,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const clearCart = () => {
     setItems([]);
+    setPromo(null);
   };
 
   const getTotalItems = () => {
@@ -104,6 +121,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
         getTotalItems,
         getSubtotal,
         getDiscount,
+        promo,
+        setPromo,
       }}
     >
       {children}

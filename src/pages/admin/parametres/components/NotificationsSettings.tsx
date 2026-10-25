@@ -50,6 +50,7 @@ export default function NotificationsSettings({ settings, onSave }: Props) {
   });
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const toggleNotif = (key: string) => {
     setForm(prev => ({ ...prev, [key]: prev[key] === '1' ? '0' : '1' }));
@@ -58,10 +59,13 @@ export default function NotificationsSettings({ settings, onSave }: Props) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
+    setError(null);
     try {
       await onSave(form);
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Enregistrement impossible.');
     } finally {
       setSaving(false);
     }
@@ -126,6 +130,7 @@ export default function NotificationsSettings({ settings, onSave }: Props) {
         </div>
       </div>
 
+      {error && <p className="text-sm text-red-600 text-right">{error}</p>}
       <div className="flex justify-end">
         <button
           type="submit" disabled={saving}

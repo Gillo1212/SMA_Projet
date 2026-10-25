@@ -4,6 +4,8 @@
  */
 export default {
   checkout: {
+    backToCart: 'Retour au panier',
+    promoRemoved: "Le code {{code}} ne s'applique plus à cette commande et a été retiré.",
     back: 'Retour',
     edit: 'Modifier',
     title: 'Finaliser ma commande',
@@ -37,15 +39,11 @@ export default {
       continue: 'Continuer vers la livraison',
     },
 
-    account: {
-      title: 'Créer un compte SMALIM',
-      hint: 'Suivez vos commandes, accédez à vos factures et devis',
-      password: 'Mot de passe',
-      passwordPlaceholder: 'Min. 8 caractères',
-      confirm: 'Confirmer',
-      confirmPlaceholder: 'Répétez le mot de passe',
-      errorTooShort: 'Le mot de passe doit contenir au moins 8 caractères.',
-      errorMismatch: 'Les mots de passe ne correspondent pas.',
+    login: {
+      title: 'Connectez-vous pour commander',
+      hint: 'Votre commande est rattachée à votre espace client : vous y suivez la livraison et retrouvez vos factures. Votre panier est conservé.',
+      signIn: 'Se connecter',
+      register: 'Créer un compte',
     },
 
     delivery: {
@@ -86,6 +84,8 @@ export default {
       vat: 'TVA',
       total: 'Total',
       secure: 'Paiement 100% sécurisé',
+      quantity: 'Quantité : {{count}}',
+      discount: 'Remise ({{code}})',
     },
   },
 

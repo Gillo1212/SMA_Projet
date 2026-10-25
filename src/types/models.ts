@@ -11,7 +11,8 @@ export interface AuthUser {
   id: string;
   name: string;
   email: string;
-  role: 'admin' | 'manager' | 'staff';
+  /** Rôles du backend (table admins) */
+  role: 'super_admin' | 'admin' | 'commercial';
   avatar?: string;
 }
 
@@ -134,6 +135,11 @@ export interface Order {
   paiementStatut?: PaymentStatus;
   date: string;
   adresseLivraison?: string;
+  /** Mode choisi au checkout (null pour les commandes antérieures) */
+  modeLivraison?: DeliveryMode;
+  fraisLivraison?: number;
+  codePromo?: string;
+  remise?: number;
   note?: string;
 }
 
@@ -239,6 +245,8 @@ export interface Invoice {
   /** Montant TTC */
   montant: number;
   montantHT: number;
+  /** Taux de TVA de la facture, en % */
+  tauxTVA?: number;
   statut: InvoiceStatus;
   dateEcheance?: string;
   commandeId?: string;
@@ -395,4 +403,39 @@ export interface QuoteListParams extends ListParams {
 export interface BlogListParams extends ListParams {
   category?: string;
   status?: BlogStatus;
+}
+
+// ── Boutique : règles de calcul d'une commande ─────────────────────────────
+
+export type DeliveryMode = 'pickup' | 'standard' | 'express';
+
+/** Renvoyé par GET /settings/public — mêmes règles que le calcul du backend */
+export interface ShopConfig {
+  /** Taux de TVA en %, ex. 18 */
+  taxRate: number;
+  currency: string;
+  delivery: Record<DeliveryMode, { enabled: boolean; fee: number }>;
+  /** Livraison standard offerte dès ce montant (remise déduite, hors TVA). 0 = désactivé */
+  freeShippingThreshold: number;
+}
+
+/** Code promo validé par l'API, appliqué au panier puis transmis à la commande */
+export interface AppliedPromo {
+  code: string;
+  type: 'percentage' | 'fixed';
+  value: number;
+}
+
+/** Code promo tel que géré dans le back-office */
+export interface PromoCode {
+  id: number;
+  code: string;
+  type: 'percentage' | 'fixed';
+  value: number;
+  minOrderAmount: number | null;
+  maxUses: number | null;
+  usesCount: number;
+  isActive: boolean;
+  expiresAt: string | null;
+  createdAt: string;
 }

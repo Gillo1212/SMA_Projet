@@ -111,6 +111,7 @@ interface BackendInvoice {
   order_id?: number | null;
   type: string;
   amount_ht: number | string;
+  tax_rate?: number | string;
   amount_ttc: number | string;
   status: string;
   due_date?: string | null;
@@ -179,6 +180,7 @@ function normalizeInvoice(raw: BackendInvoice): Invoice {
     description: raw.notes ?? (raw.order_id ? `Commande #${raw.order_id}` : 'Facture'),
     montant: toNumber(raw.amount_ttc),
     montantHT: toNumber(raw.amount_ht),
+    tauxTVA: raw.tax_rate != null ? toNumber(raw.tax_rate) : undefined,
     statut: INVOICE_STATUS[raw.status] ?? 'En attente',
     dateEcheance: raw.due_date ? formatDate(raw.due_date) : undefined,
     commandeId: raw.order_id ? String(raw.order_id) : undefined,

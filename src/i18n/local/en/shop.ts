@@ -49,7 +49,15 @@ export default {
     securePayment: '100% secure payment',
     emptyHint: 'Browse our catalogue of quality products to fill your cart.',
     apply: 'Apply',
-    invalidPromo: 'Invalid promo code.',
+    invalidPromo: 'Invalid or expired promo code.',
+    promoMinimum: 'The minimum order amount for this code has not been reached.',
+    itemCount_one: '{{count}} item in your cart',
+    itemCount_other: '{{count}} items in your cart',
+    volumeDiscount: '-{{discount}}% off',
+    shippingHint: 'You choose the delivery method at the next step.',
+    // <b> renders in bold
+    freeShippingProgress: 'Only <b>{{amount}} FCFA</b> more for free standard delivery!',
+    vat: 'VAT ({{rate}}%)',
     perUnit: '{{price}} FCFA / unit',
   },
 

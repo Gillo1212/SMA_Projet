@@ -1,57 +1,56 @@
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useTranslation, Trans } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../home/components/Navbar';
 import Footer from '../home/components/Footer';
 import { useCart } from '../../contexts/CartContext';
+import { useShopConfig } from '../../hooks/useShopConfig';
+import { shopService } from '../../services/shop.service';
+import { ApiError } from '../../services/apiClient';
+import { computeTotals, defaultDeliveryMode } from '../../utils/orderTotals';
+import type { AppliedPromo } from '../../types/models';
 
 export default function PanierPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { items, updateQuantity, removeFromCart, getSubtotal, getDiscount } = useCart();
+  const { items, updateQuantity, removeFromCart, getSubtotal, getDiscount, promo: appliedPromo, setPromo } = useCart();
+  const { config } = useShopConfig();
   const [promoCode, setPromoCode] = useState('');
-  const [appliedPromo, setAppliedPromo] = useState<{ code: string; discount: number } | null>(null);
   const [promoError, setPromoError] = useState('');
+  const [checkingPromo, setCheckingPromo] = useState(false);
 
-  const PROMO_CODES = {
-    'BIENVENUE10': 10,
-    'SMA2026': 15,
-    'FIRST20': 20,
-  };
+  // Le mode se choisit au checkout : le panier affiche la livraison par défaut
+  const mode = defaultDeliveryMode(config);
+  const totals = computeTotals(config, getSubtotal(), appliedPromo, mode);
+  const threshold = config.freeShippingThreshold;
+  const showFreeShippingProgress =
+    mode === 'standard' && threshold > 0 && totals.amountDue < threshold;
 
-  const TVA_RATE = 0.18;
-  const FREE_SHIPPING_THRESHOLD = 50000;
-
-  const subtotal = getSubtotal();
-  const promoDiscount = appliedPromo ? (subtotal * appliedPromo.discount) / 100 : 0;
-  const subtotalAfterPromo = subtotal - promoDiscount;
-  const shippingCost = subtotalAfterPromo >= FREE_SHIPPING_THRESHOLD ? 0 : 2500;
-  const tva = subtotalAfterPromo * TVA_RATE;
-  const total = subtotalAfterPromo + shippingCost + tva;
-
-  const handleApplyPromo = () => {
-    const upperCode = promoCode.toUpperCase();
-    if (PROMO_CODES[upperCode as keyof typeof PROMO_CODES]) {
-      setAppliedPromo({
-        code: upperCode,
-        discount: PROMO_CODES[upperCode as keyof typeof PROMO_CODES],
-      });
+  const handleApplyPromo = async () => {
+    setCheckingPromo(true);
+    setPromoError('');
+    try {
+      setPromo(await shopService.validatePromo(promoCode, totals.subtotal));
       setPromoCode('');
-      setPromoError('');
-    } else {
-      setPromoError(t('cart.invalidPromo'));
+    } catch (err) {
+      // 400 : minimum de commande non atteint ; 404 : code inconnu ou expiré
+      setPromoError(
+        err instanceof ApiError && err.status === 400 ? t('cart.promoMinimum') : t('cart.invalidPromo'),
+      );
+    } finally {
+      setCheckingPromo(false);
     }
   };
 
   const handleRemovePromo = () => {
-    setAppliedPromo(null);
+    setPromo(null);
   };
 
+  const promoLabel = (promo: AppliedPromo) =>
+    promo.type === 'percentage' ? `${promo.value} %` : `${promo.value.toLocaleString('fr-FR')} FCFA`;
+
   const handleCheckout = () => {
-    if (items.length === 0) {
-      alert('Votre panier est vide');
-      return;
-    }
+    if (items.length === 0) return;
     navigate('/checkout');
   };
 
@@ -91,7 +90,7 @@ export default function PanierPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
           <h1 className="text-3xl sm:text-5xl font-bold text-[#00272B] mb-3 sm:mb-4">{t('cart.title')}</h1>
           <p className="text-sm sm:text-base text-gray-600">
-            {items.length} article{items.length > 1 ? 's' : ''} dans votre panier
+            {t('cart.itemCount', { count: items.length })}
           </p>
         </div>
       </section>
@@ -181,7 +180,7 @@ export default function PanierPage() {
 
                           {discount > 0 && (
                             <div className="mt-2 inline-block px-3 py-1 bg-[#F6F3EC] text-[#1AAA3F] text-xs font-semibold rounded-lg">
-                              -{discount}% de réduction
+                              {t('cart.volumeDiscount', { discount })}
                             </div>
                           )}
                         </div>
@@ -236,10 +235,10 @@ export default function PanierPage() {
                     />
                     <button
                       onClick={handleApplyPromo}
-                      disabled={!promoCode}
+                      disabled={!promoCode || checkingPromo}
                       className="px-6 h-12 bg-[#00272B] text-white text-sm font-semibold rounded-lg hover:bg-[#003d42] transition-colors cursor-pointer disabled:bg-gray-300 disabled:cursor-not-allowed whitespace-nowrap"
                     >
-                      {t('cart.apply')}
+                      {checkingPromo ? <i className="ri-loader-4-line animate-spin"></i> : t('cart.apply')}
                     </button>
                   </div>
                   {promoError && (
@@ -253,7 +252,7 @@ export default function PanierPage() {
                       <div className="flex items-center space-x-2">
                         <i className="ri-checkbox-circle-fill text-[#1AAA3F]"></i>
                         <span className="text-sm font-semibold text-[#1AAA3F]">
-                          {appliedPromo.code} (-{appliedPromo.discount}%)
+                          {appliedPromo.code} (-{promoLabel(appliedPromo)})
                         </span>
                       </div>
                       <button
@@ -271,7 +270,7 @@ export default function PanierPage() {
                   <div className="flex justify-between text-base">
                     <span className="text-gray-700">{t('cart.subtotal')}</span>
                     <span className="font-semibold text-[#00272B]">
-                      {subtotal.toLocaleString('fr-FR')} FCFA
+                      {totals.subtotal.toLocaleString('fr-FR')} FCFA
                     </span>
                   </div>
 
@@ -279,38 +278,41 @@ export default function PanierPage() {
                     <div className="flex justify-between text-base">
                       <span className="text-gray-700">{t('cart.promoDiscount')}</span>
                       <span className="font-semibold text-[#1AAA3F]">
-                        -{promoDiscount.toLocaleString('fr-FR')} FCFA
+                        -{totals.discount.toLocaleString('fr-FR')} FCFA
                       </span>
                     </div>
                   )}
 
                   <div className="flex justify-between text-base">
-                    <span className="text-gray-700">{t('cart.shipping')}</span>
+                    <span className="text-gray-700">
+                      {t(`checkout.delivery.${mode}`)}
+                    </span>
                     <span className="font-semibold text-[#00272B]">
-                      {shippingCost === 0 ? (
+                      {totals.shipping === 0 ? (
                         <span className="text-[#1AAA3F]">{t('cart.free')}</span>
                       ) : (
-                        `${shippingCost.toLocaleString('fr-FR')} FCFA`
+                        `${(totals.shipping ?? 0).toLocaleString('fr-FR')} FCFA`
                       )}
                     </span>
                   </div>
+                  <p className="-mt-2 text-xs text-gray-500">{t('cart.shippingHint')}</p>
 
-                  {subtotalAfterPromo < FREE_SHIPPING_THRESHOLD && (
+                  {showFreeShippingProgress && (
                     <div className="p-3 bg-blue-50 rounded-lg">
                       <p className="text-xs text-blue-700">
-                        Plus que{' '}
-                        <strong>
-                          {(FREE_SHIPPING_THRESHOLD - subtotalAfterPromo).toLocaleString('fr-FR')} FCFA
-                        </strong>{' '}
-                        pour la livraison gratuite !
+                        <Trans
+                          i18nKey="cart.freeShippingProgress"
+                          values={{ amount: (threshold - totals.amountDue).toLocaleString('fr-FR') }}
+                          components={{ b: <strong /> }}
+                        />
                       </p>
                     </div>
                   )}
 
                   <div className="flex justify-between text-base">
-                    <span className="text-gray-700">TVA (18%)</span>
+                    <span className="text-gray-700">{t('cart.vat', { rate: config.taxRate })}</span>
                     <span className="font-semibold text-[#00272B]">
-                      {tva.toLocaleString('fr-FR')} FCFA
+                      {totals.tax.toLocaleString('fr-FR')} FCFA
                     </span>
                   </div>
                 </div>
@@ -319,7 +321,7 @@ export default function PanierPage() {
                 <div className="flex justify-between mb-8">
                   <span className="text-xl font-bold text-[#00272B]">{t('cart.total')}</span>
                   <span className="text-3xl font-bold text-[#00272B]">
-                    {total.toLocaleString('fr-FR')} <span className="text-lg">FCFA</span>
+                    {totals.total.toLocaleString('fr-FR')} <span className="text-lg">FCFA</span>
                   </span>
                 </div>
 

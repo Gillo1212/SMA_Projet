@@ -1,11 +1,18 @@
 import { useState, FormEvent, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useClientAuth } from '../../../contexts/ClientAuthContext';
 
 export default function ClientConnexionPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  // Retour après connexion (ex. le checkout) : chemin interne uniquement,
+  // pour ne jamais rediriger vers un site tiers
+  const redirectParam = searchParams.get('redirect') ?? '';
+  const redirectTo = redirectParam.startsWith('/') && !redirectParam.startsWith('//')
+    ? redirectParam
+    : '/espace-client';
   const { login, loginError, clearError, isAuthenticated, isLoading } = useClientAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -13,8 +20,8 @@ export default function ClientConnexionPage() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (!isLoading && isAuthenticated) navigate('/espace-client');
-  }, [isAuthenticated, isLoading, navigate]);
+    if (!isLoading && isAuthenticated) navigate(redirectTo);
+  }, [isAuthenticated, isLoading, navigate, redirectTo]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -22,7 +29,7 @@ export default function ClientConnexionPage() {
     setSubmitting(true);
     const ok = await login(email, password);
     setSubmitting(false);
-    if (ok) navigate('/espace-client');
+    if (ok) navigate(redirectTo);
   };
 
   return (

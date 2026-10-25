@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
 import { settingsService, AdminUser, CreateAdminData } from '../services/settings.service';
-import { mockSettings, mockAdmins } from '../mocks/settings';
 
 interface UseSettingsReturn {
   settings: Record<string, string>;
@@ -15,8 +14,8 @@ interface UseSettingsReturn {
 }
 
 export function useSettings(): UseSettingsReturn {
-  const [settings, setSettings] = useState<Record<string, string>>(mockSettings);
-  const [admins, setAdmins] = useState<AdminUser[]>(mockAdmins as AdminUser[]);
+  const [settings, setSettings] = useState<Record<string, string>>({});
+  const [admins, setAdmins] = useState<AdminUser[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [tick, setTick] = useState(0);
@@ -42,8 +41,8 @@ export function useSettings(): UseSettingsReturn {
   }, [tick]);
 
   const updateSettings = useCallback(async (data: Record<string, string>) => {
-    await settingsService.updateSettings(data);
-    setSettings(prev => ({ ...prev, ...data }));
+    const updated = await settingsService.updateSettings(data);
+    setSettings(prev => ({ ...prev, ...updated }));
   }, []);
 
   const createAdmin = useCallback(async (data: CreateAdminData) => {

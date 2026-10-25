@@ -49,7 +49,15 @@ export default {
     securePayment: 'Paiement 100% sécurisé',
     emptyHint: 'Découvrez notre catalogue de produits de qualité pour remplir votre panier.',
     apply: 'Appliquer',
-    invalidPromo: 'Code promo invalide.',
+    invalidPromo: 'Code promo invalide ou expiré.',
+    promoMinimum: "Le montant minimum de commande n'est pas atteint pour ce code.",
+    itemCount_one: '{{count}} article dans votre panier',
+    itemCount_other: '{{count}} articles dans votre panier',
+    volumeDiscount: '-{{discount}} % de réduction',
+    shippingHint: "Le mode de livraison se choisit à l'étape suivante.",
+    // <b> passe en gras
+    freeShippingProgress: 'Plus que <b>{{amount}} FCFA</b> pour la livraison standard offerte !',
+    vat: 'TVA ({{rate}} %)',
     perUnit: '{{price}} FCFA / unité',
   },
 
