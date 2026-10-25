@@ -47,6 +47,10 @@ export default {
     total: 'Total',
     checkout: 'Place order',
     securePayment: '100% secure payment',
+    emptyHint: 'Browse our catalogue of quality products to fill your cart.',
+    apply: 'Apply',
+    invalidPromo: 'Invalid promo code.',
+    perUnit: '{{price}} FCFA / unit',
   },
 
   blogDetail: {
@@ -55,6 +59,8 @@ export default {
     share: 'Share this article',
     recent: 'Recent articles',
     ctaTitle: 'Need a vending machine?',
+    ctaText: 'Contact us for a tailored assessment and a free quote.',
+    ctaButton: 'Contact us',
   },
 
   blogPage: {

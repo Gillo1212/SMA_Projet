@@ -14,6 +14,8 @@ export default {
     characteristicsTitle: 'Caractéristiques',
     featuresTitle: 'Fonctionnalités et avantages',
     similar: 'Machines similaires',
+    requestFreeQuote: 'Demander un devis gratuit',
+    addToCompare: 'Ajouter au comparateur',
 
     /** Libellés des clés de `machine.capacity` renvoyées par l'API */
     capacity: {

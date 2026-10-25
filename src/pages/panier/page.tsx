@@ -39,7 +39,7 @@ export default function PanierPage() {
       setPromoCode('');
       setPromoError('');
     } else {
-      setPromoError('Code promo invalide. Essayez BIENVENUE10 ou SMA2026.');
+      setPromoError(t('cart.invalidPromo'));
     }
   };
 
@@ -66,7 +66,7 @@ export default function PanierPage() {
             </div>
             <h1 className="text-4xl font-bold text-[#00272B] mb-4">{t('cart.empty')}</h1>
             <p className="text-base text-gray-600 mb-8 max-w-md mx-auto">
-              Découvrez notre catalogue de produits de qualité pour remplir votre panier.
+              {t('cart.emptyHint')}
             </p>
             <Link
               to="/produits"
@@ -197,7 +197,7 @@ export default function PanierPage() {
                             </p>
                           )}
                           <p className="text-xs text-gray-500 mt-1">
-                            {discountedPrice.toLocaleString('fr-FR')} FCFA / unité
+                            {t('cart.perUnit', { price: discountedPrice.toLocaleString('fr-FR') })}
                           </p>
                         </div>
                       </div>
@@ -239,7 +239,7 @@ export default function PanierPage() {
                       disabled={!promoCode}
                       className="px-6 h-12 bg-[#00272B] text-white text-sm font-semibold rounded-lg hover:bg-[#003d42] transition-colors cursor-pointer disabled:bg-gray-300 disabled:cursor-not-allowed whitespace-nowrap"
                     >
-                      Appliquer
+                      {t('cart.apply')}
                     </button>
                   </div>
                   {promoError && (

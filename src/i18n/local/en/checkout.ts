@@ -4,6 +4,8 @@
  */
 export default {
   checkout: {
+    back: 'Back',
+    edit: 'Edit',
     title: 'Complete my order',
 
     orderLabel: 'Order',
@@ -65,6 +67,8 @@ export default {
       orangeSubtitle: 'Secure WebPay',
       orangeHint: 'Secure Orange Money transaction',
       continue: 'Review my order',
+      waveRedirect: 'You will be redirected to Wave to complete your payment securely.',
+      orangeRedirect: 'You will be redirected to Orange Money WebPay to pay with your Orange Money account.',
     },
 
     review: {

@@ -180,13 +180,13 @@ export default function BlogDetailPage() {
                 <div className="mt-10 bg-gradient-to-br from-[#1AAA3F] to-[#158f35] rounded-2xl p-8 text-white">
                   <h3 className="text-2xl font-bold mb-3">{t('blogDetail.ctaTitle')}</h3>
                   <p className="text-base mb-6 opacity-90">
-                    Contactez-nous pour une étude personnalisée et un devis gratuit.
+                    {t('blogDetail.ctaText')}
                   </p>
                   <Link 
                     to="/contact"
                     className="inline-block w-full bg-white text-[#1AAA3F] px-6 py-3 rounded-lg font-semibold text-center hover:bg-gray-100 transition-colors whitespace-nowrap cursor-pointer"
                   >
-                    Nous contacter
+                    {t('blogDetail.ctaButton')}
                   </Link>
                 </div>
               </div>

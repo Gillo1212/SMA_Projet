@@ -67,10 +67,10 @@ export default function ContactPage() {
       <Navbar />
       
       <PageHero
-        eyebrow="Contactez-nous"
-        title="Parlons de"
-        titleAccent="votre projet"
-        subtitle="Notre équipe est à votre écoute pour répondre à vos questions et vous accompagner dans le choix et l'installation de vos machines."
+        eyebrow={t('contact.heroEyebrow')}
+        title={t('contact.heroTitle')}
+        titleAccent={t('contact.heroAccent')}
+        subtitle={t('contact.heroSubtitle')}
       />
 
       {/* Contact Info Cards */}
@@ -116,13 +116,13 @@ export default function ContactPage() {
             <div>
               <h2 className="text-2xl sm:text-4xl font-bold text-[#00272B] mb-3 sm:mb-4">{t('contact.formTitle')}</h2>
               <p className="text-base sm:text-lg text-[#4A4A4A] mb-6 sm:mb-8">
-                Remplissez le formulaire ci-dessous et nous vous répondrons dans les plus brefs délais.
+                {t('contact.formHint')}
               </p>
 
               <form id="contact-form" data-readdy-form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                   <label htmlFor="nom" className="block text-sm font-semibold text-[#00272B] mb-2">
-                    Nom complet *
+                    {t('contact.fullName')}
                   </label>
                   <input
                     type="text"
@@ -138,7 +138,7 @@ export default function ContactPage() {
 
                 <div>
                   <label htmlFor="email" className="block text-sm font-semibold text-[#00272B] mb-2">
-                    Email *
+                    {t('contact.emailLabel')}
                   </label>
                   <input
                     type="email"
@@ -154,7 +154,7 @@ export default function ContactPage() {
 
                 <div>
                   <label htmlFor="telephone" className="block text-sm font-semibold text-[#00272B] mb-2">
-                    Téléphone *
+                    {t('contact.phoneLabel')}
                   </label>
                   <input
                     type="tel"
@@ -170,7 +170,7 @@ export default function ContactPage() {
 
                 <div>
                   <label htmlFor="sujet" className="block text-sm font-semibold text-[#00272B] mb-2">
-                    Sujet *
+                    {t('contact.subject')}
                   </label>
                   <select
                     id="sujet"
@@ -191,7 +191,7 @@ export default function ContactPage() {
 
                 <div>
                   <label htmlFor="message" className="block text-sm font-semibold text-[#00272B] mb-2">
-                    Message *
+                    {t('contact.message')}
                   </label>
                   <textarea
                     id="message"
@@ -205,7 +205,7 @@ export default function ContactPage() {
                     placeholder={t('contact.messagePlaceholder')}
                   />
                   <p className="text-sm text-[#4A4A4A] mt-2">
-                    {formData.message.length}/500 caractères
+                    {t('contact.charCount', { count: formData.message.length })}
                   </p>
                 </div>
 
@@ -214,7 +214,7 @@ export default function ContactPage() {
                   disabled={isSubmitting}
                   className="w-full bg-[#1AAA3F] text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-[#158f35] transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed whitespace-nowrap cursor-pointer"
                 >
-                  {isSubmitting ? 'Envoi en cours...' : 'Envoyer le message'}
+                  {isSubmitting ? t('contact.sending') : t('contact.send')}
                 </button>
 
                 {submitStatus === 'success' && (
@@ -262,7 +262,7 @@ export default function ContactPage() {
                 <div className="mt-8 pt-8 border-t border-gray-200">
                   <h4 className="text-lg font-bold text-[#00272B] mb-4">{t('contact.support247')}</h4>
                   <p className="text-base text-[#4A4A4A] mb-3">
-                    Pour toute urgence technique, notre hotline est disponible 7 jours sur 7.
+                    {t('contact.hotlineHint')}
                   </p>
                   <div className="flex items-center gap-2 text-[#1AAA3F] font-semibold">
                     <i className="ri-phone-line text-xl"></i>
@@ -281,7 +281,7 @@ export default function ContactPage() {
                   allowFullScreen
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
-                  title="Localisation SMA Dakar"
+                  title={t('contact.mapTitle')}
                 ></iframe>
               </div>
             </div>
@@ -291,11 +291,11 @@ export default function ContactPage() {
 
       {/* CTA Section */}
       <CTABanner
-        badge="Réponse rapide"
-        title="Besoin d'une Réponse Rapide ?"
-        subtitle="Appelez-nous directement ou envoyez-nous un WhatsApp - notre équipe répond en moins de 2h."
+        badge={t('contact.ctaBadge')}
+        title={t('contact.ctaTitle')}
+        subtitle={t('contact.ctaSubtitle')}
         buttons={[
-          { label: 'Appeler maintenant', href: 'tel:+221331234567', icon: 'ri-phone-line', variant: 'white' },
+          { label: t('contact.ctaCall'), href: 'tel:+221331234567', icon: 'ri-phone-line', variant: 'white' },
           { label: 'WhatsApp', href: 'https://wa.me/221771234567', icon: 'ri-whatsapp-line', variant: 'whatsapp', isExternal: true },
         ]}
       />

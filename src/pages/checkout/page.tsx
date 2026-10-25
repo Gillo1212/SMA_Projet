@@ -375,7 +375,7 @@ export default function CheckoutPage() {
                       onClick={() => setCurrentStep(1)}
                       className="flex-1 h-14 border-2 border-gray-300 text-[#00272B] text-base font-semibold rounded-xl hover:bg-gray-50 transition-colors cursor-pointer whitespace-nowrap"
                     >
-                      Retour
+                      {t('checkout.back')}
                     </button>
                     <button
                       onClick={handleDeliverySubmit}
@@ -430,7 +430,7 @@ export default function CheckoutPage() {
                       {paymentMethod === 'wave' && (
                         <div className="p-4 bg-white rounded-lg border border-gray-200">
                           <p className="text-sm text-gray-600 mb-3">
-                            Vous serez redirigé vers Wave pour finaliser votre paiement de manière sécurisée.
+                            {t('checkout.payment.waveRedirect')}
                           </p>
                           <div className="flex items-center space-x-2 text-sm text-gray-500">
                             <i className="ri-shield-check-line text-[#1AAA3F]"></i>
@@ -476,7 +476,7 @@ export default function CheckoutPage() {
                       {paymentMethod === 'orange_money' && (
                         <div className="p-4 bg-white rounded-lg border border-gray-200">
                           <p className="text-sm text-gray-600 mb-3">
-                            Vous serez redirigé vers Orange Money WebPay pour effectuer le paiement avec votre compte Orange Money.
+                            {t('checkout.payment.orangeRedirect')}
                           </p>
                           <div className="flex items-center space-x-2 text-sm text-gray-500">
                             <i className="ri-shield-check-line text-[#1AAA3F]"></i>
@@ -492,7 +492,7 @@ export default function CheckoutPage() {
                       onClick={() => setCurrentStep(2)}
                       className="flex-1 h-14 border-2 border-gray-300 text-[#00272B] text-base font-semibold rounded-xl hover:bg-gray-50 transition-colors cursor-pointer whitespace-nowrap"
                     >
-                      Retour
+                      {t('checkout.back')}
                     </button>
                     <button
                       onClick={handlePaymentSubmit}
@@ -518,7 +518,7 @@ export default function CheckoutPage() {
                         onClick={() => setCurrentStep(1)}
                         className="text-sm text-[#1AAA3F] hover:underline cursor-pointer"
                       >
-                        Modifier
+                        {t('checkout.edit')}
                       </button>
                     </div>
                     <p className="text-sm text-gray-700">
@@ -539,7 +539,7 @@ export default function CheckoutPage() {
                         onClick={() => setCurrentStep(2)}
                         className="text-sm text-[#1AAA3F] hover:underline cursor-pointer"
                       >
-                        Modifier
+                        {t('checkout.edit')}
                       </button>
                     </div>
                     <p className="text-sm text-gray-700">
@@ -555,7 +555,7 @@ export default function CheckoutPage() {
                         onClick={() => setCurrentStep(3)}
                         className="text-sm text-[#1AAA3F] hover:underline cursor-pointer"
                       >
-                        Modifier
+                        {t('checkout.edit')}
                       </button>
                     </div>
                     <p className="text-sm text-gray-700">
@@ -576,7 +576,7 @@ export default function CheckoutPage() {
                       disabled={placingOrder}
                       className="flex-1 h-14 border-2 border-gray-300 text-[#00272B] text-base font-semibold rounded-xl hover:bg-gray-50 disabled:opacity-60 transition-colors cursor-pointer whitespace-nowrap"
                     >
-                      Retour
+                      {t('checkout.back')}
                     </button>
                     <button
                       onClick={handleFinalizeOrder}

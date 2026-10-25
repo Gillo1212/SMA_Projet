@@ -14,6 +14,8 @@ export default {
     characteristicsTitle: 'Characteristics',
     featuresTitle: 'Features and benefits',
     similar: 'Similar machines',
+    requestFreeQuote: 'Request a free quote',
+    addToCompare: 'Add to comparison',
 
     /** Labels for the `machine.capacity` keys returned by the API */
     capacity: {

@@ -171,14 +171,14 @@ export default function MachineDetailPage() {
                   className="w-full h-14 bg-[#00272B] text-white text-sm font-semibold rounded-md hover:bg-[#0D8C2E] transition-colors flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap"
                 >
                   <i className="ri-file-list-line text-lg"></i>
-                  Demander un devis gratuit
+                  {t('machineDetail.requestFreeQuote')}
                 </Link>
                 <Link 
                   to="/machines/comparateur"
                   className="w-full h-14 border border-[#00272B]/20 text-[#00272B] text-sm font-semibold rounded-md hover:border-[#00272B] transition-colors flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap"
                 >
                   <i className="ri-scales-line text-lg"></i>
-                  Ajouter au comparateur
+                  {t('machineDetail.addToCompare')}
                 </Link>
               </div>
 

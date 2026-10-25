@@ -47,6 +47,10 @@ export default {
     total: 'Total',
     checkout: 'Passer la commande',
     securePayment: 'Paiement 100% sécurisé',
+    emptyHint: 'Découvrez notre catalogue de produits de qualité pour remplir votre panier.',
+    apply: 'Appliquer',
+    invalidPromo: 'Code promo invalide.',
+    perUnit: '{{price}} FCFA / unité',
   },
 
   blogDetail: {
@@ -55,6 +59,8 @@ export default {
     share: 'Partager cet article',
     recent: 'Articles récents',
     ctaTitle: "Besoin d'un distributeur ?",
+    ctaText: 'Contactez-nous pour une étude personnalisée et un devis gratuit.',
+    ctaButton: 'Nous contacter',
   },
 
   blogPage: {
