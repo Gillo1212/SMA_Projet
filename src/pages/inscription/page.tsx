@@ -1,5 +1,32 @@
 import { useState, FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { authService } from '../../services/auth.service';
+import { ApiError } from '../../services/apiClient';
+
+const STEP1_FIELDS = ['email', 'phone', 'first_name', 'last_name'];
+
+/**
+ * Traduit une erreur de l'API d'inscription en message affichable.
+ * Le backend renvoie 409 si l'email existe, ou 400 avec
+ * `errors: [{ field, message }]` si la validation échoue.
+ */
+function parseRegisterError(err: unknown): { message: string; fields: string[] } {
+  if (!(err instanceof ApiError)) {
+    return { message: 'Impossible de joindre le serveur. Réessayez dans un instant.', fields: [] };
+  }
+  if (err.status === 409) return { message: err.message, fields: ['email'] };
+
+  const details = Array.isArray(err.errors)
+    ? (err.errors as { field?: string; message?: string }[])
+    : [];
+  if (details.length > 0) {
+    return {
+      message: details.map(d => d.message).filter(Boolean).join(' · '),
+      fields: details.map(d => d.field ?? ''),
+    };
+  }
+  return { message: err.message, fields: [] };
+}
 
 interface RegisterForm {
   firstName: string;
@@ -52,15 +79,33 @@ export default function InscriptionPage() {
       setError('Les mots de passe ne correspondent pas.');
       return;
     }
+    if (form.password.length < 8) {
+      setError('Le mot de passe doit contenir au moins 8 caractères.');
+      return;
+    }
     if (strength < 2) {
       setError('Votre mot de passe est trop faible.');
       return;
     }
     setLoading(true);
-    // TODO: call POST /api/auth/client/register
-    await new Promise(r => setTimeout(r, 1500));
-    setLoading(false);
-    navigate('/confirmation-email', { state: { email: form.email } });
+    try {
+      await authService.clientRegister({
+        firstName: form.firstName.trim(),
+        lastName:  form.lastName.trim(),
+        email:     form.email.trim(),
+        phone:     form.phone.trim(),
+        company:   form.company.trim(),
+        password:  form.password,
+      });
+      navigate('/confirmation-email', { state: { email: form.email.trim() } });
+    } catch (err) {
+      const { message, fields } = parseRegisterError(err);
+      setError(message);
+      // Email déjà pris ou champ invalide de l'étape 1 : on y ramène l'utilisateur
+      if (fields.some(f => STEP1_FIELDS.includes(f))) setStep(1);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

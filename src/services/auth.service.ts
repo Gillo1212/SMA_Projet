@@ -20,6 +20,15 @@ import {
 } from '../config/api';
 import type { AuthUser, LoginCredentials, LoginResponse } from '../types/models';
 
+export interface ClientRegisterData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+  company?: string;
+  password: string;
+}
+
 // ── Mock data ──────────────────────────────────────────────────────────────
 
 const MOCK_ADMIN: AuthUser = {
@@ -110,6 +119,28 @@ export const authService = {
         refreshToken: res.refreshToken,
       },
     };
+  },
+
+  /**
+   * Inscription Client
+   * @endpoint POST /auth/client/register
+   * Le backend crée le compte et envoie l'email de confirmation d'adresse.
+   * Le client se connecte ensuite normalement : le token renvoyé n'est pas conservé.
+   */
+  async clientRegister(data: ClientRegisterData): Promise<string> {
+    if (USE_MOCK) {
+      await delay(MOCK_DELAY);
+      return 'Compte créé avec succès';
+    }
+    const res = await apiClient.post<{ message: string }>(ENDPOINTS.AUTH.CLIENT_REGISTER, {
+      first_name:   data.firstName,
+      last_name:    data.lastName,
+      email:        data.email,
+      phone:        data.phone || undefined,
+      company_name: data.company || undefined,
+      password:     data.password,
+    });
+    return res.message;
   },
 
   /**
