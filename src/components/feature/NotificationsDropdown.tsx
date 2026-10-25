@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import type { AppNotification } from '../../hooks/useNotifications';
 
 interface NotificationsDropdownProps {
@@ -23,6 +24,7 @@ export default function NotificationsDropdown({
   onMarkAllRead,
   onMarkRead,
 }: NotificationsDropdownProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [localNotifs, setLocalNotifs] = useState<AppNotification[]>(notifications);
   const ref = useRef<HTMLDivElement>(null);
@@ -67,7 +69,7 @@ export default function NotificationsDropdown({
       <button
         onClick={() => setOpen(v => !v)}
         className="relative w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-[#00272B]/60 hover:bg-gray-50 cursor-pointer transition-colors"
-        aria-label="Notifications"
+        aria-label={t('clientPortal.notifications.title')}
       >
         <i className="ri-notification-3-line text-base"></i>
         {unreadCount > 0 && (
@@ -83,10 +85,10 @@ export default function NotificationsDropdown({
           {/* Header */}
           <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-bold text-[#00272B]">Notifications</span>
+              <span className="text-sm font-bold text-[#00272B]">{t('clientPortal.notifications.title')}</span>
               {unreadCount > 0 && (
                 <span className="px-2 py-0.5 bg-[#1AAA3F]/10 text-[#1AAA3F] text-xs font-semibold rounded-full">
-                  {unreadCount} nouvelles
+                  {t('clientPortal.notifications.unread', { count: unreadCount })}
                 </span>
               )}
             </div>
@@ -95,7 +97,7 @@ export default function NotificationsDropdown({
                 onClick={handleMarkAllRead}
                 className="text-xs text-[#1AAA3F] hover:underline cursor-pointer font-medium"
               >
-                Tout marquer comme lu
+                {t('clientPortal.notifications.markAllRead')}
               </button>
             )}
           </div>
@@ -107,7 +109,7 @@ export default function NotificationsDropdown({
                 <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-3">
                   <i className="ri-notification-off-line text-gray-400 text-xl"></i>
                 </div>
-                <p className="text-sm text-[#00272B]/40 text-center">Aucune notification</p>
+                <p className="text-sm text-[#00272B]/40 text-center">{t('clientPortal.notifications.empty')}</p>
               </div>
             ) : (
               localNotifs.map(notif => {
@@ -145,7 +147,7 @@ export default function NotificationsDropdown({
           {localNotifs.length > 0 && (
             <div className="px-5 py-3 border-t border-gray-100 bg-gray-50">
               <p className="text-xs text-center text-[#00272B]/40">
-                {localNotifs.filter(n => n.read).length} notification(s) déjà lue(s)
+                {t('clientPortal.notifications.alreadyRead', { count: localNotifs.filter(n => n.read).length })}
               </p>
             </div>
           )}

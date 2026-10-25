@@ -1,21 +1,25 @@
 import { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import ClientSidebar from './components/ClientSidebar';
 import { useClientAuth } from '../../contexts/ClientAuthContext';
 import NotificationsDropdown from '../../components/feature/NotificationsDropdown';
 import { useClientNotifications } from '../../hooks/useNotifications';
+import LanguageSwitcher from '../../components/feature/LanguageSwitcher';
 
+/** Clé de titre (clientPortal.titles.*) par route */
 const pageTitles: Record<string, string> = {
-  '/espace-client': 'Tableau de bord',
-  '/espace-client/commandes': 'Mes commandes',
-  '/espace-client/devis': 'Mes devis',
-  '/espace-client/machines': 'Mes machines',
-  '/espace-client/factures': 'Factures & Documents',
-  '/espace-client/support': 'Support & SAV',
-  '/espace-client/profil': 'Mon profil',
+  '/espace-client': 'dashboard',
+  '/espace-client/commandes': 'orders',
+  '/espace-client/devis': 'quotes',
+  '/espace-client/machines': 'machines',
+  '/espace-client/factures': 'invoices',
+  '/espace-client/support': 'support',
+  '/espace-client/profil': 'profile',
 };
 
 export default function ClientLayout() {
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const { isAuthenticated, isLoading } = useClientAuth();
@@ -40,7 +44,7 @@ export default function ClientLayout() {
   }
   if (!isAuthenticated) return null;
 
-  const pageTitle = pageTitles[location.pathname] ?? 'Espace Client';
+  const pageTitle = t(`clientPortal.titles.${pageTitles[location.pathname] ?? 'default'}`);
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#F5F7F5]">
@@ -65,6 +69,7 @@ export default function ClientLayout() {
             {/* Mobile hamburger */}
             <button
               onClick={() => setSidebarOpen(true)}
+              aria-label={t('clientPortal.nav.openMenu')}
               className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-[#00272B]/60 hover:bg-gray-50 cursor-pointer lg:hidden flex-shrink-0"
             >
               <i className="ri-menu-line text-xl"></i>
@@ -72,11 +77,12 @@ export default function ClientLayout() {
             <div>
               <h2 className="text-base sm:text-lg font-bold text-[#00272B]">{pageTitle}</h2>
               <p className="text-xs text-[#00272B]/40 mt-0.5 hidden sm:block">
-                {new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                {new Date().toLocaleDateString(i18n.language, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <LanguageSwitcher />
             <NotificationsDropdown
               notifications={notifications}
               onMarkRead={markAsRead}

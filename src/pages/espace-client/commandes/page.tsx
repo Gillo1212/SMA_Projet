@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useOrders, useOrder } from '../../../hooks/useOrders';
 import { LoadingState, ErrorState } from '../../../components/feature/AsyncState';
+import { useTranslation } from 'react-i18next';
+import { useStatusLabels } from '../../../i18n/useStatusLabels';
 
 const statusColors: Record<string, string> = {
   'En attente': 'bg-amber-50 text-amber-700 border-amber-200',
@@ -15,20 +17,23 @@ const statusColors: Record<string, string> = {
 
 // Étapes du tunnel affichées dans le suivi (hors annulation / remboursement)
 const steps = ['En attente', 'Confirmée', 'En préparation', 'Expédiée', 'Livrée'];
+const ALL = 'all';
 
 export default function ClientCommandesPage() {
+  const { t } = useTranslation();
+  const status = useStatusLabels();
   const { orders, isLoading, error, refetch } = useOrders();
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [filter, setFilter] = useState('Tous');
+  const [filter, setFilter] = useState(ALL);
 
   // Le détail porte les lignes de commande, absentes de la liste
   const { order: detail, isLoading: detailLoading } = useOrder(selectedId);
 
-  if (isLoading) return <LoadingState label="Chargement de vos commandes…" />;
+  if (isLoading) return <LoadingState label={t('clientPortal.orders.loading')} />;
   if (error) return <ErrorState message={error} onRetry={refetch} />;
 
-  const filters = ['Tous', ...steps, 'Annulée'];
-  const filtered = filter === 'Tous' ? orders : orders.filter(o => o.statut === filter);
+  const filters = [ALL, ...steps, 'Annulée'];
+  const filtered = filter === ALL ? orders : orders.filter(o => o.statut === filter);
 
   const selected = detail ?? orders.find(o => o.id === selectedId) ?? null;
   const stepIndex = selected ? steps.indexOf(selected.statut) : -1;
@@ -38,7 +43,7 @@ export default function ClientCommandesPage() {
       {/* List */}
       <div className={`flex-1 min-w-0 bg-white rounded-2xl border border-gray-100 flex flex-col ${selected ? 'xl:max-w-xl' : ''}`}>
         <div className="p-5 border-b border-gray-100">
-          <h3 className="text-sm font-bold text-[#00272B] mb-3">Historique des commandes</h3>
+          <h3 className="text-sm font-bold text-[#00272B] mb-3">{t('clientPortal.orders.history')}</h3>
           <div className="flex gap-2 flex-wrap">
             {filters.map(f => (
               <button
@@ -46,7 +51,7 @@ export default function ClientCommandesPage() {
                 onClick={() => setFilter(f)}
                 className={`px-3 py-1.5 text-xs font-medium rounded-lg cursor-pointer transition-all whitespace-nowrap ${filter === f ? 'bg-[#1AAA3F] text-white' : 'bg-gray-100 text-[#00272B]/60 hover:bg-gray-200'}`}
               >
-                {f}
+                {f === ALL ? t('clientPortal.common.all') : status.order(f)}
               </button>
             ))}
           </div>
@@ -63,7 +68,7 @@ export default function ClientCommandesPage() {
                   <p className="text-sm font-bold text-[#00272B]">{order.reference}</p>
                   <p className="text-xs text-[#00272B]/40">{order.date} · {order.paiement}</p>
                 </div>
-                <span className={`text-xs font-medium px-2.5 py-1 rounded-full border flex-shrink-0 ml-2 ${statusColors[order.statut]}`}>{order.statut}</span>
+                <span className={`text-xs font-medium px-2.5 py-1 rounded-full border flex-shrink-0 ml-2 ${statusColors[order.statut]}`}>{status.order(order.statut)}</span>
               </div>
               <p className="text-xs text-[#00272B]/60 truncate">{order.produits || '-'}</p>
               <p className="text-sm font-bold text-[#00272B] mt-1">{order.montant.toLocaleString('fr-FR')} FCFA</p>
@@ -72,7 +77,7 @@ export default function ClientCommandesPage() {
           {filtered.length === 0 && (
             <div className="p-12 text-center">
               <i className="ri-shopping-bag-line text-3xl text-[#00272B]/20"></i>
-              <p className="text-sm text-[#00272B]/40 mt-2">Aucune commande</p>
+              <p className="text-sm text-[#00272B]/40 mt-2">{t('clientPortal.orders.empty')}</p>
             </div>
           )}
         </div>
@@ -82,14 +87,14 @@ export default function ClientCommandesPage() {
       {selected && (
         <div className="w-96 flex-shrink-0 bg-white rounded-2xl border border-gray-100 p-6 space-y-5">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-[#00272B]">Suivi de commande</h3>
+            <h3 className="text-sm font-bold text-[#00272B]">{t('clientPortal.orders.tracking')}</h3>
             <button onClick={() => setSelectedId(null)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 cursor-pointer text-[#00272B]/40">
               <i className="ri-close-line"></i>
             </button>
           </div>
 
           <div className="p-3 bg-gray-50 rounded-xl">
-            <p className="text-xs text-[#00272B]/40 mb-0.5">Commande</p>
+            <p className="text-xs text-[#00272B]/40 mb-0.5">{t('clientPortal.orders.order')}</p>
             <p className="text-sm font-bold text-[#00272B]">{selected.reference}</p>
             <p className="text-xs text-[#00272B]/50">{selected.date}</p>
           </div>
@@ -97,7 +102,7 @@ export default function ClientCommandesPage() {
           {/* Progress tracker */}
           {selected.statut !== 'Annulée' && (
             <div>
-              <p className="text-xs font-semibold text-[#00272B]/40 uppercase tracking-wide mb-4">Progression</p>
+              <p className="text-xs font-semibold text-[#00272B]/40 uppercase tracking-wide mb-4">{t('clientPortal.orders.progress')}</p>
               <div className="space-y-0">
                 {steps.map((s, i) => {
                   const done = i < stepIndex;
@@ -122,8 +127,8 @@ export default function ClientCommandesPage() {
                         )}
                       </div>
                       <div className="pt-1 pb-8 last:pb-0">
-                        <p className={`text-sm font-semibold ${current ? 'text-[#1AAA3F]' : future ? 'text-[#00272B]/30' : 'text-[#00272B]'}`}>{s}</p>
-                        {current && <p className="text-xs text-[#1AAA3F]/70 mt-0.5">Étape actuelle</p>}
+                        <p className={`text-sm font-semibold ${current ? 'text-[#1AAA3F]' : future ? 'text-[#00272B]/30' : 'text-[#00272B]'}`}>{status.order(s)}</p>
+                        {current && <p className="text-xs text-[#1AAA3F]/70 mt-0.5">{t('clientPortal.orders.currentStep')}</p>}
                       </div>
                     </div>
                   );
@@ -134,33 +139,33 @@ export default function ClientCommandesPage() {
 
           {/* Items */}
           <div>
-            <p className="text-xs font-semibold text-[#00272B]/40 uppercase tracking-wide mb-3">Produits commandés</p>
+            <p className="text-xs font-semibold text-[#00272B]/40 uppercase tracking-wide mb-3">{t('clientPortal.orders.items')}</p>
             {detailLoading ? (
-              <p className="text-xs text-[#00272B]/40">Chargement du détail…</p>
+              <p className="text-xs text-[#00272B]/40">{t('clientPortal.orders.loadingDetail')}</p>
             ) : selected.items?.length ? (
               <div className="space-y-2">
                 {selected.items.map((item, i) => (
                   <div key={i} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
                     <div className="flex-1 min-w-0 mr-2">
                       <p className="text-xs font-medium text-[#00272B] truncate">{item.name}</p>
-                      <p className="text-xs text-[#00272B]/40">x{item.quantity} · {item.unitPrice.toLocaleString('fr-FR')} F/u</p>
+                      <p className="text-xs text-[#00272B]/40">x{item.quantity} · {item.unitPrice.toLocaleString('fr-FR')} {t('clientPortal.orders.perUnit')}</p>
                     </div>
                     <p className="text-xs font-bold text-[#00272B]">{(item.quantity * item.unitPrice).toLocaleString('fr-FR')} F</p>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-xs text-[#00272B]/40">{selected.produits || 'Détail indisponible'}</p>
+              <p className="text-xs text-[#00272B]/40">{selected.produits || t('clientPortal.orders.detailUnavailable')}</p>
             )}
             <div className="flex justify-between items-center mt-3 pt-3 border-t border-gray-100">
-              <p className="text-sm font-bold text-[#00272B]">Total</p>
+              <p className="text-sm font-bold text-[#00272B]">{t('clientPortal.common.total')}</p>
               <p className="text-sm font-bold text-[#1AAA3F]">{selected.montant.toLocaleString('fr-FR')} FCFA</p>
             </div>
           </div>
 
           {selected.adresseLivraison && (
             <div className="p-3 bg-gray-50 rounded-xl">
-              <p className="text-xs text-[#00272B]/40 mb-0.5">Livraison prévue à</p>
+              <p className="text-xs text-[#00272B]/40 mb-0.5">{t('clientPortal.orders.deliveryTo')}</p>
               <p className="text-sm font-medium text-[#00272B]">{selected.adresseLivraison}</p>
             </div>
           )}
@@ -170,7 +175,7 @@ export default function ClientCommandesPage() {
             className="w-full flex items-center justify-center gap-2 py-2.5 border border-[#1AAA3F] text-[#1AAA3F] text-sm font-semibold rounded-xl hover:bg-[#1AAA3F]/5 cursor-pointer transition-all whitespace-nowrap"
           >
             <i className="ri-bill-line"></i>
-            Voir mes factures
+            {t('clientPortal.orders.seeInvoices')}
           </Link>
         </div>
       )}

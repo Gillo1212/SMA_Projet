@@ -1,5 +1,7 @@
 import { useClientMachines } from '../../../hooks/useClientPortal';
 import { LoadingState, ErrorState, EmptyState } from '../../../components/feature/AsyncState';
+import { useTranslation } from 'react-i18next';
+import { useStatusLabels } from '../../../i18n/useStatusLabels';
 
 const statusColors: Record<string, { dot: string; badge: string }> = {
   'Opérationnelle': { dot: 'bg-emerald-500', badge: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
@@ -8,9 +10,11 @@ const statusColors: Record<string, { dot: string; badge: string }> = {
 };
 
 export default function ClientMachinesPage() {
+  const { t, i18n } = useTranslation();
+  const status = useStatusLabels();
   const { machines, isLoading, error, refetch } = useClientMachines();
 
-  if (isLoading) return <LoadingState label="Chargement de votre parc…" />;
+  if (isLoading) return <LoadingState label={t('clientPortal.machines.loading')} />;
   if (error) return <ErrorState message={error} onRetry={refetch} />;
 
   const operational = machines.filter(m => m.statut === 'Opérationnelle').length;
@@ -20,9 +24,9 @@ export default function ClientMachinesPage() {
       {/* Summary */}
       <div className="grid grid-cols-3 gap-4">
         {[
-          { label: 'Machines installées', value: machines.length, icon: 'ri-settings-2-line', color: 'text-[#1AAA3F]', bg: 'bg-[#1AAA3F]/10' },
-          { label: 'Opérationnelles', value: operational, icon: 'ri-checkbox-circle-line', color: 'text-emerald-600', bg: 'bg-emerald-50' },
-          { label: 'Total ventes cumulées', value: machines.reduce((s, m) => s + m.totalVentes, 0).toLocaleString('fr-FR'), icon: 'ri-bar-chart-line', color: 'text-sky-600', bg: 'bg-sky-50' },
+          { label: t('clientPortal.machines.installed'), value: machines.length, icon: 'ri-settings-2-line', color: 'text-[#1AAA3F]', bg: 'bg-[#1AAA3F]/10' },
+          { label: t('clientPortal.machines.operational'), value: operational, icon: 'ri-checkbox-circle-line', color: 'text-emerald-600', bg: 'bg-emerald-50' },
+          { label: t('clientPortal.machines.totalSales'), value: machines.reduce((s, m) => s + m.totalVentes, 0).toLocaleString('fr-FR'), icon: 'ri-bar-chart-line', color: 'text-sky-600', bg: 'bg-sky-50' },
         ].map((s, i) => (
           <div key={i} className="bg-white rounded-xl p-5 border border-gray-100 flex items-center gap-4">
             <div className={`w-11 h-11 ${s.bg} rounded-xl flex items-center justify-center flex-shrink-0`}>
@@ -40,8 +44,8 @@ export default function ClientMachinesPage() {
       {machines.length === 0 ? (
         <EmptyState
           icon="ri-settings-2-line"
-          title="Aucune machine installée"
-          description="Vos machines installées par SMALIM apparaîtront ici."
+          title={t('clientPortal.machines.emptyTitle')}
+          description={t('clientPortal.machines.emptyHint')}
         />
       ) : (
       <div className="grid xl:grid-cols-3 gap-5">
@@ -65,7 +69,7 @@ export default function ClientMachinesPage() {
                 <div className="absolute top-3 right-3">
                   <span className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-semibold ${sc.badge}`}>
                     <div className={`w-1.5 h-1.5 ${sc.dot} rounded-full`}></div>
-                    {machine.statut}
+                    {status.machine(machine.statut)}
                   </span>
                 </div>
               </div>
@@ -83,11 +87,11 @@ export default function ClientMachinesPage() {
 
                 <div className="grid grid-cols-2 gap-3">
                   <div className="p-3 bg-gray-50 rounded-xl">
-                    <p className="text-xs text-[#00272B]/40 mb-0.5">Ventes totales</p>
+                    <p className="text-xs text-[#00272B]/40 mb-0.5">{t('clientPortal.machines.sales')}</p>
                     <p className="text-sm font-bold text-[#00272B]">{machine.totalVentes.toLocaleString('fr-FR')}</p>
                   </div>
                   <div className="p-3 bg-gray-50 rounded-xl">
-                    <p className="text-xs text-[#00272B]/40 mb-0.5">N° de série</p>
+                    <p className="text-xs text-[#00272B]/40 mb-0.5">{t('clientPortal.machines.serialNumber')}</p>
                     <p className="text-sm font-bold text-[#00272B] truncate">{machine.numeroSerie ?? '-'}</p>
                   </div>
                 </div>
@@ -99,11 +103,11 @@ export default function ClientMachinesPage() {
                     </div>
                     <p className={`text-xs font-medium ${maintenanceProche ? 'text-amber-700' : 'text-[#00272B]/50'}`}>
                       {maintenanceDate
-                        ? <>Prochaine maintenance : {maintenanceDate.toLocaleDateString('fr-FR')}</>
-                        : 'Maintenance non planifiée'}
+                        ? t('clientPortal.machines.nextMaintenance', { date: maintenanceDate.toLocaleDateString(i18n.language) })
+                        : t('clientPortal.machines.noMaintenance')}
                       {maintenanceProche && daysLeft !== null && (
                         <span className="ml-1">
-                          {daysLeft < 0 ? '(en retard)' : `(dans ${daysLeft}j)`}
+                          {daysLeft < 0 ? t('clientPortal.machines.overdue') : t('clientPortal.machines.inDays', { count: daysLeft })}
                         </span>
                       )}
                     </p>
@@ -112,7 +116,7 @@ export default function ClientMachinesPage() {
 
                 {machine.dateInstallation && (
                   <div className="mt-3 text-xs text-[#00272B]/30">
-                    Installée le {new Date(machine.dateInstallation).toLocaleDateString('fr-FR')}
+                    {t('clientPortal.machines.installedOn', { date: new Date(machine.dateInstallation).toLocaleDateString(i18n.language) })}
                   </div>
                 )}
               </div>

@@ -1,14 +1,15 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useClientAuth } from '../../../contexts/ClientAuthContext';
 
 const navItems = [
-  { path: '/espace-client', icon: 'ri-dashboard-line', label: 'Tableau de bord', exact: true },
-  { path: '/espace-client/commandes', icon: 'ri-shopping-bag-line', label: 'Mes commandes' },
-  { path: '/espace-client/devis', icon: 'ri-file-list-3-line', label: 'Mes devis' },
-  { path: '/espace-client/machines', icon: 'ri-settings-2-line', label: 'Mes machines' },
-  { path: '/espace-client/factures', icon: 'ri-receipt-line', label: 'Factures' },
-  { path: '/espace-client/support', icon: 'ri-customer-service-2-line', label: 'Support & SAV' },
-  { path: '/espace-client/profil', icon: 'ri-user-settings-line', label: 'Mon profil' },
+  { path: '/espace-client', icon: 'ri-dashboard-line', label: 'dashboard', exact: true },
+  { path: '/espace-client/commandes', icon: 'ri-shopping-bag-line', label: 'orders' },
+  { path: '/espace-client/devis', icon: 'ri-file-list-3-line', label: 'quotes' },
+  { path: '/espace-client/machines', icon: 'ri-settings-2-line', label: 'machines' },
+  { path: '/espace-client/factures', icon: 'ri-receipt-line', label: 'invoices' },
+  { path: '/espace-client/support', icon: 'ri-customer-service-2-line', label: 'support' },
+  { path: '/espace-client/profil', icon: 'ri-user-settings-line', label: 'profile' },
 ];
 
 interface ClientSidebarProps {
@@ -16,6 +17,7 @@ interface ClientSidebarProps {
 }
 
 export default function ClientSidebar({ onClose }: ClientSidebarProps) {
+  const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const { client, logout } = useClientAuth();
@@ -40,7 +42,7 @@ export default function ClientSidebar({ onClose }: ClientSidebarProps) {
           />
         </Link>
         {onClose && (
-          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-lg text-white/40 hover:text-white hover:bg-white/10 cursor-pointer lg:hidden">
+          <button onClick={onClose} aria-label={t('clientPortal.nav.closeMenu')} className="w-8 h-8 flex items-center justify-center rounded-lg text-white/40 hover:text-white hover:bg-white/10 cursor-pointer lg:hidden">
             <i className="ri-close-line text-xl"></i>
           </button>
         )}
@@ -48,7 +50,7 @@ export default function ClientSidebar({ onClose }: ClientSidebarProps) {
       <div className="px-6 py-3 border-b border-white/8">
         <div className="px-2.5 py-1.5 bg-[#0D8C2E]/20 rounded-lg inline-flex items-center gap-1.5">
           <div className="w-1.5 h-1.5 bg-[#0D8C2E] rounded-full"></div>
-          <span className="text-[#0D8C2E] text-xs font-medium">Espace Client</span>
+          <span className="text-[#0D8C2E] text-xs font-medium">{t('clientPortal.nav.badge')}</span>
         </div>
       </div>
       {client && (
@@ -79,7 +81,7 @@ export default function ClientSidebar({ onClose }: ClientSidebarProps) {
               <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
                 <i className={`${item.icon} text-base`}></i>
               </div>
-              <span>{item.label}</span>
+              <span>{t(`clientPortal.nav.${item.label}`)}</span>
             </Link>
           );
         })}
@@ -87,11 +89,11 @@ export default function ClientSidebar({ onClose }: ClientSidebarProps) {
       <div className="px-3 pb-4 space-y-1">
         <Link to="/" onClick={handleNavClick} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-white/40 hover:text-white hover:bg-white/8 transition-all cursor-pointer">
           <div className="w-5 h-5 flex items-center justify-center"><i className="ri-home-line text-base"></i></div>
-          <span>Retour au site</span>
+          <span>{t('clientPortal.nav.backToSite')}</span>
         </Link>
         <button onClick={handleLogout} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-red-400/70 hover:text-red-400 hover:bg-red-500/10 transition-all cursor-pointer whitespace-nowrap">
           <div className="w-5 h-5 flex items-center justify-center"><i className="ri-logout-box-r-line text-base"></i></div>
-          <span>Déconnexion</span>
+          <span>{t('clientPortal.nav.logout')}</span>
         </button>
       </div>
     </aside>

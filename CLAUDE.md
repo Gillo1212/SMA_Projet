@@ -123,6 +123,12 @@ return <h1>{t('home.hero.titleLine1')}</h1>;
 | `home.ts` | page d'accueil |
 | `shop.ts` | catalogues, panier, blog |
 | `checkout.ts` | tunnel de commande et retour de paiement |
+| `pages.ts` | catalogue produits, fiche produit, contact |
+| `machineDetail.ts` | fiche machine, comparateur, demande de devis |
+| `marketing.ts` | sections Features / About / Testimonials de l'accueil |
+| `about.ts` | page « Qui sommes-nous », page 404 |
+| `auth.ts` | connexion, inscription, mot de passe, confirmation d'email |
+| `clientPortal.ts` | espace client + libellés des statuts (`statuses.*`) |
 
 Chaque module exporte un objet **imbriqué** dont la première clé est la section (`nav`, `cart`, `checkout`…).
 
@@ -136,15 +142,24 @@ Chaque module exporte un objet **imbriqué** dont la première clé est la secti
 
 Deux contrôles utiles avant de livrer : comparer les clés `fr/` et `en/` (aucune ne doit manquer d'un côté), et vérifier que chaque `t('…')` du code correspond à une clé définie.
 
+### Statuts
+
+Les services convertissent les statuts du backend en valeurs françaises (« Livrée », « Payée »…), utilisées pour les couleurs et les filtres. Ne pas les traduire dans les services : passer par `useStatusLabels()` (`src/i18n/useStatusLabels.ts`) au moment de l'affichage.
+
+```tsx
+const status = useStatusLabels();
+<span>{status.order(order.statut)}</span>
+```
+
 ### État de la traduction
 
-Traduits : navbar, pied de page, accueil, catalogues machines et produits, panier, blog (liste et détail), contact, tunnel de commande, retour de paiement, composants d'état partagés.
+Traduits : tout le site public, les pages d'authentification et l'espace client.
 
-**Encore en français en dur** : page à-propos, sections Features/About/Testimonials de l'accueil, détail machine, détail produit, comparateur, demande de devis — ainsi que le portail admin et l'espace client, qui sont des outils internes.
+**Restent en français** : le portail admin (outil interne, choix assumé), la page de simulation de paiement (outil de dev), les messages d'erreur renvoyés par le backend et les données du catalogue.
 
 ## Sélecteur de langue
 
-`components/feature/LanguageSwitcher.tsx`, intégré à la navbar. La prop `variant` adapte les couleurs au fond (`light` sur la navbar transparente en haut de page).
+`components/feature/LanguageSwitcher.tsx`, intégré à la navbar et à l'en-tête de l'espace client. La prop `variant` adapte les couleurs au fond (`light` sur la navbar transparente en haut de page).
 
 ## Panier
 

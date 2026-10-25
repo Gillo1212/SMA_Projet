@@ -5,6 +5,7 @@ import { apiClient } from '../../../services/apiClient';
 import { ENDPOINTS } from '../../../config/api';
 import { LoadingState } from '../../../components/feature/AsyncState';
 import type { ClientProfile } from '../../../types/models';
+import { useTranslation } from 'react-i18next';
 
 const EMPTY_PROFILE: ClientProfile = {
   id: '', nom: '', prenom: '', email: '', telephone: '',
@@ -12,6 +13,7 @@ const EMPTY_PROFILE: ClientProfile = {
 };
 
 export default function ClientProfilPage() {
+  const { t } = useTranslation();
   const { client, isLoading } = useClientAuth();
   const [editing, setEditing] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -44,7 +46,7 @@ export default function ClientProfilPage() {
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (err) {
-      setFormError(err instanceof Error ? err.message : 'Enregistrement impossible.');
+      setFormError(err instanceof Error ? err.message : t('clientPortal.profile.saveError'));
     } finally {
       setSaving(false);
     }
@@ -55,7 +57,20 @@ export default function ClientProfilPage() {
     setPwdError(null);
 
     if (pwd.next !== pwd.confirm) {
-      setPwdError('Les mots de passe ne correspondent pas.');
+      setPwdError(t('auth.errors.mismatch'));
+      return;
+    }
+    // Mêmes règles que changePasswordRules côté backend
+    if (pwd.next.length < 8) {
+      setPwdError(t('auth.errors.tooShort'));
+      return;
+    }
+    if (!/[A-Z]/.test(pwd.next)) {
+      setPwdError(t('auth.errors.needsUppercase'));
+      return;
+    }
+    if (!/[0-9]/.test(pwd.next)) {
+      setPwdError(t('auth.errors.needsDigit'));
       return;
     }
 
@@ -70,13 +85,13 @@ export default function ClientProfilPage() {
       setPwdSaved(true);
       setTimeout(() => setPwdSaved(false), 3000);
     } catch (err) {
-      setPwdError(err instanceof Error ? err.message : 'Modification impossible.');
+      setPwdError(err instanceof Error ? err.message : t('clientPortal.profile.passwordError'));
     } finally {
       setPwdSaving(false);
     }
   };
 
-  if (isLoading) return <LoadingState label="Chargement de votre profil…" />;
+  if (isLoading) return <LoadingState label={t('clientPortal.profile.loading')} />;
 
   return (
     <div className="max-w-3xl space-y-6">
@@ -84,13 +99,13 @@ export default function ClientProfilPage() {
       {saved && (
         <div className="flex items-center gap-3 p-4 bg-emerald-50 border border-emerald-200 rounded-xl">
           <i className="ri-checkbox-circle-line text-emerald-500"></i>
-          <p className="text-sm font-medium text-emerald-700">Profil mis à jour avec succès.</p>
+          <p className="text-sm font-medium text-emerald-700">{t('clientPortal.profile.saved')}</p>
         </div>
       )}
       {pwdSaved && (
         <div className="flex items-center gap-3 p-4 bg-emerald-50 border border-emerald-200 rounded-xl">
           <i className="ri-lock-unlock-line text-emerald-500"></i>
-          <p className="text-sm font-medium text-emerald-700">Mot de passe modifié avec succès.</p>
+          <p className="text-sm font-medium text-emerald-700">{t('clientPortal.profile.passwordSaved')}</p>
         </div>
       )}
 
@@ -111,21 +126,21 @@ export default function ClientProfilPage() {
             className="flex items-center gap-2 px-4 py-2 border border-gray-200 text-[#00272B]/60 text-sm font-medium rounded-xl hover:bg-gray-50 cursor-pointer transition-all whitespace-nowrap"
           >
             <i className={editing ? 'ri-close-line' : 'ri-edit-line'}></i>
-            {editing ? 'Annuler' : 'Modifier'}
+            {editing ? t('clientPortal.common.cancel') : t('clientPortal.common.edit')}
           </button>
         </div>
 
         <form onSubmit={handleSave}>
           <div className="grid grid-cols-2 gap-4">
             {[
-              { label: 'Prénom', key: 'prenom', type: 'text' },
-              { label: 'Nom', key: 'nom', type: 'text' },
-              { label: 'Email', key: 'email', type: 'email' },
-              { label: 'Téléphone', key: 'telephone', type: 'tel' },
-              { label: 'Entreprise', key: 'entreprise', type: 'text' },
-              { label: 'Poste', key: 'poste', type: 'text' },
-              { label: 'Ville', key: 'ville', type: 'text' },
-              { label: 'Adresse', key: 'adresse', type: 'text' },
+              { label: t('clientPortal.profile.firstName'), key: 'prenom', type: 'text' },
+              { label: t('clientPortal.profile.lastName'), key: 'nom', type: 'text' },
+              { label: t('clientPortal.profile.email'), key: 'email', type: 'email' },
+              { label: t('clientPortal.profile.phone'), key: 'telephone', type: 'tel' },
+              { label: t('clientPortal.profile.company'), key: 'entreprise', type: 'text' },
+              { label: t('clientPortal.profile.position'), key: 'poste', type: 'text' },
+              { label: t('clientPortal.profile.city'), key: 'ville', type: 'text' },
+              { label: t('clientPortal.profile.address'), key: 'adresse', type: 'text' },
             ].map(field => (
               <div key={field.key}>
                 <label className="block text-xs font-semibold text-[#00272B]/50 uppercase tracking-wide mb-1.5">{field.label}</label>
@@ -159,7 +174,7 @@ export default function ClientProfilPage() {
                 className="flex items-center gap-2 px-5 py-2.5 bg-[#1AAA3F] text-white text-sm font-semibold rounded-xl hover:bg-[#158f35] disabled:opacity-60 cursor-pointer transition-all whitespace-nowrap"
               >
                 <i className={saving ? 'ri-loader-4-line animate-spin' : 'ri-save-line'}></i>
-                {saving ? 'Enregistrement…' : 'Enregistrer'}
+                {saving ? t('clientPortal.profile.saving') : t('clientPortal.profile.save')}
               </button>
             </div>
           )}
@@ -167,7 +182,7 @@ export default function ClientProfilPage() {
 
         <div className="mt-4 pt-4 border-t border-gray-100">
           <p className="text-xs text-[#00272B]/30">
-            {form.dateInscription ? `Client depuis le ${form.dateInscription} · ` : ''}ID : {form.id}
+            {form.dateInscription ? t('clientPortal.profile.clientSince', { date: form.dateInscription }) : ''}{t('clientPortal.profile.id', { id: form.id })}
           </p>
         </div>
       </div>
@@ -176,21 +191,21 @@ export default function ClientProfilPage() {
       <div className="bg-white rounded-2xl border border-gray-100 p-6">
         <div className="flex items-center justify-between mb-1">
           <div>
-            <h3 className="text-sm font-bold text-[#00272B]">Mot de passe</h3>
-            <p className="text-xs text-[#00272B]/40 mt-0.5">Modifiez votre mot de passe de connexion</p>
+            <h3 className="text-sm font-bold text-[#00272B]">{t('clientPortal.profile.passwordTitle')}</h3>
+            <p className="text-xs text-[#00272B]/40 mt-0.5">{t('clientPortal.profile.passwordHint')}</p>
           </div>
           <button onClick={() => setShowPwdForm(v => !v)} className="flex items-center gap-2 px-4 py-2 border border-gray-200 text-[#00272B]/60 text-sm font-medium rounded-xl hover:bg-gray-50 cursor-pointer whitespace-nowrap">
             <i className="ri-lock-line"></i>
-            {showPwdForm ? 'Annuler' : 'Modifier'}
+            {showPwdForm ? t('clientPortal.common.cancel') : t('clientPortal.common.edit')}
           </button>
         </div>
 
         {showPwdForm && (
           <form onSubmit={handlePwdSave} className="mt-5 space-y-4">
             {[
-              { label: 'Mot de passe actuel', key: 'current', show: showCurrent, toggle: () => setShowCurrent(v => !v) },
-              { label: 'Nouveau mot de passe', key: 'next', show: showNext, toggle: () => setShowNext(v => !v) },
-              { label: 'Confirmer le nouveau', key: 'confirm', show: showNext, toggle: () => setShowNext(v => !v) },
+              { label: t('clientPortal.profile.currentPassword'), key: 'current', show: showCurrent, toggle: () => setShowCurrent(v => !v) },
+              { label: t('clientPortal.profile.newPassword'), key: 'next', show: showNext, toggle: () => setShowNext(v => !v) },
+              { label: t('clientPortal.profile.confirmPassword'), key: 'confirm', show: showNext, toggle: () => setShowNext(v => !v) },
             ].map(f => (
               <div key={f.key}>
                 <label className="block text-sm font-semibold text-[#00272B] mb-1.5">{f.label}</label>
@@ -221,7 +236,7 @@ export default function ClientProfilPage() {
                 className="flex items-center gap-2 px-5 py-2.5 bg-[#1AAA3F] text-white text-sm font-semibold rounded-xl hover:bg-[#158f35] disabled:opacity-60 cursor-pointer transition-all whitespace-nowrap"
               >
                 <i className={pwdSaving ? 'ri-loader-4-line animate-spin' : 'ri-lock-unlock-line'}></i>
-                {pwdSaving ? 'Mise à jour…' : 'Mettre à jour'}
+                {pwdSaving ? t('clientPortal.profile.updating') : t('clientPortal.profile.update')}
               </button>
             </div>
           </form>

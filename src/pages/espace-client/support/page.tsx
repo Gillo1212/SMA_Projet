@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useClientTickets } from '../../../hooks/useClientPortal';
 import { LoadingState, ErrorState, EmptyState } from '../../../components/feature/AsyncState';
 import type { TicketCategory, TicketPriority } from '../../../types/models';
+import { useTranslation } from 'react-i18next';
+import { useStatusLabels } from '../../../i18n/useStatusLabels';
 
 const statusColors: Record<string, string> = {
   'Ouvert': 'bg-amber-50 text-amber-700 border-amber-200',
@@ -40,6 +42,8 @@ const CATEGORIES: TicketCategory[] = [
 const PRIORITES: TicketPriority[] = ['Basse', 'Normale', 'Haute', 'Urgente'];
 
 export default function ClientSupportPage() {
+  const { t } = useTranslation();
+  const status = useStatusLabels();
   const { tickets, isLoading, error, refetch, createTicket } = useClientTickets();
   const [showForm, setShowForm] = useState(false);
   const [sujet, setSujet] = useState('');
@@ -66,27 +70,27 @@ export default function ClientSupportPage() {
         setPriorite('Normale');
       }, 2000);
     } catch (err) {
-      setFormError(err instanceof Error ? err.message : "Envoi impossible. Réessayez.");
+      setFormError(err instanceof Error ? err.message : t('clientPortal.support.sendError'));
     } finally {
       setSending(false);
     }
   };
 
-  if (isLoading) return <LoadingState label="Chargement de vos tickets…" />;
+  if (isLoading) return <LoadingState label={t('clientPortal.support.loading')} />;
   if (error) return <ErrorState message={error} onRetry={refetch} />;
 
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between">
         <div className="flex gap-3">
-          <span className="text-xs font-medium px-2.5 py-1 bg-amber-50 text-amber-700 rounded-full border border-amber-200">{tickets.filter(t => t.statut === 'Ouvert' || t.statut === 'En cours').length} ticket(s) actif(s)</span>
+          <span className="text-xs font-medium px-2.5 py-1 bg-amber-50 text-amber-700 rounded-full border border-amber-200">{t('clientPortal.support.activeTickets', { count: tickets.filter(tk => tk.statut === 'Ouvert' || tk.statut === 'En cours').length })}</span>
         </div>
         <button
           onClick={() => setShowForm(true)}
           className="flex items-center gap-2 px-4 py-2 bg-[#1AAA3F] text-white text-sm font-semibold rounded-xl hover:bg-[#158f35] cursor-pointer transition-all whitespace-nowrap"
         >
           <i className="ri-add-line"></i>
-          Nouveau ticket
+          {t('clientPortal.support.newTicket')}
         </button>
       </div>
 
@@ -95,7 +99,7 @@ export default function ClientSupportPage() {
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl w-full max-w-lg p-6">
             <div className="flex items-center justify-between mb-5">
-              <h3 className="text-base font-bold text-[#00272B]">Nouveau ticket de support</h3>
+              <h3 className="text-base font-bold text-[#00272B]">{t('clientPortal.support.formTitle')}</h3>
               <button onClick={() => setShowForm(false)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 cursor-pointer text-[#00272B]/40"><i className="ri-close-line text-lg"></i></button>
             </div>
             {submitted ? (
@@ -103,8 +107,8 @@ export default function ClientSupportPage() {
                 <div className="w-14 h-14 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-3">
                   <i className="ri-checkbox-circle-line text-emerald-500 text-3xl"></i>
                 </div>
-                <p className="text-sm font-semibold text-[#00272B]">Ticket envoyé !</p>
-                <p className="text-xs text-[#00272B]/50 mt-1">Notre équipe vous répond sous 24h.</p>
+                <p className="text-sm font-semibold text-[#00272B]">{t('clientPortal.support.sentTitle')}</p>
+                <p className="text-xs text-[#00272B]/50 mt-1">{t('clientPortal.support.sentHint')}</p>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
@@ -115,39 +119,39 @@ export default function ClientSupportPage() {
                 )}
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-sm font-semibold text-[#00272B] mb-1.5">Catégorie</label>
+                    <label className="block text-sm font-semibold text-[#00272B] mb-1.5">{t('clientPortal.support.category')}</label>
                     <select
                       value={categorie}
                       onChange={e => setCategorie(e.target.value as TicketCategory)}
                       className="w-full h-10 px-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#1AAA3F] cursor-pointer text-[#00272B]"
                     >
-                      {CATEGORIES.map(c => <option key={c}>{c}</option>)}
+                      {CATEGORIES.map(c => <option key={c} value={c}>{status.category(c)}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-[#00272B] mb-1.5">Priorité</label>
+                    <label className="block text-sm font-semibold text-[#00272B] mb-1.5">{t('clientPortal.support.priority')}</label>
                     <select
                       value={priorite}
                       onChange={e => setPriorite(e.target.value as TicketPriority)}
                       className="w-full h-10 px-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#1AAA3F] cursor-pointer text-[#00272B]"
                     >
-                      {PRIORITES.map(p => <option key={p}>{p}</option>)}
+                      {PRIORITES.map(p => <option key={p} value={p}>{status.priority(p)}</option>)}
                     </select>
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-[#00272B] mb-1.5">Sujet</label>
-                  <input type="text" value={sujet} onChange={e => setSujet(e.target.value)} required placeholder="Décrivez brièvement le problème" className="w-full h-10 px-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#1AAA3F]" />
+                  <label className="block text-sm font-semibold text-[#00272B] mb-1.5">{t('clientPortal.support.subject')}</label>
+                  <input type="text" value={sujet} onChange={e => setSujet(e.target.value)} required placeholder={t('clientPortal.support.subjectPlaceholder')} className="w-full h-10 px-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#1AAA3F]" />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-[#00272B] mb-1.5">Description</label>
-                  <textarea value={description} onChange={e => setDescription(e.target.value)} required rows={4} maxLength={500} placeholder="Détaillez votre problème..." className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#1AAA3F] resize-none" />
+                  <label className="block text-sm font-semibold text-[#00272B] mb-1.5">{t('clientPortal.support.description')}</label>
+                  <textarea value={description} onChange={e => setDescription(e.target.value)} required rows={4} maxLength={500} placeholder={t('clientPortal.support.descriptionPlaceholder')} className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#1AAA3F] resize-none" />
                   <p className="text-xs text-[#00272B]/30 text-right mt-1">{description.length}/500</p>
                 </div>
                 <div className="flex gap-3 pt-1">
-                  <button type="button" onClick={() => setShowForm(false)} className="flex-1 h-10 border border-gray-200 text-[#00272B]/60 text-sm font-medium rounded-xl hover:bg-gray-50 cursor-pointer whitespace-nowrap">Annuler</button>
+                  <button type="button" onClick={() => setShowForm(false)} className="flex-1 h-10 border border-gray-200 text-[#00272B]/60 text-sm font-medium rounded-xl hover:bg-gray-50 cursor-pointer whitespace-nowrap">{t('clientPortal.common.cancel')}</button>
                   <button type="submit" disabled={sending} className="flex-1 h-10 bg-[#1AAA3F] text-white text-sm font-semibold rounded-xl hover:bg-[#158f35] disabled:opacity-60 cursor-pointer whitespace-nowrap">
-                    {sending ? 'Envoi…' : 'Envoyer'}
+                    {sending ? t('clientPortal.support.sending') : t('clientPortal.support.send')}
                   </button>
                 </div>
               </form>
@@ -160,8 +164,8 @@ export default function ClientSupportPage() {
       {tickets.length === 0 ? (
         <EmptyState
           icon="ri-customer-service-2-line"
-          title="Aucun ticket"
-          description="Ouvrez un ticket si vous rencontrez un problème avec vos équipements."
+          title={t('clientPortal.support.emptyTitle')}
+          description={t('clientPortal.support.emptyHint')}
         />
       ) : (
       <div className="space-y-4">
@@ -175,14 +179,14 @@ export default function ClientSupportPage() {
                 <div>
                   <p className="text-sm font-bold text-[#00272B]">{ticket.sujet}</p>
                   <p className="text-xs text-[#00272B]/40">
-                    {ticket.reference} · {ticket.date} · {ticket.categorie}
+                    {ticket.reference} · {ticket.date} · {status.category(ticket.categorie)}
                     {ticket.machineNom ? ` · ${ticket.machineNom}` : ''}
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-2 flex-shrink-0 ml-3">
-                <span className={`text-xs font-semibold ${priorityColors[ticket.priorite]}`}>{ticket.priorite}</span>
-                <span className={`text-xs font-medium px-2.5 py-1 rounded-full border ${statusColors[ticket.statut]}`}>{ticket.statut}</span>
+                <span className={`text-xs font-semibold ${priorityColors[ticket.priorite]}`}>{status.priority(ticket.priorite)}</span>
+                <span className={`text-xs font-medium px-2.5 py-1 rounded-full border ${statusColors[ticket.statut]}`}>{status.ticket(ticket.statut)}</span>
               </div>
             </div>
 
@@ -192,7 +196,7 @@ export default function ClientSupportPage() {
               <div className="p-3.5 bg-[#f0f9f4] rounded-xl border border-[#1AAA3F]/20">
                 <div className="flex items-center gap-1.5 mb-1">
                   <i className="ri-shield-user-line text-[#1AAA3F] text-xs"></i>
-                  <p className="text-xs font-semibold text-[#1AAA3F]">Réponse SMALIM</p>
+                  <p className="text-xs font-semibold text-[#1AAA3F]">{t('clientPortal.common.smalimReply')}</p>
                 </div>
                 <p className="text-sm text-[#00272B]/70">{ticket.reponseAdmin}</p>
               </div>

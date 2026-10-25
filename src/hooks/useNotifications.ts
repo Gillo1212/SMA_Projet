@@ -13,6 +13,9 @@ import { ordersService } from '../services/orders.service';
 import { quotesService } from '../services/quotes.service';
 import { clientPortalService } from '../services/clientPortal.service';
 import { useClientAuth } from '../contexts/ClientAuthContext';
+import { useTranslation } from 'react-i18next';
+import { useStatusLabels } from '../i18n/useStatusLabels';
+import type { Invoice, SupportTicket } from '../types/models';
 
 export interface AppNotification {
   id: string;
@@ -109,12 +112,18 @@ export function useAdminNotifications() {
 
 /**
  * Notifications de l'espace client : factures à régler et suivi des tickets.
- * Le chargement ne démarre qu'une fois le client authentifié.
+ * Le chargement ne démarre qu'une fois le client authentifié. Les textes sont
+ * construits à l'affichage, pour suivre la langue choisie sans recharger.
  */
 export function useClientNotifications() {
   const { client } = useClientAuth();
+  const { t } = useTranslation();
+  const status = useStatusLabels();
   const clientId = client?.id ? String(client.id) : null;
-  const [notifications, setNotifications] = useState<AppNotification[]>([]);
+  const [data, setData] = useState<{ invoices: Invoice[]; tickets: SupportTicket[] }>({
+    invoices: [],
+    tickets: [],
+  });
 
   useEffect(() => {
     if (!clientId) return;
@@ -125,38 +134,42 @@ export function useClientNotifications() {
       clientPortalService.getTickets(clientId),
     ])
       .then(([invoices, tickets]) => {
-        if (cancelled) return;
-
-        const dues: AppNotification[] = invoices
-          .filter(i => i.statut === 'En attente' || i.statut === 'En retard')
-          .map(i => ({
-            id: `invoice-${i.id}`,
-            type: 'invoice',
-            title: i.statut === 'En retard' ? 'Facture en retard' : 'Facture à régler',
-            message: `${i.numero} · ${i.montant.toLocaleString('fr-FR')} FCFA`,
-            time: i.dateEcheance ? `échéance ${i.dateEcheance}` : i.date,
-            read: false,
-            link: '/espace-client/factures',
-          }));
-
-        const actifs: AppNotification[] = tickets
-          .filter(t => t.statut !== 'Fermé')
-          .map(t => ({
-            id: `ticket-${t.id}`,
-            type: 'support',
-            title: `Ticket ${t.statut.toLowerCase()}`,
-            message: t.sujet,
-            time: t.date,
-            read: false,
-            link: '/espace-client/support',
-          }));
-
-        setNotifications([...dues, ...actifs]);
+        if (!cancelled) setData({ invoices, tickets });
       })
-      .catch(() => { if (!cancelled) setNotifications([]); });
+      .catch(() => { if (!cancelled) setData({ invoices: [], tickets: [] }); });
 
     return () => { cancelled = true; };
   }, [clientId]);
+
+  const notifications = useMemo<AppNotification[]>(() => {
+    const dues: AppNotification[] = data.invoices
+      .filter(i => i.statut === 'En attente' || i.statut === 'En retard')
+      .map(i => ({
+        id: `invoice-${i.id}`,
+        type: 'invoice',
+        title: i.statut === 'En retard'
+          ? t('clientPortal.notifications.invoiceOverdue')
+          : t('clientPortal.notifications.invoiceDue'),
+        message: `${i.numero} · ${i.montant.toLocaleString('fr-FR')} FCFA`,
+        time: i.dateEcheance ? t('clientPortal.notifications.dueDate', { date: i.dateEcheance }) : i.date,
+        read: false,
+        link: '/espace-client/factures',
+      }));
+
+    const actifs: AppNotification[] = data.tickets
+      .filter(tk => tk.statut !== 'Fermé')
+      .map(tk => ({
+        id: `ticket-${tk.id}`,
+        type: 'support',
+        title: t('clientPortal.notifications.ticket', { status: status.ticket(tk.statut) }),
+        message: tk.sujet,
+        time: tk.date,
+        read: false,
+        link: '/espace-client/support',
+      }));
+
+    return [...dues, ...actifs];
+  }, [data, t, status]);
 
   return useReadState(notifications);
 }

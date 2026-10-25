@@ -7,6 +7,8 @@ import {
   useClientTickets,
 } from '../../hooks/useClientPortal';
 import { LoadingState, ErrorState } from '../../components/feature/AsyncState';
+import { useTranslation } from 'react-i18next';
+import { useStatusLabels } from '../../i18n/useStatusLabels';
 
 const statusOrder: Record<string, string> = {
   'En attente': 'bg-amber-50 text-amber-700',
@@ -24,6 +26,8 @@ const statusMachine: Record<string, string> = {
 };
 
 export default function ClientDashboardPage() {
+  const { t, i18n } = useTranslation();
+  const status = useStatusLabels();
   const { client } = useClientAuth();
   const { stats, machines, isLoading, error, refetch } = useClientDashboard();
   // Le backend restreint /orders au client connecté : pas de filtre à passer
@@ -31,11 +35,11 @@ export default function ClientDashboardPage() {
   const { invoices } = useClientInvoices();
   const { tickets } = useClientTickets();
 
-  if (isLoading) return <LoadingState label="Chargement de votre espace…" />;
+  if (isLoading) return <LoadingState label={t('clientPortal.dashboard.loading')} />;
   if (error) return <ErrorState message={error} onRetry={refetch} />;
 
   const recentOrders = orders.slice(0, 3);
-  const openTickets = tickets.filter(t => t.statut === 'Ouvert' || t.statut === 'En cours');
+  const openTickets = tickets.filter(tk => tk.statut === 'Ouvert' || tk.statut === 'En cours');
   const unpaidInvoices = invoices.filter(i => i.statut === 'En attente' || i.statut === 'En retard');
 
   return (
@@ -47,16 +51,16 @@ export default function ClientDashboardPage() {
           <div className="absolute bottom-4 right-20 w-20 h-20 rounded-full border border-white"></div>
         </div>
         <div className="relative z-10">
-          <p className="text-white/60 text-sm">Bonjour,</p>
+          <p className="text-white/60 text-sm">{t('clientPortal.dashboard.hello')}</p>
           <h2 className="text-2xl font-bold text-white mt-0.5">
             {client?.prenom} {client?.nom}
           </h2>
           <p className="text-white/50 text-sm mt-1">{client?.entreprise} · {client?.ville}</p>
         </div>
         <div className="relative z-10 text-right">
-          <p className="text-white/50 text-xs">Client depuis</p>
+          <p className="text-white/50 text-xs">{t('clientPortal.dashboard.clientSince')}</p>
           <p className="text-white font-semibold text-sm mt-0.5">
-            {new Date(client?.dateInscription ?? '').toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}
+            {new Date(client?.dateInscription ?? '').toLocaleDateString(i18n.language, { month: 'long', year: 'numeric' })}
           </p>
         </div>
       </div>
@@ -64,10 +68,10 @@ export default function ClientDashboardPage() {
       {/* KPI Cards */}
       <div className="grid grid-cols-4 gap-4">
         {[
-          { label: 'Commandes totales', value: stats.totalCommandes, icon: 'ri-shopping-bag-line', color: 'text-[#1AAA3F]', bg: 'bg-[#1AAA3F]/10', sub: `${orders.filter(o => o.statut === 'En attente').length} en attente` },
-          { label: 'Machines installées', value: machines.length, icon: 'ri-settings-2-line', color: 'text-sky-600', bg: 'bg-sky-50', sub: `${stats.machinesActives} opérationnelle(s)` },
-          { label: 'Total dépensé', value: `${(stats.totalDepense / 1000000).toFixed(2)}M FCFA`, icon: 'ri-money-dollar-circle-line', color: 'text-emerald-600', bg: 'bg-emerald-50', sub: 'commandes livrées' },
-          { label: 'Tickets ouverts', value: stats.ticketsOuverts, icon: 'ri-customer-service-2-line', color: 'text-amber-600', bg: 'bg-amber-50', sub: `${stats.facturesEnAttente} facture(s) à régler` },
+          { label: t('clientPortal.dashboard.totalOrders'), value: stats.totalCommandes, icon: 'ri-shopping-bag-line', color: 'text-[#1AAA3F]', bg: 'bg-[#1AAA3F]/10', sub: t('clientPortal.dashboard.pendingOrders', { count: orders.filter(o => o.statut === 'En attente').length }) },
+          { label: t('clientPortal.dashboard.installedMachines'), value: machines.length, icon: 'ri-settings-2-line', color: 'text-sky-600', bg: 'bg-sky-50', sub: t('clientPortal.dashboard.operationalMachines', { count: stats.machinesActives }) },
+          { label: t('clientPortal.dashboard.totalSpent'), value: `${(stats.totalDepense / 1000000).toFixed(2)}M FCFA`, icon: 'ri-money-dollar-circle-line', color: 'text-emerald-600', bg: 'bg-emerald-50', sub: t('clientPortal.dashboard.deliveredOrders') },
+          { label: t('clientPortal.dashboard.openTickets'), value: stats.ticketsOuverts, icon: 'ri-customer-service-2-line', color: 'text-amber-600', bg: 'bg-amber-50', sub: t('clientPortal.dashboard.invoicesToPay', { count: stats.facturesEnAttente }) },
         ].map((k, i) => (
           <div key={i} className="bg-white rounded-2xl p-5 border border-gray-100">
             <div className="flex items-center gap-3 mb-3">
@@ -86,11 +90,11 @@ export default function ClientDashboardPage() {
         {/* Recent orders */}
         <div className="xl:col-span-3 bg-white rounded-2xl border border-gray-100 p-6">
           <div className="flex items-center justify-between mb-5">
-            <h3 className="text-sm font-bold text-[#00272B]">Dernières commandes</h3>
-            <Link to="/espace-client/commandes" className="text-xs text-[#1AAA3F] hover:underline font-medium">Tout voir</Link>
+            <h3 className="text-sm font-bold text-[#00272B]">{t('clientPortal.dashboard.recentOrders')}</h3>
+            <Link to="/espace-client/commandes" className="text-xs text-[#1AAA3F] hover:underline font-medium">{t('clientPortal.dashboard.seeAll')}</Link>
           </div>
           {recentOrders.length === 0 ? (
-            <p className="text-sm text-[#00272B]/35 py-6 text-center">Aucune commande pour le moment.</p>
+            <p className="text-sm text-[#00272B]/35 py-6 text-center">{t('clientPortal.dashboard.noOrders')}</p>
           ) : (
             <div className="space-y-3">
               {recentOrders.map(order => (
@@ -102,7 +106,7 @@ export default function ClientDashboardPage() {
                   </div>
                   <div className="text-right flex-shrink-0">
                     <p className="text-sm font-bold text-[#00272B]">{order.montant.toLocaleString('fr-FR')} F</p>
-                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${statusOrder[order.statut] ?? 'bg-gray-100 text-gray-600'}`}>{order.statut}</span>
+                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${statusOrder[order.statut] ?? 'bg-gray-100 text-gray-600'}`}>{status.order(order.statut)}</span>
                   </div>
                 </div>
               ))}
@@ -113,11 +117,11 @@ export default function ClientDashboardPage() {
         {/* Machines status */}
         <div className="xl:col-span-2 bg-white rounded-2xl border border-gray-100 p-6">
           <div className="flex items-center justify-between mb-5">
-            <h3 className="text-sm font-bold text-[#00272B]">Mes machines</h3>
-            <Link to="/espace-client/machines" className="text-xs text-[#1AAA3F] hover:underline font-medium">Détails</Link>
+            <h3 className="text-sm font-bold text-[#00272B]">{t('clientPortal.dashboard.myMachines')}</h3>
+            <Link to="/espace-client/machines" className="text-xs text-[#1AAA3F] hover:underline font-medium">{t('clientPortal.dashboard.details')}</Link>
           </div>
           {machines.length === 0 ? (
-            <p className="text-sm text-[#00272B]/35 py-6 text-center">Aucune machine installée.</p>
+            <p className="text-sm text-[#00272B]/35 py-6 text-center">{t('clientPortal.dashboard.noMachines')}</p>
           ) : (
           <div className="space-y-3">
             {machines.map(m => (
@@ -127,7 +131,7 @@ export default function ClientDashboardPage() {
                   <p className="text-sm font-semibold text-[#00272B] truncate">{m.nom}</p>
                   <p className="text-xs text-[#00272B]/40 truncate">{m.site}</p>
                 </div>
-                <span className={`text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0 ${statusMachine[m.statut]}`}>{m.statut}</span>
+                <span className={`text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0 ${statusMachine[m.statut]}`}>{status.machine(m.statut)}</span>
               </div>
             ))}
           </div>
@@ -144,9 +148,9 @@ export default function ClientDashboardPage() {
                 <i className="ri-file-warning-line text-amber-600 text-lg"></i>
               </div>
               <div className="flex-1">
-                <p className="text-sm font-bold text-amber-800">{unpaidInvoices.length} facture(s) en attente</p>
-                <p className="text-xs text-amber-700/70 mt-0.5">Montant dû : {unpaidInvoices.reduce((s, i) => s + i.montant, 0).toLocaleString('fr-FR')} FCFA</p>
-                <Link to="/espace-client/factures" className="text-xs text-amber-700 font-semibold underline mt-1 inline-block">Voir les factures</Link>
+                <p className="text-sm font-bold text-amber-800">{t('clientPortal.dashboard.pendingInvoices', { count: unpaidInvoices.length })}</p>
+                <p className="text-xs text-amber-700/70 mt-0.5">{t('clientPortal.dashboard.amountDue', { amount: unpaidInvoices.reduce((s, i) => s + i.montant, 0).toLocaleString('fr-FR') })}</p>
+                <Link to="/espace-client/factures" className="text-xs text-amber-700 font-semibold underline mt-1 inline-block">{t('clientPortal.dashboard.seeInvoices')}</Link>
               </div>
             </div>
           )}
@@ -156,9 +160,9 @@ export default function ClientDashboardPage() {
                 <i className="ri-customer-service-2-line text-sky-600 text-lg"></i>
               </div>
               <div className="flex-1">
-                <p className="text-sm font-bold text-sky-800">{openTickets.length} ticket(s) de support en cours</p>
+                <p className="text-sm font-bold text-sky-800">{t('clientPortal.dashboard.activeTickets', { count: openTickets.length })}</p>
                 <p className="text-xs text-sky-700/70 mt-0.5 truncate">{openTickets[0].sujet}</p>
-                <Link to="/espace-client/support" className="text-xs text-sky-700 font-semibold underline mt-1 inline-block">Voir le support</Link>
+                <Link to="/espace-client/support" className="text-xs text-sky-700 font-semibold underline mt-1 inline-block">{t('clientPortal.dashboard.seeSupport')}</Link>
               </div>
             </div>
           )}

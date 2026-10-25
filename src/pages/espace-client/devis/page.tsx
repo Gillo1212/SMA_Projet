@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useQuotes } from '../../../hooks/useQuotes';
 import { LoadingState, ErrorState, EmptyState } from '../../../components/feature/AsyncState';
+import { useTranslation } from 'react-i18next';
+import { useStatusLabels } from '../../../i18n/useStatusLabels';
 
 const statusColors: Record<string, string> = {
   'Nouveau': 'bg-amber-50 text-amber-700 border-amber-200',
@@ -27,12 +29,14 @@ interface Toast {
 }
 
 export default function ClientDevisPage() {
+  const { t } = useTranslation();
+  const status = useStatusLabels();
   const { quotes, isLoading, error, refetch, updateStatus } = useQuotes();
   const [toast, setToast] = useState<Toast | null>(null);
   const [loading, setLoading] = useState<string | null>(null);
 
-  function showToast(t: Toast) {
-    setToast(t);
+  function showToast(next: Toast) {
+    setToast(next);
     setTimeout(() => setToast(null), 4000);
   }
 
@@ -42,42 +46,42 @@ export default function ClientDevisPage() {
       await updateStatus(quoteId, decision);
       showToast(
         decision === 'Accepté'
-          ? { type: 'success', message: 'Devis accepté !', sub: 'Notre équipe vous contactera très prochainement.' }
-          : { type: 'error', message: 'Devis refusé', sub: 'Vous pouvez soumettre une nouvelle demande.' }
+          ? { type: 'success', message: t('clientPortal.quotes.acceptedToast'), sub: t('clientPortal.quotes.acceptedToastSub') }
+          : { type: 'error', message: t('clientPortal.quotes.declinedToast'), sub: t('clientPortal.quotes.declinedToastSub') }
       );
     } catch (e) {
       // Le hook resynchronise déjà la liste en cas d'échec
       showToast({
         type: 'error',
-        message: 'Erreur',
-        sub: e instanceof Error ? e.message : 'Une erreur est survenue, veuillez réessayer.',
+        message: t('clientPortal.quotes.errorToast'),
+        sub: e instanceof Error ? e.message : t('clientPortal.quotes.errorToastSub'),
       });
     } finally {
       setLoading(null);
     }
   }
 
-  if (isLoading) return <LoadingState label="Chargement de vos devis…" />;
+  if (isLoading) return <LoadingState label={t('clientPortal.quotes.loading')} />;
   if (error) return <ErrorState message={error} onRetry={refetch} />;
 
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between">
-        <p className="text-sm text-[#00272B]/50">{quotes.length} demande(s) de devis</p>
+        <p className="text-sm text-[#00272B]/50">{t('clientPortal.quotes.count', { count: quotes.length })}</p>
         <a
           href="/machines/devis"
           className="flex items-center gap-2 px-4 py-2 bg-[#1AAA3F] text-white text-sm font-semibold rounded-xl hover:bg-[#158f35] cursor-pointer transition-all whitespace-nowrap"
         >
           <i className="ri-add-line"></i>
-          Nouvelle demande
+          {t('clientPortal.quotes.newRequest')}
         </a>
       </div>
 
       {quotes.length === 0 && (
         <EmptyState
           icon="ri-file-list-3-line"
-          title="Aucune demande de devis"
-          description="Demandez un devis depuis le catalogue pour un projet sur mesure."
+          title={t('clientPortal.quotes.emptyTitle')}
+          description={t('clientPortal.quotes.emptyHint')}
         />
       )}
 
@@ -93,11 +97,11 @@ export default function ClientDevisPage() {
                 <div>
                   <p className="text-sm font-bold text-[#00272B]">{quote.machine}</p>
                   <p className="text-xs text-[#00272B]/40">
-                    {quote.reference} · {quote.date} · {quote.quantite} unité(s)
+                    {quote.reference} · {quote.date} · {t('clientPortal.quotes.units', { count: quote.quantite })}
                   </p>
                 </div>
                 <span className={`text-xs font-medium px-2.5 py-1 rounded-full border flex-shrink-0 ml-3 ${statusColors[quote.statut]}`}>
-                  {quote.statut}
+                  {status.quote(quote.statut)}
                 </span>
               </div>
 
@@ -106,7 +110,7 @@ export default function ClientDevisPage() {
               {/* Progress bar */}
               <div className="mb-3">
                 <div className="flex items-center justify-between mb-1.5">
-                  <p className="text-xs text-[#00272B]/40">Progression du traitement</p>
+                  <p className="text-xs text-[#00272B]/40">{t('clientPortal.quotes.progress')}</p>
                   <p className="text-xs font-semibold text-[#1AAA3F]">{progressMap[quote.statut]}%</p>
                 </div>
                 <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
@@ -122,7 +126,7 @@ export default function ClientDevisPage() {
                 <div className="p-3 bg-[#f0f9f4] rounded-xl border border-[#1AAA3F]/20">
                   <div className="flex items-center gap-1.5 mb-1">
                     <i className="ri-message-2-line text-[#1AAA3F] text-xs"></i>
-                    <p className="text-xs font-semibold text-[#1AAA3F]">Réponse SMALIM</p>
+                    <p className="text-xs font-semibold text-[#1AAA3F]">{t('clientPortal.common.smalimReply')}</p>
                   </div>
                   <p className="text-sm text-[#00272B]/70 leading-relaxed">{quote.notes}</p>
                 </div>
@@ -132,7 +136,7 @@ export default function ClientDevisPage() {
               {quote.montantPropose && (
                 <div className="mt-3 flex items-center gap-3 flex-wrap">
                   <div className="px-4 py-2 bg-emerald-50 border border-emerald-200 rounded-xl">
-                    <p className="text-xs text-emerald-700/70">Montant proposé</p>
+                    <p className="text-xs text-emerald-700/70">{t('clientPortal.quotes.proposedAmount')}</p>
                     <p className="text-base font-bold text-emerald-700">{quote.montantPropose.toLocaleString('fr-FR')} FCFA</p>
                   </div>
 
@@ -148,7 +152,7 @@ export default function ClientDevisPage() {
                         ) : (
                           <i className="ri-check-line"></i>
                         )}
-                        Accepter
+                        {t('clientPortal.quotes.accept')}
                       </button>
                       <button
                         onClick={() => handleDecision(quote.id, 'Refusé')}
@@ -160,7 +164,7 @@ export default function ClientDevisPage() {
                         ) : (
                           <i className="ri-close-line"></i>
                         )}
-                        Refuser
+                        {t('clientPortal.quotes.decline')}
                       </button>
                     </div>
                   )}
@@ -168,14 +172,14 @@ export default function ClientDevisPage() {
                   {quote.statut === 'Accepté' && (
                     <div className="flex items-center gap-2 text-sm text-emerald-600 font-medium">
                       <i className="ri-checkbox-circle-fill text-base"></i>
-                      Vous avez accepté ce devis
+                      {t('clientPortal.quotes.youAccepted')}
                     </div>
                   )}
 
                   {quote.statut === 'Refusé' && (
                     <div className="flex items-center gap-2 text-sm text-red-500 font-medium">
                       <i className="ri-close-circle-line text-base"></i>
-                      Vous avez refusé ce devis
+                      {t('clientPortal.quotes.youDeclined')}
                     </div>
                   )}
                 </div>
