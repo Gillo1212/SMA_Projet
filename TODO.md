@@ -28,11 +28,8 @@ Périmètre décidé le 2026-10-25 : **site public + espace client**. Le portail
 - TVA, 3 modes de livraison (actif / tarif) et seuil de livraison standard offerte sont réglables dans **Admin → Paramètres → TVA & livraison**. Codes promo gérés dans **Admin → Paramètres → Codes promo**.
 - Panier et checkout calculent comme le backend (`frontend/src/utils/orderTotals.ts`), le code promo est validé par l'API et transmis à la commande, le checkout exige un compte client.
 - Vérifié de bout en bout dans Chrome : réglage admin → panier → checkout express + code promo → commande en base identique au franc près.
-- **Restent dans la page Paramètres** :
-  - Onglet **Administrateurs** : appelle `/api/settings/admins`, qui n'existe pas (liste fictive). Seule `POST /api/auth/admin/register` existe.
-  - Onglet **Email & SMTP** : non relié (signalé dans l'onglet) ; la config SMTP est dans le `.env`.
-  - Onglet **Notifications** : enregistré en base, mais aucun code backend ne lit encore ces préférences.
-  - Onglet **Entreprise** : enregistré, mais le site public affiche toujours les coordonnées codées en dur (voir §3).
+- ✅ **Page Paramètres entièrement reliée** (2026-10-26) : Administrateurs, Email & SMTP (test réel, mot de passe chiffré), Notifications (commande, devis, client, stock faible), Entreprise (coordonnées affichées sur Contact et À propos), Sécurité. Vérifié dans Chrome (19/19).
+- **À faire de ton côté** : saisir les vraies coordonnées dans Paramètres → Entreprise (la page Contact masque les champs vides), et configurer le SMTP dans Paramètres → Email & SMTP (mot de passe d'application Gmail), puis renseigner l'email de réception des notifications.
 
 ## Ancien constat (2 bis), pour mémoire
 

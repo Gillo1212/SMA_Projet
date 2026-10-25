@@ -172,6 +172,10 @@ Voir `.env.example`, section Paiement : `BACKEND_URL`, `WAVE_API_KEY`, `WAVE_WEB
 - Routes : `GET /api/settings/public` (public), `GET /api/settings` (admin), `PUT /api/settings` (`super_admin`, `admin`). Codes promo : CRUD `/api/promo-codes`.
 - `orders.create` fige `delivery_mode` et `tax_rate` sur la commande : changer un paramètre ne réécrit pas l'historique.
 - Le frontend réplique le calcul dans `frontend/src/utils/orderTotals.ts` : toute modification de la formule doit être faite **des deux côtés**.
+- **Secrets** (clé déclarée avec `secret: true`, ex. `smtp_pass`) : chiffrés via `lib/secrets.js` (AES-256-GCM, clé `SETTINGS_SECRET` ou `JWT_SECRET`), jamais renvoyés au navigateur (`getAllForAdmin()` les remplace par `<clé>_set`). Une valeur vide en PUT conserve le secret existant.
+- **SMTP** : `getSmtpConfig()` prend toute la configuration du back-office dès que `smtp_host` est renseigné, sinon tout le `.env`. Le transport est reconstruit à chaque changement (`settings.onChange`). Test : `POST /api/settings/smtp/test`.
+- **Notifications équipe** : `services/adminNotifications.service.js` (nouvelle commande, devis, client, stock faible), selon les clés `notif_*`. Toujours non bloquantes.
+- **Comptes admin** : `/api/settings/admins` (écriture `super_admin`) ; on ne peut ni se désactiver, ni se supprimer, ni changer son propre rôle.
 
 ## Uploads de fichiers
 
