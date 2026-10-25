@@ -36,8 +36,17 @@ export default function SecuritySettings() {
       setMessage({ type: 'error', text: 'Les mots de passe ne correspondent pas' });
       return;
     }
+    // Mêmes règles que changePasswordRules côté backend
     if (form.new_password.length < 8) {
       setMessage({ type: 'error', text: 'Le mot de passe doit contenir au moins 8 caractères' });
+      return;
+    }
+    if (!/[A-Z]/.test(form.new_password)) {
+      setMessage({ type: 'error', text: 'Le mot de passe doit contenir au moins une majuscule' });
+      return;
+    }
+    if (!/[0-9]/.test(form.new_password)) {
+      setMessage({ type: 'error', text: 'Le mot de passe doit contenir au moins un chiffre' });
       return;
     }
     setSaving(true);

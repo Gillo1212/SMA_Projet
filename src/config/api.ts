@@ -115,6 +115,7 @@ export const ENDPOINTS = {
     /** Public : TVA et livraison, pour que le panier affiche le montant facturé */
     PUBLIC: '/settings/public',
     ADMINS: '/settings/admins',
+    SMTP_TEST: '/settings/smtp/test',
   },
 
   // ── Codes promo (back-office) ─────────────────────────────

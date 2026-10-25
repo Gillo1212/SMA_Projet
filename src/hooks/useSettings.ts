@@ -9,7 +9,8 @@ interface UseSettingsReturn {
   updateSettings: (data: Record<string, string>) => Promise<void>;
   createAdmin: (data: CreateAdminData) => Promise<void>;
   toggleAdmin: (id: number) => Promise<void>;
-  deleteAdmin: (id: number) => Promise<void>;
+  updateAdmin: (id: number, data: { first_name?: string; last_name?: string; role?: string }) => Promise<void>;
+  deleteAdmin: (id: number) => Promise<boolean>;
   refetch: () => void;
 }
 
@@ -45,9 +46,16 @@ export function useSettings(): UseSettingsReturn {
     setSettings(prev => ({ ...prev, ...updated }));
   }, []);
 
+  // Mises à jour locales : un rechargement complet réafficherait l'écran de
+  // chargement et ramènerait la page sur son premier onglet.
   const createAdmin = useCallback(async (data: CreateAdminData) => {
-    await settingsService.createAdmin(data);
-    setTick(t => t + 1);
+    const admin = await settingsService.createAdmin(data);
+    setAdmins(prev => [...prev, admin]);
+  }, []);
+
+  const updateAdmin = useCallback(async (id: number, data: { first_name?: string; last_name?: string; role?: string }) => {
+    const admin = await settingsService.updateAdmin(id, data);
+    setAdmins(prev => prev.map(a => (a.id === id ? admin : a)));
   }, []);
 
   const toggleAdmin = useCallback(async (id: number) => {
@@ -57,12 +65,16 @@ export function useSettings(): UseSettingsReturn {
     );
   }, []);
 
+  /** Renvoie true si le compte a été désactivé au lieu d'être supprimé */
   const deleteAdmin = useCallback(async (id: number) => {
-    await settingsService.deleteAdmin(id);
-    setAdmins(prev => prev.filter(a => a.id !== id));
+    const { deactivated } = await settingsService.deleteAdmin(id);
+    setAdmins(prev =>
+      deactivated ? prev.map(a => (a.id === id ? { ...a, is_active: 0 } : a)) : prev.filter(a => a.id !== id)
+    );
+    return deactivated;
   }, []);
 
   const refetch = useCallback(() => setTick(t => t + 1), []);
 
-  return { settings, admins, isLoading, error, updateSettings, createAdmin, toggleAdmin, deleteAdmin, refetch };
+  return { settings, admins, isLoading, error, updateSettings, createAdmin, updateAdmin, toggleAdmin, deleteAdmin, refetch };
 }

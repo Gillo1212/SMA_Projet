@@ -3,6 +3,8 @@ import Footer from '../home/components/Footer';
 import CTABanner from '../../components/feature/CTABanner';
 import PageHero from '../../components/feature/PageHero';
 import { useTranslation } from 'react-i18next';
+import { useShopConfig } from '../../hooks/useShopConfig';
+import { telHref } from '../../utils/contact';
 
 // Structure de la page ; les textes sont dans i18n/local/<lang>/about.ts
 const ACTIVITIES = ['distribution', 'agrifood', 'tech', 'partnerships'];
@@ -16,6 +18,7 @@ const ROADMAP = [
 
 export default function AboutPage() {
   const { t } = useTranslation();
+  const { company } = useShopConfig().config;
   const list = (key: string) => t(key, { returnObjects: true }) as string[];
 
   return (
@@ -158,7 +161,10 @@ export default function AboutPage() {
         subtitle={t('aboutPage.ctaSubtitle')}
         buttons={[
           { label: t('aboutPage.ctaQuote'), href: '/machines/devis', icon: 'ri-file-list-3-line', variant: 'white' },
-          { label: t('aboutPage.ctaCall'), href: 'tel:+221331234567', icon: 'ri-phone-line', variant: 'primary' },
+          // Numéro saisi dans Paramètres → Entreprise ; bouton masqué tant qu'il est vide
+          ...(company.phone
+            ? [{ label: t('aboutPage.ctaCall'), href: telHref(company.phone), icon: 'ri-phone-line', variant: 'primary' as const }]
+            : []),
         ]}
       />
 

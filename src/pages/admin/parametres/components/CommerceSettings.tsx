@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useAuthContext } from '../../../../contexts/AuthContext';
 import { ApiError } from '../../../../services/apiClient';
 import { shopService } from '../../../../services/shop.service';
-import { computeTotals, DELIVERY_MODES } from '../../../../utils/orderTotals';
+import { computeTotals, DEFAULT_SHOP_CONFIG, DELIVERY_MODES } from '../../../../utils/orderTotals';
 import type { DeliveryMode, ShopConfig } from '../../../../types/models';
 
 interface Props {
@@ -59,6 +59,7 @@ export default function CommerceSettings({ settings, onSave }: Props) {
       fee: Number(form[`delivery_${m}_fee`]) || 0,
     }])) as ShopConfig['delivery'],
     freeShippingThreshold: freeShippingOn ? Number(form.free_shipping_threshold) || 0 : 0,
+    company: DEFAULT_SHOP_CONFIG.company, // sans effet sur le calcul
   };
   const noModeEnabled = DELIVERY_MODES.every(m => !draft.delivery[m].enabled);
 

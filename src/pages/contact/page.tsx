@@ -4,9 +4,24 @@ import Navbar from '../home/components/Navbar';
 import Footer from '../home/components/Footer';
 import PageHero from '../../components/feature/PageHero';
 import CTABanner from '../../components/feature/CTABanner';
+import { useShopConfig } from '../../hooks/useShopConfig';
+import { telHref, whatsappHref } from '../../utils/contact';
 
 export default function ContactPage() {
   const { t } = useTranslation();
+  // Coordonnées saisies dans Paramètres → Entreprise ; un champ vide est masqué
+  const { config } = useShopConfig();
+  const company = config.company;
+  const cityLine = [company.city, company.country].filter(Boolean).join(', ');
+  const infoCards = [
+    company.phone && { key: 'phone', icon: 'ri-phone-line', title: t('contact.phone'), lines: [company.phone], hint: t('contact.phoneHours'), href: telHref(company.phone) },
+    company.email && { key: 'email', icon: 'ri-mail-line', title: t('contact.email'), lines: [company.email], hint: t('contact.emailDelay'), href: `mailto:${company.email}` },
+    (company.address || cityLine) && { key: 'address', icon: 'ri-map-pin-line', title: t('contact.address'), lines: [company.address].filter(Boolean), hint: cityLine },
+  ].filter(Boolean) as { key: string; icon: string; title: string; lines: string[]; hint: string; href?: string }[];
+  const ctaButtons = [
+    company.phone && { label: t('contact.ctaCall'), href: telHref(company.phone), icon: 'ri-phone-line', variant: 'white' as const },
+    company.whatsapp && { label: 'WhatsApp', href: whatsappHref(company.whatsapp), icon: 'ri-whatsapp-line', variant: 'whatsapp' as const, isExternal: true },
+  ].filter(Boolean) as { label: string; href: string; icon: string; variant: 'white' | 'whatsapp'; isExternal?: boolean }[];
   const [formData, setFormData] = useState({
     nom: '',
     email: '',
@@ -74,39 +89,28 @@ export default function ContactPage() {
       />
 
       {/* Contact Info Cards */}
+      {infoCards.length > 0 && (
       <section className="py-8 sm:py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-8">
-            <div className="border border-[#00272B]/10 rounded-2xl p-6 sm:p-8 text-center">
-              <div className="w-14 h-14 sm:w-16 sm:h-16 border border-[#00272B]/15 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-5">
-                <i className="ri-phone-line text-xl sm:text-2xl text-[#0D8C2E]"></i>
+          <div className={`grid grid-cols-1 gap-4 sm:gap-8 ${['', 'sm:grid-cols-1', 'sm:grid-cols-2', 'sm:grid-cols-3'][infoCards.length]}`}>
+            {infoCards.map(card => (
+              <div key={card.key} className="border border-[#00272B]/10 rounded-2xl p-6 sm:p-8 text-center">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 border border-[#00272B]/15 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-5">
+                  <i className={`${card.icon} text-xl sm:text-2xl text-[#0D8C2E]`}></i>
+                </div>
+                <h3 className="text-lg sm:text-xl font-bold text-[#00272B] mb-2 sm:mb-3">{card.title}</h3>
+                {card.lines.map(line => (
+                  <p key={line} className="text-sm sm:text-base text-[#4A4A4A] mb-1 break-words">
+                    {card.href ? <a href={card.href} className="hover:text-[#1AAA3F]">{line}</a> : line}
+                  </p>
+                ))}
+                {card.hint && <p className="text-xs sm:text-sm text-[#4A4A4A] mt-2 sm:mt-3">{card.hint}</p>}
               </div>
-              <h3 className="text-lg sm:text-xl font-bold text-[#00272B] mb-2 sm:mb-3">{t('contact.phone')}</h3>
-              <p className="text-sm sm:text-base text-[#4A4A4A] mb-1">+221 33 123 45 67</p>
-              <p className="text-sm sm:text-base text-[#4A4A4A]">+221 77 123 45 67</p>
-              <p className="text-xs sm:text-sm text-[#4A4A4A] mt-2 sm:mt-3">{t('contact.phoneHours')}</p>
-            </div>
-            <div className="border border-[#00272B]/10 rounded-2xl p-6 sm:p-8 text-center">
-              <div className="w-14 h-14 sm:w-16 sm:h-16 border border-[#00272B]/15 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-5">
-                <i className="ri-mail-line text-xl sm:text-2xl text-[#0D8C2E]"></i>
-              </div>
-              <h3 className="text-lg sm:text-xl font-bold text-[#00272B] mb-2 sm:mb-3">{t('contact.email')}</h3>
-              <p className="text-sm sm:text-base text-[#4A4A4A] mb-1">contact@sma-senegal.com</p>
-              <p className="text-sm sm:text-base text-[#4A4A4A]">commercial@sma-senegal.com</p>
-              <p className="text-xs sm:text-sm text-[#4A4A4A] mt-2 sm:mt-3">{t('contact.emailDelay')}</p>
-            </div>
-            <div className="border border-[#00272B]/10 rounded-2xl p-6 sm:p-8 text-center">
-              <div className="w-14 h-14 sm:w-16 sm:h-16 border border-[#00272B]/15 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-5">
-                <i className="ri-map-pin-line text-xl sm:text-2xl text-[#0D8C2E]"></i>
-              </div>
-              <h3 className="text-lg sm:text-xl font-bold text-[#00272B] mb-2 sm:mb-3">{t('contact.address')}</h3>
-              <p className="text-sm sm:text-base text-[#4A4A4A] mb-1">Zone Industrielle de Dakar</p>
-              <p className="text-sm sm:text-base text-[#4A4A4A]">Rue 15, Parcelle 234</p>
-              <p className="text-xs sm:text-sm text-[#4A4A4A] mt-2 sm:mt-3">Dakar, Sénégal</p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
+      )}
 
       {/* Formulaire + Carte */}
       <section className="py-12 sm:py-20 bg-white">
@@ -259,16 +263,18 @@ export default function ContactPage() {
                   </div>
                 </div>
 
-                <div className="mt-8 pt-8 border-t border-gray-200">
-                  <h4 className="text-lg font-bold text-[#00272B] mb-4">{t('contact.support247')}</h4>
-                  <p className="text-base text-[#4A4A4A] mb-3">
-                    {t('contact.hotlineHint')}
-                  </p>
-                  <div className="flex items-center gap-2 text-[#1AAA3F] font-semibold">
-                    <i className="ri-phone-line text-xl"></i>
-                    <span>+221 70 000 00 00</span>
+                {company.phone && (
+                  <div className="mt-8 pt-8 border-t border-gray-200">
+                    <h4 className="text-lg font-bold text-[#00272B] mb-4">{t('contact.support247')}</h4>
+                    <p className="text-base text-[#4A4A4A] mb-3">
+                      {t('contact.hotlineHint')}
+                    </p>
+                    <a href={telHref(company.phone)} className="flex items-center gap-2 text-[#1AAA3F] font-semibold hover:underline">
+                      <i className="ri-phone-line text-xl"></i>
+                      <span>{company.phone}</span>
+                    </a>
                   </div>
-                </div>
+                )}
               </div>
 
               {/* Carte Google Maps */}
@@ -289,16 +295,15 @@ export default function ContactPage() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <CTABanner
-        badge={t('contact.ctaBadge')}
-        title={t('contact.ctaTitle')}
-        subtitle={t('contact.ctaSubtitle')}
-        buttons={[
-          { label: t('contact.ctaCall'), href: 'tel:+221331234567', icon: 'ri-phone-line', variant: 'white' },
-          { label: 'WhatsApp', href: 'https://wa.me/221771234567', icon: 'ri-whatsapp-line', variant: 'whatsapp', isExternal: true },
-        ]}
-      />
+      {/* CTA Section : seulement si un numéro est renseigné */}
+      {ctaButtons.length > 0 && (
+        <CTABanner
+          badge={t('contact.ctaBadge')}
+          title={t('contact.ctaTitle')}
+          subtitle={t('contact.ctaSubtitle')}
+          buttons={ctaButtons}
+        />
+      )}
 
       <Footer />
     </div>

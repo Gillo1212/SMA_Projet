@@ -23,6 +23,9 @@ export const DEFAULT_SHOP_CONFIG: ShopConfig = {
     express:  { enabled: true, fee: 5000 },
   },
   freeShippingThreshold: 0,
+  company: {
+    name: 'SMALIM', email: '', phone: '', whatsapp: '', address: '', city: '', country: 'Sénégal', website: '', description: '',
+  },
 };
 
 export const DELIVERY_MODES: DeliveryMode[] = ['pickup', 'standard', 'express'];

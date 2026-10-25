@@ -417,6 +417,20 @@ export interface ShopConfig {
   delivery: Record<DeliveryMode, { enabled: boolean; fee: number }>;
   /** Livraison standard offerte dès ce montant (remise déduite, hors TVA). 0 = désactivé */
   freeShippingThreshold: number;
+  /** Coordonnées saisies dans Paramètres → Entreprise (champ vide = non renseigné) */
+  company: CompanyInfo;
+}
+
+export interface CompanyInfo {
+  name: string;
+  email: string;
+  phone: string;
+  whatsapp: string;
+  address: string;
+  city: string;
+  country: string;
+  website: string;
+  description: string;
 }
 
 /** Code promo validé par l'API, appliqué au panier puis transmis à la commande */

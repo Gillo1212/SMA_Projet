@@ -102,30 +102,59 @@ export const settingsService = {
     return { deactivated: Boolean(res?.deactivated) };
   },
 
-  async getAdmins(): Promise<AdminUser[]> {
+  // ── Email (SMTP) ─────────────────────────────────────────────────────────
+
+  /**
+   * Connexion au serveur SMTP enregistré puis envoi d'un email de test.
+   * Ne lève pas d'erreur sur un échec SMTP : le message du serveur est renvoyé
+   * pour être affiché tel quel (ex. identifiants refusés).
+   */
+  async testSmtp(to?: string): Promise<SmtpTestResult> {
     try {
-      const data = await apiClient.get<{ success: boolean; admins: AdminUser[] }>('/settings/admins');
-      return (data as { success: boolean; admins: AdminUser[] }).admins || [];
-    } catch {
-      const { mockAdmins } = await import('../mocks/settings');
-      return mockAdmins as AdminUser[];
+      const res = await apiClient.post<SmtpTestResult>(ENDPOINTS.SETTINGS.SMTP_TEST, to ? { to } : {});
+      return res;
+    } catch (err) {
+      return { success: false, message: err instanceof Error ? err.message : 'Test impossible' };
     }
   },
 
-  async createAdmin(payload: CreateAdminData): Promise<void> {
-    await apiClient.post('/settings/admins', payload);
+  // ── Comptes du back-office ───────────────────────────────────────────────
+
+  async getAdmins(): Promise<AdminUser[]> {
+    if (USE_MOCK) {
+      const { mockAdmins } = await import('../mocks/settings');
+      return mockAdmins as AdminUser[];
+    }
+    const data = await apiClient.get<{ admins: AdminUser[] }>(ENDPOINTS.SETTINGS.ADMINS);
+    return data.admins ?? [];
   },
 
-  async updateAdmin(id: number, payload: { first_name: string; last_name: string; role: string }): Promise<void> {
-    await apiClient.put(`/settings/admins/${id}`, payload);
+  async createAdmin(payload: CreateAdminData): Promise<AdminUser> {
+    const data = await apiClient.post<{ admin: AdminUser }>(ENDPOINTS.SETTINGS.ADMINS, payload);
+    return data.admin;
+  },
+
+  async updateAdmin(id: number, payload: { first_name?: string; last_name?: string; role?: string }): Promise<AdminUser> {
+    const data = await apiClient.put<{ admin: AdminUser }>(`${ENDPOINTS.SETTINGS.ADMINS}/${id}`, payload);
+    return data.admin;
   },
 
   async toggleAdmin(id: number): Promise<{ is_active: number }> {
-    const data = await apiClient.patch<{ success: boolean; is_active: number }>(`/settings/admins/${id}/toggle`);
-    return data as { is_active: number };
+    return apiClient.patch<{ is_active: number }>(`${ENDPOINTS.SETTINGS.ADMINS}/${id}/toggle`);
   },
 
-  async deleteAdmin(id: number): Promise<void> {
-    await apiClient.delete(`/settings/admins/${id}`);
+  /** Un auteur d'articles est désactivé par le backend au lieu d'être supprimé */
+  async deleteAdmin(id: number): Promise<{ deactivated: boolean }> {
+    const res = await apiClient.delete<{ deactivated?: boolean }>(`${ENDPOINTS.SETTINGS.ADMINS}/${id}`);
+    return { deactivated: Boolean(res?.deactivated) };
   },
 };
+
+export interface SmtpTestResult {
+  success: boolean;
+  message: string;
+  /** Étape en échec : configuration absente, connexion, ou envoi */
+  step?: 'config' | 'connect' | 'send';
+  /** D'où vient la configuration testée */
+  source?: 'database' | 'env';
+}

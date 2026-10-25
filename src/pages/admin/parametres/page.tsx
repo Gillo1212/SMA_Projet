@@ -22,7 +22,7 @@ const tabs: { id: Tab; label: string; icon: string }[] = [
 
 export default function ParametresPage() {
   const [activeTab, setActiveTab] = useState<Tab>('entreprise');
-  const { settings, admins, isLoading, error, refetch, updateSettings, createAdmin, toggleAdmin, deleteAdmin } = useSettings();
+  const { settings, admins, isLoading, error, refetch, updateSettings, createAdmin, updateAdmin, toggleAdmin, deleteAdmin } = useSettings();
 
   if (isLoading) {
     return (
@@ -92,6 +92,7 @@ export default function ParametresPage() {
           <AdminsSettings
             admins={admins}
             onCreateAdmin={createAdmin}
+            onUpdateAdmin={updateAdmin}
             onToggleAdmin={toggleAdmin}
             onDeleteAdmin={deleteAdmin}
           />

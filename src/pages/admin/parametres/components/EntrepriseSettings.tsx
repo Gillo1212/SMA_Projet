@@ -10,6 +10,7 @@ export default function EntrepriseSettings({ settings, onSave }: Props) {
     app_name: settings.app_name || 'SMALIM',
     app_email: settings.app_email || '',
     app_phone: settings.app_phone || '',
+    app_whatsapp: settings.app_whatsapp || '',
     app_address: settings.app_address || '',
     app_city: settings.app_city || '',
     app_country: settings.app_country || 'Sénégal',
@@ -51,7 +52,7 @@ export default function EntrepriseSettings({ settings, onSave }: Props) {
           </div>
           <div>
             <h3 className="text-sm font-bold text-[#00272B]">Identité de l&apos;entreprise</h3>
-            <p className="text-xs text-[#00272B]/40">Informations affichées sur le site et les documents</p>
+            <p className="text-xs text-[#00272B]/40">Affichées sur le site public (page Contact, pied de page) ; un champ vide est masqué</p>
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -78,6 +79,15 @@ export default function EntrepriseSettings({ settings, onSave }: Props) {
               className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:border-[#1AAA3F] text-[#00272B]"
               placeholder="+221 77 000 00 00"
             />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-[#00272B]/60 mb-1.5">WhatsApp</label>
+            <input
+              type="text" name="app_whatsapp" value={form.app_whatsapp} onChange={handleChange}
+              className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:border-[#1AAA3F] text-[#00272B]"
+              placeholder="+221 77 000 00 00"
+            />
+            <p className="mt-1 text-xs text-[#00272B]/40">Utilisé pour le bouton WhatsApp de la page Contact</p>
           </div>
           <div>
             <label className="block text-xs font-semibold text-[#00272B]/60 mb-1.5">Site web</label>
