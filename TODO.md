@@ -2,12 +2,11 @@
 
 Reste à faire, relevé le 2026-10-20. À traiter plus tard, par ordre de priorité.
 
-## 1. Inscription client non branchée (bloquant)
+## 1. ~~Inscription client non branchée~~ ✅ fait le 2026-10-25
 
-- La route backend `POST /api/auth/client/register` existe et fonctionne.
-- Côté frontend, `frontend/src/pages/inscription/page.tsx` (ligne ~60) contient un `TODO` : la page simule un délai de 1,5 s puis redirige vers `/confirmation-email` **sans créer de compte**.
-- `frontend/src/services/auth.service.ts` n'expose pas de fonction `register`.
-- À faire : ajouter `register()` au service d'auth, l'appeler depuis la page, afficher les erreurs renvoyées par l'API (email déjà utilisé, validation).
+- La page appelle `authService.clientRegister()` et affiche les erreurs de l'API.
+- Corrigé au passage : le backend rejetait les numéros au format `+221…`.
+- **Reste lié** : l'envoi d'emails échoue (`535-5.7.8 Username and Password not accepted`). Les identifiants SMTP du `.env` sont refusés par Gmail : il faut un **mot de passe d'application** Gmail (pas le mot de passe du compte). Sans ça, l'email de confirmation d'adresse ne part pas.
 
 ## 2. Internationalisation FR/EN incomplète
 
