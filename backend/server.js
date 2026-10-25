@@ -51,7 +51,18 @@ const authLimiter = rateLimit({
 });
 
 app.use('/api/', limiter);
-app.use('/api/auth/', authLimiter);
+// Limite stricte sur les seules routes qui reçoivent des identifiants ou des
+// jetons à deviner. /auth/me est appelé à chaque chargement de page : le
+// limiter déconnecterait un utilisateur qui recharge une dizaine de fois.
+app.use([
+  '/api/auth/admin/login',
+  '/api/auth/client/login',
+  '/api/auth/client/register',
+  '/api/auth/forgot-password',
+  '/api/auth/reset-password',
+  '/api/auth/verify-email',
+  '/api/auth/resend-verification',
+], authLimiter);
 
 // Body parsers
 // `verify` conserve les octets reçus : la signature des webhooks de paiement
