@@ -107,10 +107,11 @@ async function sendWelcomeEmail(user) {
 }
 
 /**
- * Email de réinitialisation de mot de passe
+ * Email de réinitialisation de mot de passe.
+ * `userType` permet au frontend de renvoyer vers la bonne page de connexion.
  */
-async function sendPasswordReset(user, token) {
-  const resetUrl = `${process.env.FRONTEND_URL}/reinitialiser-mot-de-passe?token=${token}`;
+async function sendPasswordReset(user, token, userType = 'client') {
+  const resetUrl = `${process.env.FRONTEND_URL}/reinitialiser-mot-de-passe?token=${token}&type=${userType}`;
   return sendEmail({
     to: user.email,
     subject: 'Réinitialisation de votre mot de passe - SMALIM',

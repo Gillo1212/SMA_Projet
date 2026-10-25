@@ -221,7 +221,7 @@ exports.forgotPassword = async (req, res, next) => {
     });
 
     // Envoi non bloquant : la réponse ne doit pas dépendre du SMTP
-    sendPasswordReset(user, token).catch(err =>
+    sendPasswordReset(user, token, userType).catch(err =>
       console.error('[Email] Reset mot de passe non envoyé:', err.message)
     );
 
