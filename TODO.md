@@ -8,19 +8,28 @@ Reste à faire, relevé le 2026-10-20. À traiter plus tard, par ordre de priori
 - Corrigé au passage : le backend rejetait les numéros au format `+221…`.
 - **Reste lié** : l'envoi d'emails échoue (`535-5.7.8 Username and Password not accepted`). Les identifiants SMTP du `.env` sont refusés par Gmail : il faut un **mot de passe d'application** Gmail (pas le mot de passe du compte). Sans ça, l'email de confirmation d'adresse ne part pas.
 
-## 2. Internationalisation FR/EN incomplète
+## 2. Internationalisation FR/EN — en cours
 
-- Travail en cours non commité dans le dépôt `frontend/` : `About.tsx`, `Features.tsx`, `Testimonials.tsx`, `machines/detail/page.tsx` + nouveaux fichiers `i18n/local/{fr,en}/machineDetail.ts` et `marketing.ts`. **À commiter.**
-- Pages qui n'utilisent pas encore `useTranslation` :
-  - `pages/about/page.tsx`
-  - `pages/home/page.tsx`
-  - `pages/NotFound.tsx`
-  - `pages/confirmation-email/page.tsx`
-  - `pages/admin/page.tsx`, `pages/admin/parametres/page.tsx`
-  - `pages/admin/components/AdminSidebar.tsx`
-  - `pages/admin/blog/components/DeleteModal.tsx`, `pages/admin/machines/components/DeleteModal.tsx`
-  - `pages/espace-client/commandes/page.tsx`, `factures/page.tsx`, `machines/page.tsx`
-- Les messages d'erreur codés en dur (ex. « Les mots de passe ne correspondent pas. » dans l'inscription) sont aussi à traduire.
+Périmètre décidé le 2026-10-25 : **site public + espace client**. Le portail admin reste en français (outil interne).
+
+- ✅ Lot A : pages d'authentification (connexion admin/client, inscription, mot de passe, confirmation d'email).
+- ✅ Lot B : À propos, 404, comparateur, demande de devis, fiche produit.
+- ⏳ Lot C : espace client (tableau de bord, commandes, devis, factures, machines, support, profil, sidebar, layout, notifications).
+- Volontairement non traduits : `paiement/simulation` (outil de dev), `commande/confirmation` (page morte, voir §7).
+- **Limites restantes** :
+  - Les messages d'erreur renvoyés par le backend (« Cet email est déjà utilisé », « Email ou mot de passe incorrect »…) restent en français.
+  - `machines.service.ts` fabrique des libellés en français : « Sur devis », « Populaire », niveaux de stock.
+  - Les données du catalogue (noms, descriptions, catégories, délais) sont en français dans la base.
+
+## 2 bis. Panier : montants incohérents avec le backend (bug)
+
+- `pages/panier/page.tsx` offre la livraison au-delà de 50 000 FCFA, et la fiche produit l'annonce (« Livraison gratuite dès 50 000 FCFA »). **Le backend ne connaît pas cette règle** : il facture 0 / 2 500 / 5 000 FCFA selon le mode (`DELIVERY_FEES` dans `orders.controller.js`). Le client voit un total dans le panier, puis un autre au checkout.
+- Le panier valide les codes promo avec une liste codée en dur (`BIENVENUE10`, `SMA2026`, `FIRST20`) au lieu d'appeler l'API, et le message d'erreur affiche les codes valides.
+- À faire : décider de la règle de livraison (l'implémenter côté backend, ou retirer la mention), et faire valider les codes promo par l'API.
+
+## 2 ter. Comparateur : données manquantes
+
+- `machines.service.ts` force `capacity: {}` et `maintenanceIncluded: false` : le comparateur affiche « N/A » et « ✗ maintenance » pour toutes les machines.
 
 ## 3. Catalogue et contenus réels à compléter
 
@@ -65,6 +74,7 @@ Le catalogue ne contient plus que les produits de la banque d'images : 5 machine
 ## 7. Nettoyage du dépôt
 
 - `backend/` contient des fichiers qui semblent venir du frontend : `index.html`, `vite.config.ts`, `vite-env.d.ts`, `tailwind.config.ts`, `postcss.config.ts`, `eslint.config.ts`, `tsconfig*.json`. À vérifier puis supprimer.
+- Page morte `frontend/src/pages/commande/confirmation/` : plus aucun lien n'y mène depuis le passage au paiement Wave / Orange Money (le checkout redirige vers `/paiement/retour`). À supprimer avec sa route, ou à rebrancher.
 - Fichiers SQL de session inutiles : `SMA.session.sql` (racine, vide) et `backend/SenMartAli.session.sql`.
 - Vidéo `WhatsApp Video 2026-03-29 at 19.18.16.mp4` (6 Mo) à la racine : ignorée par git, à déplacer ou supprimer.
 - Images encore hébergées chez readdy.ai (illustrations de la page d'accueil, de la page À propos, du blog, des mocks) : à remplacer par des visuels propres à SMALIM au fur et à mesure.
