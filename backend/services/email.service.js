@@ -149,6 +149,8 @@ async function sendOrderConfirmation(user, order) {
       subtotal: Number(order.subtotal).toLocaleString('fr-FR'),
       shipping: Number(order.shipping_cost).toLocaleString('fr-FR'),
       tva: Number(order.tax_amount).toLocaleString('fr-FR'),
+      // Taux figé sur la commande ; 18 % pour les commandes antérieures à la colonne
+      tvaRate: Number(order.tax_rate ?? 18).toLocaleString('fr-FR'),
       total: Number(order.total_amount).toLocaleString('fr-FR'),
       deliveryAddress: `${order.shipping_address}, ${order.shipping_city}`,
       trackingUrl: `${process.env.FRONTEND_URL}/espace-client/commandes`,

@@ -60,6 +60,17 @@ const requireSuperAdmin = (req, res, next) => {
 };
 
 /**
+ * Middleware - admins ayant l'un des rôles donnés
+ *   router.put('/', authenticate, requireRole('super_admin', 'admin'), …)
+ */
+const requireRole = (...roles) => (req, res, next) => {
+  if (req.user?.type !== 'admin' || !roles.includes(req.user?.role)) {
+    return res.status(403).json({ success: false, message: 'Action non autorisée pour votre rôle' });
+  }
+  next();
+};
+
+/**
  * Middleware - clients uniquement
  */
 const requireClient = (req, res, next) => {
@@ -98,4 +109,4 @@ const optionalAuth = async (req, res, next) => {
   next();
 };
 
-module.exports = { authenticate, requireAdmin, requireSuperAdmin, requireClient, optionalAuth };
+module.exports = { authenticate, requireAdmin, requireSuperAdmin, requireRole, requireClient, optionalAuth };

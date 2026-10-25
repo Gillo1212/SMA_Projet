@@ -35,8 +35,9 @@ async function migrate() {
         await connection.query(statement);
         applied++;
       } catch (err) {
-        // 1061 = index déjà existant, 1050 = table déjà existante
-        if (err.errno === 1061 || err.errno === 1050) {
+        // 1061 = index déjà existant, 1050 = table déjà existante,
+        // 1060 = colonne déjà existante (ALTER TABLE … ADD COLUMN rejoué)
+        if (err.errno === 1061 || err.errno === 1050 || err.errno === 1060) {
           skipped++;
           continue;
         }

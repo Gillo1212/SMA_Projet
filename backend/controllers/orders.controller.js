@@ -1,5 +1,6 @@
 const { query, queryOne, transaction } = require('../config/database');
 const { sendOrderConfirmation, sendOrderStatusUpdate } = require('../services/email.service');
+const settings = require('../services/settings.service');
 
 const generateOrderNumber = () => {
   const date = new Date();
@@ -8,22 +9,15 @@ const generateOrderNumber = () => {
   return `CMD-${year}-${rand}`;
 };
 
-/** Taux de TVA appliqué aux commandes (18 % au Sénégal) */
-const TAX_RATE = Number(process.env.TAX_RATE ?? 0.18);
-
 /**
- * Grille de frais de livraison, en FCFA.
- * Calculée côté serveur : un client ne doit pas pouvoir choisir le montant
- * qu'il paie en livraison, ni annuler la TVA en postant ses propres totaux.
+ * Remise d'un code promo sur un sous-total. Une remise fixe ne peut pas
+ * dépasser le sous-total : le montant dû ne devient jamais négatif.
  */
-const DELIVERY_FEES = {
-  pickup: 0,
-  standard: 2500,
-  express: 5000,
-};
-
-function resolveDeliveryFee(mode) {
-  return DELIVERY_FEES[mode] ?? DELIVERY_FEES.standard;
+function promoDiscount(promo, subtotal) {
+  const raw = promo.type === 'percentage'
+    ? subtotal * (Number(promo.value) / 100)
+    : Number(promo.value);
+  return Math.round(Math.min(raw, subtotal));
 }
 
 exports.getAll = async (req, res, next) => {
@@ -111,8 +105,13 @@ exports.create = async (req, res, next) => {
     // ── 2. Totaux calculés côté serveur ──
     // Ni la TVA ni les frais de port ne sont repris du corps de requête :
     // sinon un client pourrait poster tax_amount = 0 et payer moins.
-    const subtotal = resolvedItems.reduce((sum, i) => sum + i.realPrice * i.quantity, 0);
-    const shipping_amount = resolveDeliveryFee(delivery_mode);
+    // Les taux viennent des paramètres du back-office (services/settings).
+    const subtotal = resolvedItems.reduce((sum, i) => sum + Number(i.realPrice) * i.quantity, 0);
+    const shopConfig = await settings.getShopConfig();
+    const deliveryMode = delivery_mode || 'standard';
+    if (settings.deliveryFee(shopConfig, deliveryMode, subtotal) === null) {
+      return res.status(400).json({ success: false, message: "Ce mode de livraison n'est pas proposé actuellement" });
+    }
 
     // ── 3. Tout dans une transaction atomique ──
     const result = await transaction(async (conn) => {
@@ -130,25 +129,27 @@ exports.create = async (req, res, next) => {
         if (promoResult.affectedRows > 0) {
           const [promoRows] = await conn.execute('SELECT * FROM promo_codes WHERE code = ?', [promo_code]);
           const promo = promoRows[0];
-          if (promo) {
-            discount = promo.type === 'percentage'
-              ? subtotal * (promo.value / 100)
-              : promo.value;
-          }
+          if (promo) discount = promoDiscount(promo, subtotal);
+        } else {
+          // Code refusé (inconnu, expiré, épuisé, minimum non atteint) : on le
+          // signale plutôt que de facturer sans la remise que le client attend.
+          throw Object.assign(new Error('Code promo invalide ou expiré'), { statusCode: 400 });
         }
       }
 
-      // La TVA porte sur le montant réellement dû, remise déduite
-      const tax_amount = Math.round((subtotal - discount) * TAX_RATE);
-      const total_amount = subtotal - discount + shipping_amount + tax_amount;
+      // Livraison et TVA portent sur le montant réellement dû, remise déduite
+      const amountDue = subtotal - discount;
+      const shipping_amount = settings.deliveryFee(shopConfig, deliveryMode, amountDue);
+      const tax_amount = Math.round(amountDue * shopConfig.taxRate / 100);
+      const total_amount = amountDue + shipping_amount + tax_amount;
       const orderNumber = generateOrderNumber();
 
       // ── 3b. Créer la commande ──
       const [orderResult] = await conn.execute(
-        `INSERT INTO orders (order_number, client_id, subtotal, tax_amount, shipping_amount, discount_amount, total_amount, payment_method, promo_code, shipping_address, notes)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO orders (order_number, client_id, subtotal, tax_amount, tax_rate, shipping_amount, delivery_mode, discount_amount, total_amount, payment_method, promo_code, shipping_address, notes)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         // mysql2 refuse `undefined` : tout champ optionnel doit être explicitement null
-        [orderNumber, clientId, subtotal, tax_amount, shipping_amount, discount, total_amount, payment_method, promo_code || null, JSON.stringify(shipping_address), notes ?? null]
+        [orderNumber, clientId, subtotal, tax_amount, shopConfig.taxRate, shipping_amount, deliveryMode, discount, total_amount, payment_method, promo_code || null, JSON.stringify(shipping_address), notes ?? null]
       );
       const orderId = orderResult.insertId;
 
@@ -166,7 +167,10 @@ exports.create = async (req, res, next) => {
         );
         // Si affectedRows === 0 : stock épuisé entre la pré-vérification et la transaction → rollback
         if (stockResult.affectedRows === 0) {
-          throw new Error(`Stock insuffisant pour "${item.dbName}" au moment de la validation`);
+          throw Object.assign(
+            new Error(`Stock insuffisant pour "${item.dbName}" au moment de la validation`),
+            { statusCode: 409 }
+          );
         }
       }
 
@@ -232,7 +236,7 @@ exports.validatePromo = async (req, res, next) => {
     if (promo.min_order_amount && subtotal < promo.min_order_amount) {
       return res.status(400).json({ success: false, message: `Minimum de commande requis : ${promo.min_order_amount} FCFA` });
     }
-    const discount = promo.type === 'percentage' ? subtotal * (promo.value / 100) : promo.value;
-    res.json({ success: true, discount, type: promo.type, value: promo.value, code: promo.code });
+    const discount = promoDiscount(promo, Number(subtotal));
+    res.json({ success: true, discount, type: promo.type, value: Number(promo.value), code: promo.code });
   } catch (error) { next(error); }
 };

@@ -20,6 +20,8 @@ const blogRoutes = require('./routes/blog');
 const dashboardRoutes = require('./routes/dashboard');
 const uploadRoutes = require('./routes/upload');
 const paymentsRoutes = require('./routes/payments');
+const settingsRoutes = require('./routes/settings');
+const promoCodesRoutes = require('./routes/promoCodes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -89,6 +91,8 @@ app.use('/api/blog', blogRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/payments', paymentsRoutes);
+app.use('/api/settings', settingsRoutes);
+app.use('/api/promo-codes', promoCodesRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

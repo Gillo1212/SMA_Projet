@@ -354,6 +354,23 @@ CREATE TABLE IF NOT EXISTS payment_transactions (
 ) ENGINE=InnoDB;
 
 -- ────────────────────────────────────────────────────────────
+-- PARAMÈTRES (clé → valeur, édités depuis le back-office)
+-- Les valeurs par défaut vivent dans services/settings.service.js :
+-- une clé absente de la table prend sa valeur par défaut.
+-- ────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS settings (
+  setting_key     VARCHAR(100) NOT NULL PRIMARY KEY,
+  setting_value   TEXT NOT NULL,
+  updated_by      INT UNSIGNED NULL,
+  updated_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+-- Mode de livraison et taux de TVA figés au moment de la commande :
+-- un changement de paramètre ne doit pas réécrire les commandes passées.
+ALTER TABLE orders ADD COLUMN delivery_mode ENUM('pickup','standard','express') NULL AFTER shipping_amount;
+ALTER TABLE orders ADD COLUMN tax_rate DECIMAL(5,2) NULL AFTER tax_amount;
+
+-- ────────────────────────────────────────────────────────────
 -- INDEX POUR PERFORMANCES
 -- ────────────────────────────────────────────────────────────
 CREATE INDEX idx_orders_client ON orders(client_id);

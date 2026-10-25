@@ -175,6 +175,31 @@ const validatePromoRules = [
   body('subtotal').isFloat({ min: 0 }).withMessage('Sous-total invalide'),
 ];
 
+// ── Codes promo (back-office) ──────────────────────────────────
+
+/** Règles communes ; `optional` rend chaque champ facultatif (mise à jour partielle) */
+const promoFieldRules = (optional) => {
+  const f = (name) => (optional ? body(name).optional() : body(name));
+  return [
+    f('code').trim().toUpperCase()
+      .matches(/^[A-Z0-9_-]{3,50}$/).withMessage('Code : 3 à 50 caractères (lettres, chiffres, - ou _)'),
+    f('type').isIn(['percentage', 'fixed']).withMessage('Type invalide (percentage | fixed)'),
+    f('value').isFloat({ gt: 0 }).withMessage('Valeur : nombre strictement positif')
+      .custom((v, { req }) => req.body.type !== 'percentage' || Number(v) <= 100)
+      .withMessage('Un pourcentage ne peut pas dépasser 100'),
+    body('min_order_amount').optional({ values: 'null' }).isFloat({ min: 0 }).withMessage('Montant minimum invalide'),
+    body('max_uses').optional({ values: 'null' }).isInt({ min: 1 }).withMessage("Nombre d'utilisations : entier ≥ 1"),
+    body('expires_at').optional({ values: 'null' }).isISO8601().withMessage("Date d'expiration invalide"),
+    body('is_active').optional().isBoolean().withMessage('is_active doit être un booléen'),
+  ];
+};
+
+const promoCreateRules = promoFieldRules(false);
+const promoUpdateRules = [
+  param('id').isInt({ min: 1 }).withMessage('ID invalide'),
+  ...promoFieldRules(true),
+];
+
 // ── Quotes ────────────────────────────────────────────────────
 
 const quoteCreateRules = [
@@ -276,6 +301,8 @@ module.exports = {
   orderCreateRules,
   orderUpdateStatusRules,
   validatePromoRules,
+  promoCreateRules,
+  promoUpdateRules,
   // Quotes
   quoteCreateRules,
   quoteUpdateStatusRules,
