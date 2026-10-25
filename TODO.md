@@ -8,13 +8,15 @@ Reste à faire, relevé le 2026-10-20. À traiter plus tard, par ordre de priori
 - Corrigé au passage : le backend rejetait les numéros au format `+221…`.
 - **Reste lié** : l'envoi d'emails échoue (`535-5.7.8 Username and Password not accepted`). Les identifiants SMTP du `.env` sont refusés par Gmail : il faut un **mot de passe d'application** Gmail (pas le mot de passe du compte). Sans ça, l'email de confirmation d'adresse ne part pas.
 
-## 2. Internationalisation FR/EN — en cours
+## 2. ~~Internationalisation FR/EN~~ ✅ fait le 2026-10-25
 
 Périmètre décidé le 2026-10-25 : **site public + espace client**. Le portail admin reste en français (outil interne).
 
 - ✅ Lot A : pages d'authentification (connexion admin/client, inscription, mot de passe, confirmation d'email).
 - ✅ Lot B : À propos, 404, comparateur, demande de devis, fiche produit.
-- ⏳ Lot C : espace client (tableau de bord, commandes, devis, factures, machines, support, profil, sidebar, layout, notifications).
+- ✅ Lot C : espace client (tableau de bord, commandes, devis, factures, machines, support, profil, sidebar, layout, notifications) + sélecteur de langue dans l'espace client.
+- ✅ Reliquats des pages déjà traduites : contact, panier, checkout, fiche machine, article de blog.
+- Vérifié dans Chrome (Playwright) : chaque page en FR et en EN, inscription, connexion, espace client, commande complète jusqu'au paiement simulé.
 - Volontairement non traduits : `paiement/simulation` (outil de dev), `commande/confirmation` (page morte, voir §7).
 - **Limites restantes** :
   - Les messages d'erreur renvoyés par le backend (« Cet email est déjà utilisé », « Email ou mot de passe incorrect »…) restent en français.
@@ -24,7 +26,12 @@ Périmètre décidé le 2026-10-25 : **site public + espace client**. Le portail
 ## 2 bis. Panier : montants incohérents avec le backend (bug)
 
 - `pages/panier/page.tsx` offre la livraison au-delà de 50 000 FCFA, et la fiche produit l'annonce (« Livraison gratuite dès 50 000 FCFA »). **Le backend ne connaît pas cette règle** : il facture 0 / 2 500 / 5 000 FCFA selon le mode (`DELIVERY_FEES` dans `orders.controller.js`). Le client voit un total dans le panier, puis un autre au checkout.
-- Le panier valide les codes promo avec une liste codée en dur (`BIENVENUE10`, `SMA2026`, `FIRST20`) au lieu d'appeler l'API, et le message d'erreur affiche les codes valides.
+- Le panier valide les codes promo avec une liste codée en dur (`BIENVENUE10`, `SMA2026`, `FIRST20`) au lieu d'appeler l'API. (Le message d'erreur, qui affichait les codes valides, est maintenant générique.)
+- Le checkout n'exige pas d'être connecté, alors que `POST /orders` le demande : un visiteur anonyme remplit tout le tunnel puis reçoit une erreur. Rediriger vers la connexion client avant l'étape adresse (ou proposer la création de compte, déjà amorcée dans le formulaire).
+
+## 2 quater. Connexion lente (~3 à 4 s)
+
+- `bcryptjs` (JavaScript pur) à 12 tours prend environ 4 s par hachage sur la machine de dev : chaque connexion et inscription attend autant. Passer au paquet natif `bcrypt` (compatible avec les hachages existants), ou mesurer sur le serveur de production avant de décider.
 - À faire : décider de la règle de livraison (l'implémenter côté backend, ou retirer la mention), et faire valider les codes promo par l'API.
 
 ## 2 ter. Comparateur : données manquantes
