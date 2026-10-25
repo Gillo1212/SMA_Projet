@@ -48,7 +48,11 @@ const clientRegisterRules = [
     .isLength({ min: 8 }).withMessage('Mot de passe : 8 caractères minimum'),
   body('first_name').trim().notEmpty().withMessage('Prénom requis'),
   body('last_name').trim().notEmpty().withMessage('Nom requis'),
-  body('phone').optional().isMobilePhone().withMessage('Numéro de téléphone invalide'),
+  // isMobilePhone() n'a pas de locale sénégalaise et rejette +221 77 123 45 67 :
+  // on accepte 9 à 15 chiffres, préfixe international et séparateurs compris.
+  body('phone').optional({ values: 'falsy' }).trim()
+    .custom(v => /^(\+|00)?\d{9,15}$/.test(v.replace(/[\s.\-()]/g, '')))
+    .withMessage('Numéro de téléphone invalide'),
 ];
 
 const changePasswordRules = [
