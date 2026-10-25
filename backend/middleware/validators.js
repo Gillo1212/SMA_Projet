@@ -37,6 +37,13 @@ const adminRegisterRules = [
     .withMessage('Rôle invalide'),
 ];
 
+const adminUpdateRules = [
+  param('id').isInt({ min: 1 }).withMessage('ID invalide'),
+  body('first_name').optional().trim().notEmpty().withMessage('Prénom requis'),
+  body('last_name').optional().trim().notEmpty().withMessage('Nom requis'),
+  body('role').optional().isIn(['super_admin', 'admin', 'commercial']).withMessage('Rôle invalide'),
+];
+
 const clientLoginRules = [
   body('email').isEmail().withMessage('Email invalide').normalizeEmail(),
   body('password').notEmpty().withMessage('Mot de passe requis'),
@@ -281,6 +288,7 @@ module.exports = {
   // Auth
   adminLoginRules,
   adminRegisterRules,
+  adminUpdateRules,
   clientLoginRules,
   clientRegisterRules,
   changePasswordRules,

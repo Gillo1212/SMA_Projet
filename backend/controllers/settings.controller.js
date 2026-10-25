@@ -1,9 +1,10 @@
 const settings = require('../services/settings.service');
+const { testSmtp } = require('../services/email.service');
 
-/** GET /api/settings — tous les paramètres (admin) */
+/** GET /api/settings — tous les paramètres, secrets masqués (admin) */
 exports.getAll = async (req, res, next) => {
   try {
-    res.json({ success: true, settings: await settings.getAll() });
+    res.json({ success: true, settings: await settings.getAllForAdmin() });
   } catch (error) { next(error); }
 };
 
@@ -21,11 +22,33 @@ exports.update = async (req, res, next) => {
 };
 
 /**
- * GET /api/settings/public — règles de calcul d'une commande (public).
- * Le panier et le checkout s'en servent pour afficher le montant facturé.
+ * GET /api/settings/public — règles de calcul d'une commande et coordonnées
+ * de l'entreprise (public). Le panier, le checkout et les pages de contact
+ * s'en servent.
  */
 exports.getPublic = async (req, res, next) => {
   try {
-    res.json({ success: true, data: await settings.getShopConfig() });
+    const [shop, company] = await Promise.all([settings.getShopConfig(), settings.getCompany()]);
+    res.json({ success: true, data: { ...shop, company } });
+  } catch (error) { next(error); }
+};
+
+/**
+ * POST /api/settings/smtp/test — connexion au serveur SMTP enregistré puis
+ * envoi d'un email de test à l'adresse donnée (par défaut, celle de l'admin).
+ */
+exports.testSmtp = async (req, res, next) => {
+  try {
+    const to = (req.body?.to || req.user.email || '').trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) {
+      return res.status(400).json({ success: false, message: 'Adresse de test invalide' });
+    }
+    const result = await testSmtp(to);
+    res.status(result.success ? 200 : 502).json({
+      success: result.success,
+      message: result.success ? `Email de test envoyé à ${to}` : result.error,
+      step: result.step,
+      source: result.source,
+    });
   } catch (error) { next(error); }
 };

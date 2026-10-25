@@ -7,6 +7,7 @@ const {
   sendPasswordReset,
   sendEmailVerification,
 } = require('../services/email.service');
+const adminNotifications = require('../services/adminNotifications.service');
 
 const generateTokens = (payload) => {
   const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN || '7d' });
@@ -141,6 +142,7 @@ exports.clientRegister = async (req, res, next) => {
         console.error('[Email] Vérification non envoyée:', err.message)
       );
 
+    adminNotifications.newClient({ first_name, last_name, email, company_name, phone });
     res.status(201).json({ success: true, message: 'Compte créé avec succès', token, refreshToken });
   } catch (error) { next(error); }
 };

@@ -1,6 +1,7 @@
 const { query, queryOne, transaction } = require('../config/database');
 const { sendOrderConfirmation, sendOrderStatusUpdate } = require('../services/email.service');
 const settings = require('../services/settings.service');
+const adminNotifications = require('../services/adminNotifications.service');
 
 const generateOrderNumber = () => {
   const date = new Date();
@@ -179,6 +180,13 @@ exports.create = async (req, res, next) => {
     });
 
     const order = await queryOne('SELECT * FROM orders WHERE id = ?', [result]);
+
+    // Notifications équipe (non bloquantes)
+    const buyer = clientId
+      ? await queryOne('SELECT first_name, last_name, company_name FROM clients WHERE id = ?', [clientId])
+      : null;
+    adminNotifications.newOrder(order, buyer && (buyer.company_name || `${buyer.first_name} ${buyer.last_name}`));
+    adminNotifications.lowStockAfterOrder(resolvedItems.map(i => ({ type: i.type, id: i.id })));
 
     // Email de confirmation (non bloquant, uniquement si le client est authentifié)
     if (clientId) {

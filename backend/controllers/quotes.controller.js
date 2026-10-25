@@ -1,5 +1,6 @@
 const { query, queryOne } = require('../config/database');
 const { sendQuoteUpdate } = require('../services/email.service');
+const adminNotifications = require('../services/adminNotifications.service');
 
 const generateQuoteNumber = () => {
   const date = new Date();
@@ -65,6 +66,7 @@ exports.create = async (req, res, next) => {
       [quoteNumber, clientId, company_name, contact_name, contact_email, contact_phone, machine_type, description, budget || null, quantity || 1, notes]
     );
     const quote = await queryOne('SELECT * FROM quotes WHERE id = ?', [result.insertId]);
+    adminNotifications.newQuote(quote);
     res.status(201).json({ success: true, message: 'Demande de devis envoyée', data: quote });
   } catch (error) { next(error); }
 };

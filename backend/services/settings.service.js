@@ -10,6 +10,7 @@
  * GET /api/settings/public, pour afficher exactement le montant facturé.
  */
 const { query } = require('../config/database');
+const { encrypt, decrypt } = require('../lib/secrets');
 
 const DELIVERY_MODES = ['pickup', 'standard', 'express'];
 
@@ -46,6 +47,19 @@ const email = v => {
   return s;
 };
 
+const port = v => {
+  if (v === '' || v == null) return '';
+  const n = Number(v);
+  if (!Number.isInteger(n) || n < 1 || n > 65535) throw new Error('port entre 1 et 65535');
+  return String(n);
+};
+
+const hostname = v => {
+  const s = String(v ?? '').trim();
+  if (s && !/^[a-zA-Z0-9.-]{1,255}$/.test(s)) throw new Error("nom d'hôte invalide");
+  return s;
+};
+
 const oneOf = values => v => {
   if (!values.includes(v)) throw new Error(`valeur attendue : ${values.join(', ')}`);
   return v;
@@ -73,6 +87,8 @@ const DEFINITIONS = {
   app_city:        { default: '',       validate: text(100) },
   app_country:     { default: 'Sénégal', validate: text(100) },
   app_website:     { default: '',       validate: text(255) },
+  /** Numéro WhatsApp affiché sur le site (format international, ex. 221771234567) */
+  app_whatsapp:    { default: '',       validate: text(30) },
   app_description: { default: '',       validate: text(500) },
   currency:        { default: 'XOF',    validate: oneOf(['XOF']) },
   timezone:        { default: 'Africa/Dakar', validate: oneOf(['Africa/Dakar', 'Africa/Abidjan', 'Africa/Lagos', 'Europe/Paris']) },
@@ -83,7 +99,28 @@ const DEFINITIONS = {
   notif_new_client:  { default: '0', validate: bool },
   notif_low_stock:   { default: '1', validate: bool },
   notif_admin_email: { default: '',  validate: email },
+  /** Alerte « stock faible » quand le stock d'un article passe à ce niveau ou en dessous */
+  notif_low_stock_threshold: { default: '5', validate: amount },
+
+  // Email (SMTP). Vide = valeur du fichier .env. Le mot de passe est chiffré
+  // en base et n'est jamais renvoyé au navigateur.
+  smtp_host:      { default: '', validate: hostname },
+  smtp_port:      { default: '', validate: port },
+  smtp_secure:    { default: '0', validate: bool },
+  smtp_user:      { default: '', validate: text(255) },
+  smtp_pass:      { default: '', validate: text(255), secret: true },
+  smtp_from:      { default: '', validate: email },
+  smtp_from_name: { default: '', validate: text(100) },
 };
+
+const SECRET_KEYS = Object.keys(DEFINITIONS).filter(k => DEFINITIONS[k].secret);
+
+// Abonnés prévenus après chaque mise à jour (ex. le transport email)
+const listeners = new Set();
+function onChange(listener) {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+}
 
 // ── Lecture (avec cache) ───────────────────────────────────────────────────
 // Le calcul de chaque commande lit les paramètres : on garde la dernière
@@ -102,18 +139,42 @@ async function getAll() {
 }
 
 /**
+ * Paramètres tels que renvoyés au back-office : les secrets sont masqués,
+ * remplacés par un indicateur `<clé>_set` ('1' si une valeur est enregistrée).
+ */
+async function getAllForAdmin() {
+  const all = { ...(await getAll()) };
+  for (const key of SECRET_KEYS) {
+    all[`${key}_set`] = all[key] ? '1' : '0';
+    all[key] = '';
+  }
+  return all;
+}
+
+/** Valeur déchiffrée d'un secret, ou null */
+async function getSecret(key) {
+  return decrypt((await getAll())[key]);
+}
+
+/**
  * Valide puis enregistre un lot de paramètres.
  * Tout ou rien : la première valeur invalide rejette le lot entier.
- * @returns {Promise<object>} l'ensemble des paramètres après mise à jour
+ * Un secret laissé vide est conservé tel quel (le formulaire ne le connaît pas).
+ * @returns {Promise<object>} l'ensemble des paramètres après mise à jour (secrets masqués)
  */
 async function update(changes, adminId) {
   const errors = [];
   const normalized = {};
   for (const [key, value] of Object.entries(changes ?? {})) {
+    // Indicateurs renvoyés par getAllForAdmin : à ignorer s'ils reviennent
+    if (SECRET_KEYS.some(k => key === `${k}_set`)) continue;
     const def = DEFINITIONS[key];
     if (!def) { errors.push({ field: key, message: 'Paramètre inconnu' }); continue; }
-    try { normalized[key] = def.validate(value); }
-    catch (e) { errors.push({ field: key, message: e.message }); }
+    if (def.secret && (value === '' || value == null)) continue;
+    try {
+      const valid = def.validate(value);
+      normalized[key] = def.secret ? encrypt(valid) : valid;
+    } catch (e) { errors.push({ field: key, message: e.message }); }
   }
 
   // Au moins un mode de livraison doit rester proposé
@@ -137,7 +198,10 @@ async function update(changes, adminId) {
     );
   }
   cache = null;
-  return getAll();
+  for (const listener of listeners) {
+    try { listener(Object.keys(normalized)); } catch (e) { console.error('[Settings] abonné en erreur:', e.message); }
+  }
+  return getAllForAdmin();
 }
 
 /** Règles de calcul d'une commande, sous forme typée */
@@ -169,4 +233,64 @@ function deliveryFee(config, mode, amountAfterDiscount) {
   return option.fee;
 }
 
-module.exports = { DELIVERY_MODES, getAll, update, getShopConfig, deliveryFee };
+/** Coordonnées publiques de l'entreprise (site, emails) */
+async function getCompany() {
+  const s = await getAll();
+  return {
+    name: s.app_name,
+    email: s.app_email,
+    phone: s.app_phone,
+    whatsapp: s.app_whatsapp,
+    address: s.app_address,
+    city: s.app_city,
+    country: s.app_country,
+    website: s.app_website,
+    description: s.app_description,
+  };
+}
+
+/**
+ * Configuration SMTP effective. Tout ou rien, pour ne jamais mélanger un hôte
+ * et des identifiants de sources différentes :
+ *   - hôte renseigné dans le back-office → configuration du back-office ;
+ *   - sinon → fichier .env.
+ */
+async function getSmtpConfig() {
+  const s = await getAll();
+  if (s.smtp_host) {
+    return {
+      source: 'database',
+      host: s.smtp_host,
+      port: Number(s.smtp_port || 587),
+      secure: s.smtp_secure === '1',
+      user: s.smtp_user,
+      pass: decrypt(s.smtp_pass) ?? '',
+      from: s.smtp_from || s.smtp_user,
+      fromName: s.smtp_from_name || s.app_name || 'SMALIM',
+    };
+  }
+  const env = process.env;
+  return {
+    source: 'env',
+    host: env.SMTP_HOST || '',
+    port: Number(env.SMTP_PORT || 587),
+    secure: env.SMTP_SECURE === 'true',
+    user: env.SMTP_USER || '',
+    pass: env.SMTP_PASS || '',
+    from: env.EMAIL_FROM || env.SMTP_USER || '',
+    fromName: env.EMAIL_FROM_NAME || s.app_name || 'SMALIM',
+  };
+}
+
+module.exports = {
+  DELIVERY_MODES,
+  getAll,
+  getAllForAdmin,
+  getSecret,
+  update,
+  onChange,
+  getShopConfig,
+  getCompany,
+  getSmtpConfig,
+  deliveryFee,
+};

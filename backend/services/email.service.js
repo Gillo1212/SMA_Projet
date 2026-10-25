@@ -2,38 +2,42 @@ const nodemailer = require('nodemailer');
 const fs = require('fs');
 const path = require('path');
 
+const settings = require('./settings.service');
+
 // ===================================================
-// Configuration du transporteur Nodemailer
-// À configurer dans .env selon votre fournisseur SMTP
+// Transport SMTP
+// La configuration vient du back-office (Paramètres → Email & SMTP), à défaut
+// du fichier .env. Le transport est reconstruit dès qu'un paramètre smtp_* change.
 // ===================================================
 
-let transporter;
+let transporterPromise = null;
 
-function getTransporter() {
-  if (transporter) return transporter;
-
-  const config = {
-    gmail: {
-      service: 'gmail',
-      auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
-    },
-    sendgrid: {
-      host: 'smtp.sendgrid.net',
-      port: 587,
-      auth: { user: 'apikey', pass: process.env.SENDGRID_API_KEY },
-    },
-    smtp: {
-      host: process.env.SMTP_HOST,
-      port: parseInt(process.env.SMTP_PORT || '587'),
-      secure: process.env.SMTP_SECURE === 'true',
-      auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
-    },
-  };
-
-  const provider = process.env.EMAIL_PROVIDER || 'smtp';
-  transporter = nodemailer.createTransport(config[provider] || config.smtp);
-  return transporter;
+function buildTransport(cfg) {
+  // Compte Gmail sans hôte explicite : réglages du service Gmail de nodemailer
+  if (cfg.source === 'env' && process.env.EMAIL_PROVIDER === 'gmail') {
+    return nodemailer.createTransport({ service: 'gmail', auth: { user: cfg.user, pass: cfg.pass } });
+  }
+  if (cfg.source === 'env' && process.env.EMAIL_PROVIDER === 'sendgrid') {
+    return nodemailer.createTransport({
+      host: 'smtp.sendgrid.net', port: 587, auth: { user: 'apikey', pass: process.env.SENDGRID_API_KEY },
+    });
+  }
+  return nodemailer.createTransport({
+    host: cfg.host,
+    port: cfg.port,
+    secure: cfg.secure,
+    auth: cfg.user ? { user: cfg.user, pass: cfg.pass } : undefined,
+  });
 }
+
+async function getTransport() {
+  transporterPromise ??= settings.getSmtpConfig().then(cfg => ({ cfg, transport: buildTransport(cfg) }));
+  return transporterPromise;
+}
+
+settings.onChange(keys => {
+  if (keys.some(k => k.startsWith('smtp_') || k === 'app_name')) transporterPromise = null;
+});
 
 /**
  * Charge un template HTML et remplace les variables {{key}} par leurs valeurs
@@ -53,8 +57,9 @@ function loadTemplate(templateName, variables = {}) {
 async function sendEmail({ to, subject, templateName, variables, text }) {
   try {
     const html = templateName ? loadTemplate(templateName, variables) : undefined;
-    const result = await getTransporter().sendMail({
-      from: `"${process.env.EMAIL_FROM_NAME || 'SMALIM'}" <${process.env.EMAIL_FROM || process.env.SMTP_USER}>`,
+    const { cfg, transport } = await getTransport();
+    const result = await transport.sendMail({
+      from: `"${cfg.fromName}" <${cfg.from}>`,
       to,
       subject,
       html,
@@ -223,8 +228,65 @@ async function sendInvoiceNotification(user, invoice) {
   });
 }
 
+/**
+ * Teste la configuration SMTP enregistrée : connexion + envoi d'un email.
+ * Utilise un transport neuf pour tester exactement ce qui est enregistré.
+ * @returns {{ success: boolean, step?: 'config'|'connect'|'send', error?: string, source?: string }}
+ */
+async function testSmtp(to) {
+  const cfg = await settings.getSmtpConfig();
+  if (!cfg.host && process.env.EMAIL_PROVIDER !== 'gmail') {
+    return { success: false, step: 'config', error: 'Aucun serveur SMTP configuré', source: cfg.source };
+  }
+  const transport = buildTransport(cfg);
+  try {
+    await transport.verify();
+  } catch (err) {
+    return { success: false, step: 'connect', error: err.message, source: cfg.source };
+  }
+  try {
+    await transport.sendMail({
+      from: `"${cfg.fromName}" <${cfg.from}>`,
+      to,
+      subject: `Test d'envoi - ${cfg.fromName}`,
+      text: "Cet email confirme que la configuration SMTP du back-office fonctionne.",
+      html: '<p>Cet email confirme que la configuration SMTP du back-office fonctionne.</p>',
+    });
+  } catch (err) {
+    return { success: false, step: 'send', error: err.message, source: cfg.source };
+  }
+  return { success: true, source: cfg.source };
+}
+
+/**
+ * Notification interne envoyée à l'équipe (nouvelle commande, stock faible…).
+ * `lines` : liste de [libellé, valeur] affichée en tableau.
+ */
+async function sendAdminNotification(to, { subject, title, intro, lines = [], linkPath, linkLabel }) {
+  const escape = v => String(v ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const rows = lines
+    .map(([label, value]) => `<tr><td style="padding:6px 0;color:rgba(0,39,43,0.6);font-size:13px;">${escape(label)}</td><td style="padding:6px 0;text-align:right;color:#00272B;font-size:13px;font-weight:600;">${escape(value)}</td></tr>`)
+    .join('');
+  return sendEmail({
+    to,
+    subject,
+    templateName: 'admin-notification',
+    variables: {
+      title: escape(title),
+      intro: escape(intro),
+      rows,
+      link: `${process.env.FRONTEND_URL}${linkPath || '/admin'}`,
+      linkLabel: escape(linkLabel || 'Ouvrir le back-office'),
+      year: new Date().getFullYear(),
+    },
+    text: [title, intro, ...lines.map(([l, v]) => `${l} : ${v}`)].join('\n'),
+  });
+}
+
 module.exports = {
   sendEmail,
+  testSmtp,
+  sendAdminNotification,
   sendEmailVerification,
   sendWelcomeEmail,
   sendPasswordReset,
