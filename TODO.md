@@ -29,6 +29,7 @@ Périmètre décidé le 2026-10-25 : **site public + espace client**. Le portail
 - Panier et checkout calculent comme le backend (`frontend/src/utils/orderTotals.ts`), le code promo est validé par l'API et transmis à la commande, le checkout exige un compte client.
 - Vérifié de bout en bout dans Chrome : réglage admin → panier → checkout express + code promo → commande en base identique au franc près.
 - ✅ **Page Paramètres entièrement reliée** (2026-10-26) : Administrateurs, Email & SMTP (test réel, mot de passe chiffré), Notifications (commande, devis, client, stock faible), Entreprise (coordonnées affichées sur Contact et À propos), Sécurité. Vérifié dans Chrome (19/19).
+- ✅ **Commandes et devis (back-office)** (2026-10-26) : fenêtres de gestion (étape suivante, annulation / remboursement / refus confirmés, proposition de devis avec validité), onglets par statut avec compteurs serveur. Badges de la barre latérale, cloche et tableau de bord suivent les changements sans rechargement (`GET /dashboard/counters`, rafraîchis toutes les 60 s et à chaque action). Stats corrigées : mois calendaire comparé au mois précédent, chiffre d'affaires hors commandes annulées / remboursées.
 - **À faire de ton côté** : saisir les vraies coordonnées dans Paramètres → Entreprise (la page Contact masque les champs vides), et configurer le SMTP dans Paramètres → Email & SMTP (mot de passe d'application Gmail), puis renseigner l'email de réception des notifications.
 
 ## Ancien constat (2 bis), pour mémoire
