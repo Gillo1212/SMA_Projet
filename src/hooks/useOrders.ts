@@ -2,6 +2,7 @@
  * Hook Commandes
  * ───────────────
  * const { orders, isLoading, updateStatus, refetch } = useOrders();
+ * const { confirmDelivery } = useOrders();   // espace client : réception confirmée
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -16,6 +17,8 @@ interface UseOrdersReturn {
   /** Met à jour le statut localement + appelle l'API */
   /** `note` : motif ajouté à l'historique (et motif d'annulation) */
   updateStatus: (id: string, statut: OrderStatus, note?: string) => Promise<void>;
+  /** Client : confirme la réception d'une commande expédiée (→ Livrée) */
+  confirmDelivery: (id: string) => Promise<void>;
   refetch: () => void;
 }
 
@@ -42,33 +45,41 @@ export function useOrders(params?: OrderListParams): UseOrdersReturn {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paramsKey, tick]);
 
+  /** Statut appliqué tout de suite, puis confirmé (ou annulé) par l'API */
+  const optimistic = useCallback(async (id: string, statut: OrderStatus, call: () => Promise<void>) => {
+    let previous: OrderStatus | undefined;
+    setOrders(prev =>
+      prev.map(o => {
+        if (o.id !== id) return o;
+        previous = o.statut;
+        return { ...o, statut };
+      }),
+    );
+    try {
+      await call();
+      notifyAdminDataChanged();
+    } catch (e) {
+      // Retour à l'ancien statut, sans recharger la page : un rechargement
+      // remplacerait l'écran par le chargement et effacerait l'erreur.
+      if (previous) setOrders(prev => prev.map(o => (o.id === id ? { ...o, statut: previous! } : o)));
+      throw e;
+    }
+  }, []);
+
   const updateStatus = useCallback(
-    async (id: string, statut: OrderStatus, note?: string) => {
-      // Mise à jour optimiste locale
-      let previous: OrderStatus | undefined;
-      setOrders(prev =>
-        prev.map(o => {
-          if (o.id !== id) return o;
-          previous = o.statut;
-          return { ...o, statut };
-        }),
-      );
-      try {
-        await ordersService.updateStatus(id, statut, note);
-        notifyAdminDataChanged();
-      } catch (e) {
-        // Retour à l'ancien statut, sans recharger la page : un rechargement
-        // remplacerait l'écran par le chargement et effacerait l'erreur.
-        if (previous) setOrders(prev => prev.map(o => (o.id === id ? { ...o, statut: previous! } : o)));
-        throw e;
-      }
-    },
-    [],
+    (id: string, statut: OrderStatus, note?: string) =>
+      optimistic(id, statut, () => ordersService.updateStatus(id, statut, note)),
+    [optimistic],
+  );
+
+  const confirmDelivery = useCallback(
+    (id: string) => optimistic(id, 'Livrée', () => ordersService.confirmDelivery(id)),
+    [optimistic],
   );
 
   const refetch = useCallback(() => setTick(t => t + 1), []);
 
-  return { orders, isLoading, error, updateStatus, refetch };
+  return { orders, isLoading, error, updateStatus, confirmDelivery, refetch };
 }
 
 // ── Détail ─────────────────────────────────────────────────────────────────

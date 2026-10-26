@@ -38,11 +38,11 @@ export default function Modal({ open, onClose, title, subtitle, headerExtra, siz
     const { overflow } = document.body.style;
     document.body.style.overflow = 'hidden';
 
-    // Focus sur le premier champ ou bouton utile (pas la croix de fermeture)
-    const focusable = panelRef.current?.querySelector<HTMLElement>(
-      '[data-autofocus], input:not([disabled]), textarea:not([disabled]), select:not([disabled]), button:not([disabled]):not([data-close])',
-    );
-    (focusable ?? panelRef.current)?.focus();
+    // Focus sur l'élément marqué data-autofocus, sinon sur la fenêtre elle-même :
+    // ni un bouton pris au hasard, ni un champ qui ouvrirait le clavier sur mobile.
+    // (querySelector sur une liste renverrait le premier dans l'ordre du document)
+    const target = panelRef.current?.querySelector<HTMLElement>('[data-autofocus]:not([disabled])');
+    (target ?? panelRef.current)?.focus({ preventScroll: true });
 
     openStack.push(titleId);
     const onKey = (e: KeyboardEvent) => {
@@ -61,7 +61,7 @@ export default function Modal({ open, onClose, title, subtitle, headerExtra, siz
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-[#00272B]/40 backdrop-blur-[2px] p-0 sm:p-4"
+      className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-[#00272B]/40 backdrop-blur-[2px] p-0 sm:p-4 motion-safe:animate-fade-in"
       onMouseDown={e => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div
@@ -70,9 +70,9 @@ export default function Modal({ open, onClose, title, subtitle, headerExtra, siz
         aria-modal="true"
         aria-labelledby={titleId}
         tabIndex={-1}
-        className={`w-full ${SIZES[size]} bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl flex flex-col max-h-[92vh] outline-none`}
+        className={`w-full ${SIZES[size]} bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl flex flex-col max-h-[92dvh] outline-none motion-safe:animate-sheet-up`}
       >
-        <div className="flex items-start justify-between gap-4 px-6 pt-5 pb-4 border-b border-gray-100">
+        <div className="flex items-start justify-between gap-4 px-5 sm:px-6 pt-5 pb-4 border-b border-gray-100">
           <div className="min-w-0">
             <h2 id={titleId} className="text-lg font-bold text-[#00272B] truncate">{title}</h2>
             {subtitle && <p className="text-xs text-[#00272B]/45 mt-0.5">{subtitle}</p>}
@@ -87,8 +87,8 @@ export default function Modal({ open, onClose, title, subtitle, headerExtra, siz
             </button>
           </div>
         </div>
-        <div className="flex-1 overflow-y-auto px-6 py-5">{children}</div>
-        {footer && <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/60 rounded-b-2xl">{footer}</div>}
+        <div className="flex-1 overflow-y-auto overscroll-contain px-5 sm:px-6 py-5">{children}</div>
+        {footer && <div className="px-5 sm:px-6 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] border-t border-gray-100 bg-gray-50/60 sm:rounded-b-2xl">{footer}</div>}
       </div>
     </div>,
     document.body,

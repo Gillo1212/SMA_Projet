@@ -60,6 +60,7 @@ export const ENDPOINTS = {
     DETAIL:        (id: string) => `/orders/${id}`,
     CREATE:        '/orders',
     UPDATE_STATUS: (id: string) => `/orders/${id}/status`,
+    CONFIRM_DELIVERY: (id: string) => `/orders/${id}/confirm-delivery`,
     VALIDATE_PROMO:'/orders/validate-promo',
   },
 

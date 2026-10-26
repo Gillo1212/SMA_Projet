@@ -136,7 +136,7 @@ export default function ClientDevisPage() {
           description={quotes.length === 0 ? t('clientPortal.quotes.emptyHint') : undefined}
         />
       ) : (
-        <div className="grid md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {filtered.map(({ quote, statut }) => {
             const step = stepOf(quote, statut);
             const answerable = statut === 'Devis envoyé';
@@ -250,7 +250,7 @@ function ClientQuoteModal({ quote, statut, onClose, onDecide }: ClientQuoteModal
               className="px-4 h-10 rounded-lg border border-red-200 text-sm font-medium text-red-600 hover:bg-red-50 cursor-pointer disabled:opacity-50">
               <i className="ri-close-line mr-1"></i>{t('clientPortal.quotes.decline')}
             </button>
-            <button type="button" disabled={busy} onClick={() => setConfirm('Accepté')} data-autofocus
+            <button type="button" disabled={busy} onClick={() => setConfirm('Accepté')}
               className="px-5 h-10 rounded-lg bg-[#1AAA3F] text-white text-sm font-semibold hover:bg-[#158f35] cursor-pointer disabled:opacity-60">
               <i className="ri-check-line mr-1"></i>{t('clientPortal.quotes.accept')}
             </button>

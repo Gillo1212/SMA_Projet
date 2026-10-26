@@ -1,19 +1,10 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useClientAuth } from '../../../contexts/ClientAuthContext';
-import { useClientCounters } from '../../../hooks/useClientCounters';
-
-const navItems = [
-  { path: '/espace-client', icon: 'ri-dashboard-line', label: 'dashboard', exact: true },
-  { path: '/espace-client/commandes', icon: 'ri-shopping-bag-line', label: 'orders' },
-  { path: '/espace-client/devis', icon: 'ri-file-list-3-line', label: 'quotes' },
-  { path: '/espace-client/machines', icon: 'ri-settings-2-line', label: 'machines' },
-  { path: '/espace-client/factures', icon: 'ri-receipt-line', label: 'invoices' },
-  { path: '/espace-client/support', icon: 'ri-customer-service-2-line', label: 'support' },
-  { path: '/espace-client/profil', icon: 'ri-user-settings-line', label: 'profile' },
-];
+import { NAV_GROUPS, initials, isActivePath, useNavBadges } from './clientNav';
 
 interface ClientSidebarProps {
+  /** Fourni dans le tiroir mobile : ferme le tiroir */
   onClose?: () => void;
 }
 
@@ -22,97 +13,103 @@ export default function ClientSidebar({ onClose }: ClientSidebarProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const { client, logout } = useClientAuth();
-  const { counters } = useClientCounters();
-
-  // Pastilles : ce qui demande l'attention du client (masquées à zéro)
-  const badges: Record<string, { value: number; title: string; tone: string } | undefined> = counters ? {
-    '/espace-client/commandes': { value: counters.ordersInProgress, title: t('clientPortal.nav.ordersBadge', { count: counters.ordersInProgress }), tone: 'bg-white/15 text-white' },
-    '/espace-client/devis': { value: counters.quotesAwaitingAnswer, title: t('clientPortal.nav.quotesBadge', { count: counters.quotesAwaitingAnswer }), tone: 'bg-indigo-500 text-white' },
-    '/espace-client/factures': { value: counters.invoicesToPay, title: t('clientPortal.nav.invoicesBadge', { count: counters.invoicesToPay }), tone: 'bg-amber-500 text-white' },
-  } : {};
+  const badges = useNavBadges();
 
   const handleLogout = () => {
     logout();
     navigate('/espace-client/connexion');
   };
 
-  const handleNavClick = () => {
-    if (onClose) onClose();
-  };
-
   return (
-    <aside className="w-60 flex-shrink-0 bg-[#00272B] flex flex-col min-h-screen">
-      <div className="px-6 py-5 border-b border-white/8 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2.5" onClick={handleNavClick}>
-          <img
-            src="/images/brand/logo-site.png"
-            alt="SMALIM"
-            className="h-8 w-auto object-contain"
-          />
+    <aside className="w-[272px] h-full flex-shrink-0 bg-[#00272B] flex flex-col text-white">
+      {/* Marque */}
+      <div className="px-5 h-16 flex items-center justify-between flex-shrink-0">
+        <Link to="/" onClick={onClose} className="flex items-center gap-2.5">
+          <img src="/images/brand/logo-site.png" alt="SMALIM" className="h-8 w-auto object-contain" />
         </Link>
-        {onClose && (
-          <button onClick={onClose} aria-label={t('clientPortal.nav.closeMenu')} className="w-8 h-8 flex items-center justify-center rounded-lg text-white/40 hover:text-white hover:bg-white/10 cursor-pointer lg:hidden">
+        {onClose ? (
+          <button onClick={onClose} aria-label={t('clientPortal.nav.closeMenu')}
+            className="w-9 h-9 flex items-center justify-center rounded-lg text-white/50 hover:text-white hover:bg-white/10 cursor-pointer">
             <i className="ri-close-line text-xl"></i>
           </button>
+        ) : (
+          <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#4FD07A] bg-[#1AAA3F]/15 px-2 py-1 rounded-md">
+            {t('clientPortal.nav.badge')}
+          </span>
         )}
       </div>
-      <div className="px-6 py-3 border-b border-white/8">
-        <div className="px-2.5 py-1.5 bg-[#0D8C2E]/20 rounded-lg inline-flex items-center gap-1.5">
-          <div className="w-1.5 h-1.5 bg-[#0D8C2E] rounded-full"></div>
-          <span className="text-[#0D8C2E] text-xs font-medium">{t('clientPortal.nav.badge')}</span>
-        </div>
-      </div>
+
+      {/* Client connecté */}
       {client && (
-        <div className="px-4 py-4 border-b border-white/8">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-[#0D8C2E]/20 rounded-xl flex items-center justify-center flex-shrink-0">
-              <i className="ri-user-line text-[#0D8C2E]"></i>
-            </div>
-            <div className="min-w-0">
-              <p className="text-sm font-semibold text-white truncate">{client.prenom} {client.nom}</p>
-              <p className="text-xs text-white/40 truncate">{client.entreprise}</p>
-            </div>
-          </div>
-        </div>
-      )}
-      <nav className="flex-1 px-3 py-4 space-y-0.5">
-        {navItems.map(item => {
-          const isActive = item.exact ? location.pathname === item.path : location.pathname.startsWith(item.path);
-          return (
-            <Link
-              key={item.path}
-              to={item.path}
-              onClick={handleNavClick}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all cursor-pointer ${
-                isActive ? 'bg-[#0D8C2E] text-white' : 'text-white/55 hover:text-white hover:bg-white/8'
-              }`}
-            >
-              <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
-                <i className={`${item.icon} text-base`}></i>
-              </div>
-              <span className="flex-1">{t(`clientPortal.nav.${item.label}`)}</span>
-              {!!badges[item.path]?.value && (
-                <span
-                  title={badges[item.path]!.title}
-                  aria-label={badges[item.path]!.title}
-                  className={`min-w-[20px] h-5 px-1.5 rounded-full text-[11px] font-bold flex items-center justify-center ${badges[item.path]!.tone}`}
-                >
-                  {badges[item.path]!.value}
-                </span>
-              )}
-            </Link>
-          );
-        })}
-      </nav>
-      <div className="px-3 pb-4 space-y-1">
-        <Link to="/" onClick={handleNavClick} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-white/40 hover:text-white hover:bg-white/8 transition-all cursor-pointer">
-          <div className="w-5 h-5 flex items-center justify-center"><i className="ri-home-line text-base"></i></div>
-          <span>{t('clientPortal.nav.backToSite')}</span>
+        <Link to="/espace-client/profil" onClick={onClose}
+          className="mx-3 mb-2 p-3 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.06] flex items-center gap-3 transition-colors">
+          <span className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#1AAA3F] to-[#0D8C2E] flex items-center justify-center text-sm font-bold flex-shrink-0">
+            {initials(client.prenom, client.nom)}
+          </span>
+          <span className="min-w-0">
+            <span className="block text-sm font-semibold truncate">{client.prenom} {client.nom}</span>
+            <span className="block text-xs text-white/45 truncate">{client.entreprise}</span>
+          </span>
         </Link>
-        <button onClick={handleLogout} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-red-400/70 hover:text-red-400 hover:bg-red-500/10 transition-all cursor-pointer whitespace-nowrap">
-          <div className="w-5 h-5 flex items-center justify-center"><i className="ri-logout-box-r-line text-base"></i></div>
-          <span>{t('clientPortal.nav.logout')}</span>
-        </button>
+      )}
+
+      {/* Navigation */}
+      <nav className="flex-1 overflow-y-auto px-3 py-2 space-y-5" aria-label={t('clientPortal.nav.mainNav')}>
+        {NAV_GROUPS.map(group => (
+          <div key={group.key}>
+            <p className="px-3 mb-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/30">{t(`clientPortal.nav.${group.key}`)}</p>
+            <ul className="space-y-0.5">
+              {group.items.map(item => {
+                const active = isActivePath(location.pathname, item);
+                const badge = badges[item.path];
+                return (
+                  <li key={item.path}>
+                    <Link
+                      to={item.path}
+                      onClick={onClose}
+                      aria-current={active ? 'page' : undefined}
+                      className={`group relative flex items-center gap-3 px-3 h-10 rounded-xl text-sm font-medium transition-all duration-200 ${
+                        active ? 'bg-[#1AAA3F] text-white shadow-lg shadow-[#1AAA3F]/20' : 'text-white/60 hover:text-white hover:bg-white/[0.06]'
+                      }`}
+                    >
+                      <i className={`${item.icon}-${active ? 'fill' : 'line'} text-[17px] w-5 text-center transition-transform duration-200 group-hover:scale-110`}></i>
+                      <span className="flex-1 truncate">{t(`clientPortal.nav.${item.label}`)}</span>
+                      {badge && (
+                        <span title={badge.title} aria-label={badge.title}
+                          className={`min-w-[20px] h-5 px-1.5 rounded-full text-[11px] font-bold flex items-center justify-center ${active ? 'bg-white text-[#1AAA3F]' : badge.tone}`}>
+                          {badge.value}
+                        </span>
+                      )}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        ))}
+      </nav>
+
+      {/* Appel à l'action + sortie */}
+      <div className="p-3 space-y-2 flex-shrink-0">
+        <div className="relative overflow-hidden rounded-2xl p-4 bg-gradient-to-br from-[#1AAA3F] to-[#0D8C2E]">
+          <i className="ri-lightbulb-flash-line absolute -right-2 -bottom-3 text-7xl text-white/10" aria-hidden="true"></i>
+          <p className="text-sm font-bold">{t('clientPortal.nav.ctaTitle')}</p>
+          <p className="text-xs text-white/75 mt-0.5 mb-3 pr-6">{t('clientPortal.nav.ctaText')}</p>
+          <Link to="/machines/devis" onClick={onClose}
+            className="relative inline-flex items-center gap-1.5 px-3 h-8 rounded-lg bg-white text-[#0D8C2E] text-xs font-bold hover:bg-[#EEFFF2] transition-colors">
+            {t('clientPortal.nav.ctaButton')}<i className="ri-arrow-right-line"></i>
+          </Link>
+        </div>
+        <div className="flex items-center gap-1">
+          <Link to="/" onClick={onClose}
+            className="flex-1 flex items-center gap-2 px-3 h-10 rounded-xl text-sm text-white/50 hover:text-white hover:bg-white/[0.06] transition-colors">
+            <i className="ri-arrow-left-line"></i>{t('clientPortal.nav.backToSite')}
+          </Link>
+          <button onClick={handleLogout} title={t('clientPortal.nav.logout')} aria-label={t('clientPortal.nav.logout')}
+            className="w-10 h-10 flex items-center justify-center rounded-xl text-red-300/70 hover:text-red-300 hover:bg-red-500/10 transition-colors cursor-pointer">
+            <i className="ri-logout-box-r-line text-lg"></i>
+          </button>
+        </div>
       </div>
     </aside>
   );

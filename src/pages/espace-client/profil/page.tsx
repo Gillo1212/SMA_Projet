@@ -6,6 +6,7 @@ import { ENDPOINTS } from '../../../config/api';
 import { LoadingState } from '../../../components/feature/AsyncState';
 import type { ClientProfile } from '../../../types/models';
 import { useTranslation } from 'react-i18next';
+import { initials } from '../components/clientNav';
 
 const EMPTY_PROFILE: ClientProfile = {
   id: '', nom: '', prenom: '', email: '', telephone: '',
@@ -94,7 +95,7 @@ export default function ClientProfilPage() {
   if (isLoading) return <LoadingState label={t('clientPortal.profile.loading')} />;
 
   return (
-    <div className="max-w-3xl space-y-6">
+    <div className="max-w-3xl mx-auto space-y-5 sm:space-y-6">
       {/* Success banner */}
       {saved && (
         <div className="flex items-center gap-3 p-4 bg-emerald-50 border border-emerald-200 rounded-xl">
@@ -110,20 +111,20 @@ export default function ClientProfilPage() {
       )}
 
       {/* Profile card */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-6">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 bg-[#1AAA3F]/10 rounded-2xl flex items-center justify-center">
-              <i className="ri-user-line text-[#1AAA3F] text-2xl"></i>
+      <div className="bg-white rounded-2xl border border-gray-100 p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <div className="flex items-center gap-4 min-w-0">
+            <div className="w-14 h-14 bg-gradient-to-br from-[#1AAA3F] to-[#0D8C2E] rounded-2xl flex items-center justify-center text-white text-lg font-bold flex-shrink-0">
+              {initials(form.prenom, form.nom)}
             </div>
-            <div>
-              <h3 className="text-base font-bold text-[#00272B]">{form.prenom} {form.nom}</h3>
-              <p className="text-sm text-[#00272B]/50">{form.poste} · {form.entreprise}</p>
+            <div className="min-w-0">
+              <h3 className="text-base font-bold text-[#00272B] truncate">{form.prenom} {form.nom}</h3>
+              <p className="text-sm text-[#00272B]/50 truncate">{[form.poste, form.entreprise].filter(Boolean).join(' · ')}</p>
             </div>
           </div>
           <button
             onClick={() => setEditing(e => !e)}
-            className="flex items-center gap-2 px-4 py-2 border border-gray-200 text-[#00272B]/60 text-sm font-medium rounded-xl hover:bg-gray-50 cursor-pointer transition-all whitespace-nowrap"
+            className="self-start sm:self-auto flex items-center gap-2 px-4 h-10 border border-gray-200 text-[#00272B]/60 text-sm font-medium rounded-xl hover:bg-gray-50 cursor-pointer transition-all whitespace-nowrap"
           >
             <i className={editing ? 'ri-close-line' : 'ri-edit-line'}></i>
             {editing ? t('clientPortal.common.cancel') : t('clientPortal.common.edit')}
@@ -131,7 +132,7 @@ export default function ClientProfilPage() {
         </div>
 
         <form onSubmit={handleSave}>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {[
               { label: t('clientPortal.profile.firstName'), key: 'prenom', type: 'text' },
               { label: t('clientPortal.profile.lastName'), key: 'nom', type: 'text' },
@@ -149,11 +150,11 @@ export default function ClientProfilPage() {
                     type={field.type}
                     value={form[field.key as keyof typeof form] as string}
                     onChange={e => setForm(f => ({ ...f, [field.key]: e.target.value }))}
-                    className="w-full h-10 px-3 border border-gray-200 rounded-xl text-sm text-[#00272B] focus:outline-none focus:border-[#1AAA3F] focus:ring-2 focus:ring-[#1AAA3F]/10"
+                    className="w-full h-11 px-3 border border-gray-200 rounded-xl text-sm text-[#00272B] focus:outline-none focus:border-[#1AAA3F] focus:ring-2 focus:ring-[#1AAA3F]/10"
                   />
                 ) : (
-                  <p className="text-sm text-[#00272B] py-2.5 px-3 bg-gray-50 rounded-xl">
-                    {form[field.key as keyof typeof form] as string}
+                  <p className="text-sm text-[#00272B] py-2.5 px-3 bg-gray-50 rounded-xl min-h-[44px] break-words">
+                    {(form[field.key as keyof typeof form] as string) || '-'}
                   </p>
                 )}
               </div>
@@ -188,8 +189,8 @@ export default function ClientProfilPage() {
       </div>
 
       {/* Password */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-6">
-        <div className="flex items-center justify-between mb-1">
+      <div className="bg-white rounded-2xl border border-gray-100 p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-1">
           <div>
             <h3 className="text-sm font-bold text-[#00272B]">{t('clientPortal.profile.passwordTitle')}</h3>
             <p className="text-xs text-[#00272B]/40 mt-0.5">{t('clientPortal.profile.passwordHint')}</p>

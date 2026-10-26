@@ -350,7 +350,7 @@ function OrderModal({ orderId, listItem, onClose, onChangeStatus }: OrderModalPr
                 <button type="button" onClick={() => apply(next)} disabled={busy} data-autofocus
                   className="px-5 h-10 bg-[#1AAA3F] text-white text-sm font-semibold rounded-lg hover:bg-[#148a33] cursor-pointer disabled:opacity-60 flex items-center gap-2">
                   {busy ? <i className="ri-loader-4-line animate-spin"></i> : <i className={STATUS_STYLES[next].icon}></i>}
-                  {NEXT_ACTION[order.statut]}
+                  {order.statut === 'En préparation' && order.modeLivraison === 'pickup' ? 'Marquer prête au retrait' : NEXT_ACTION[order.statut]}
                 </button>
               </div>
             )}
@@ -390,7 +390,7 @@ function OrderModal({ orderId, listItem, onClose, onChangeStatus }: OrderModalPr
           )}
         </section>
 
-        <div className="grid lg:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
           {/* Articles et montants */}
           <section className="lg:col-span-3">
             <h3 className="text-xs font-semibold text-[#00272B]/40 uppercase tracking-wide mb-3">Articles</h3>

@@ -22,18 +22,18 @@ export default function ClientMachinesPage() {
   return (
     <div className="space-y-6">
       {/* Summary */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
         {[
           { label: t('clientPortal.machines.installed'), value: machines.length, icon: 'ri-settings-2-line', color: 'text-[#1AAA3F]', bg: 'bg-[#1AAA3F]/10' },
           { label: t('clientPortal.machines.operational'), value: operational, icon: 'ri-checkbox-circle-line', color: 'text-emerald-600', bg: 'bg-emerald-50' },
           { label: t('clientPortal.machines.totalSales'), value: machines.reduce((s, m) => s + m.totalVentes, 0).toLocaleString('fr-FR'), icon: 'ri-bar-chart-line', color: 'text-sky-600', bg: 'bg-sky-50' },
         ].map((s, i) => (
-          <div key={i} className="bg-white rounded-xl p-5 border border-gray-100 flex items-center gap-4">
+          <div key={i} className={`bg-white rounded-2xl p-4 sm:p-5 border border-gray-100 flex items-center gap-3 sm:gap-4 ${i === 2 ? 'col-span-2 sm:col-span-1' : ''}`}>
             <div className={`w-11 h-11 ${s.bg} rounded-xl flex items-center justify-center flex-shrink-0`}>
               <i className={`${s.icon} ${s.color} text-xl`}></i>
             </div>
-            <div>
-              <p className="text-2xl font-bold text-[#00272B]">{s.value}</p>
+            <div className="min-w-0">
+              <p className="text-xl sm:text-2xl font-bold text-[#00272B] truncate">{s.value}</p>
               <p className="text-xs text-[#00272B]/40">{s.label}</p>
             </div>
           </div>
@@ -48,7 +48,7 @@ export default function ClientMachinesPage() {
           description={t('clientPortal.machines.emptyHint')}
         />
       ) : (
-      <div className="grid xl:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
         {machines.map(machine => {
           const sc = statusColors[machine.statut];
           const maintenanceDate = machine.prochaineMaintenance ? new Date(machine.prochaineMaintenance) : null;
@@ -58,11 +58,11 @@ export default function ClientMachinesPage() {
           const maintenanceProche = daysLeft !== null && daysLeft <= 7;
 
           return (
-            <div key={machine.id} className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+            <div key={machine.id} className="group bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all duration-300">
               {/* Image */}
-              <div className="h-48 bg-gray-50 relative overflow-hidden flex items-center justify-center">
+              <div className="h-44 sm:h-48 bg-gray-50 relative overflow-hidden flex items-center justify-center">
                 {machine.image ? (
-                  <img src={machine.image} alt={machine.nom} className="w-full h-full object-cover object-top" />
+                  <img src={machine.image} alt={machine.nom} loading="lazy" className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500" />
                 ) : (
                   <i className="ri-image-line text-4xl text-[#00272B]/15"></i>
                 )}

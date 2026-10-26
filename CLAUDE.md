@@ -234,3 +234,10 @@ Accessible uniquement aux clients authentifiés :
 - `/espace-client/factures` - Mes factures
 - `/espace-client/support` - Tickets de support
 - `/espace-client/profil` - Mon profil
+
+Structure : `layout.tsx` (en-tête, tiroir mobile, animation d'entrée par page), `components/ClientSidebar.tsx` (bureau et tiroir), `components/ClientBottomNav.tsx` (onglets du bas sous `lg`), `components/clientNav.ts` (menu partagé, pastilles via `useClientCounters`).
+
+- **Mobile d'abord** : contenu en une colonne, `grid grid-cols-1 sm:…` (sans `grid-cols-1`, une colonne implicite s'élargit au texte non coupé et la page déborde), `pb-28` sous la barre d'onglets, tableaux remplacés par des cartes sous `md`.
+- **Fenêtres** : `components/admin/Modal`, `ConfirmDialog`, `Toasts` avec les libellés traduits (`closeLabel`, `cancelLabel`, `dismissLabel`). Le focus va sur `[data-autofocus]`, sinon sur la fenêtre (pas de clavier qui s'ouvre sur mobile).
+- **Liens profonds** : `/espace-client/commandes?commande=<id>` ouvre la commande ; `/espace-client/support?nouveau=livraison&commande=<réf>` ouvre un ticket prérempli, `?nouveau=1` un ticket vide.
+- **Animations** : `motion-safe:animate-fade-up` (pages), `animate-sheet-up` / `animate-fade-in` (fenêtres), définies dans `tailwind.config.ts`.

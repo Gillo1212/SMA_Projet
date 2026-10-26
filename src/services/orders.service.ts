@@ -233,4 +233,16 @@ export const ordersService = {
       note,
     });
   },
+
+  /**
+   * Le client confirme la réception (commande « Expédiée » uniquement).
+   * @endpoint POST /orders/:id/confirm-delivery
+   */
+  async confirmDelivery(id: string): Promise<void> {
+    if (USE_MOCK) {
+      await delay(MOCK_DELAY);
+      return;
+    }
+    await apiClient.post(ENDPOINTS.ORDERS.CONFIRM_DELIVERY(id), {});
+  },
 };

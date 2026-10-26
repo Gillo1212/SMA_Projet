@@ -341,7 +341,7 @@ function QuoteModal({ quote, onClose, onStatus, onProposal }: QuoteModalProps) {
           </div>
         }
       >
-        <div className="grid lg:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
           {/* Demande */}
           <section className="lg:col-span-3 space-y-4">
             <div>
@@ -391,7 +391,7 @@ function QuoteModal({ quote, onClose, onStatus, onProposal }: QuoteModalProps) {
                 )
               ) : (
                 <form onSubmit={submitProposal} className="space-y-3">
-                  <div className="grid sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                       <label htmlFor="q-amount" className="block text-xs font-semibold text-[#00272B]/60 mb-1.5">Montant HT proposé (FCFA)</label>
                       <input id="q-amount" inputMode="numeric" required value={amount} onChange={e => setAmount(e.target.value)}
