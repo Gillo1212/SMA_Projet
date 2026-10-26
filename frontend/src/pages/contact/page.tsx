@@ -1,0 +1,311 @@
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import Navbar from '../home/components/Navbar';
+import Footer from '../home/components/Footer';
+import PageHero from '../../components/feature/PageHero';
+import CTABanner from '../../components/feature/CTABanner';
+import { useShopConfig } from '../../hooks/useShopConfig';
+import { telHref, whatsappHref } from '../../utils/contact';
+
+export default function ContactPage() {
+  const { t } = useTranslation();
+  // Coordonnées saisies dans Paramètres → Entreprise ; un champ vide est masqué
+  const { config } = useShopConfig();
+  const company = config.company;
+  const cityLine = [company.city, company.country].filter(Boolean).join(', ');
+  const infoCards = [
+    company.phone && { key: 'phone', icon: 'ri-phone-line', title: t('contact.phone'), lines: [company.phone], hint: t('contact.phoneHours'), href: telHref(company.phone) },
+    company.email && { key: 'email', icon: 'ri-mail-line', title: t('contact.email'), lines: [company.email], hint: t('contact.emailDelay'), href: `mailto:${company.email}` },
+    (company.address || cityLine) && { key: 'address', icon: 'ri-map-pin-line', title: t('contact.address'), lines: [company.address].filter(Boolean), hint: cityLine },
+  ].filter(Boolean) as { key: string; icon: string; title: string; lines: string[]; hint: string; href?: string }[];
+  const ctaButtons = [
+    company.phone && { label: t('contact.ctaCall'), href: telHref(company.phone), icon: 'ri-phone-line', variant: 'white' as const },
+    company.whatsapp && { label: 'WhatsApp', href: whatsappHref(company.whatsapp), icon: 'ri-whatsapp-line', variant: 'whatsapp' as const, isExternal: true },
+  ].filter(Boolean) as { label: string; href: string; icon: string; variant: 'white' | 'whatsapp'; isExternal?: boolean }[];
+  const [formData, setFormData] = useState({
+    nom: '',
+    email: '',
+    telephone: '',
+    sujet: '',
+    message: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitStatus('idle');
+
+    try {
+      const formBody = new URLSearchParams();
+      Object.entries(formData).forEach(([key, value]) => {
+        formBody.append(key, value);
+      });
+
+      const response = await fetch('https://readdy.ai/api/form/d6sblelsbgrc47fimvfg', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: formBody.toString()
+      });
+
+      if (response.ok) {
+        setSubmitStatus('success');
+        setFormData({
+          nom: '',
+          email: '',
+          telephone: '',
+          sujet: '',
+          message: ''
+        });
+      } else {
+        setSubmitStatus('error');
+      }
+    } catch (error) {
+      setSubmitStatus('error');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-white">
+      <Navbar />
+      
+      <PageHero
+        eyebrow={t('contact.heroEyebrow')}
+        title={t('contact.heroTitle')}
+        titleAccent={t('contact.heroAccent')}
+        subtitle={t('contact.heroSubtitle')}
+      />
+
+      {/* Contact Info Cards */}
+      {infoCards.length > 0 && (
+      <section className="py-8 sm:py-12 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
+          <div className={`grid grid-cols-1 gap-4 sm:gap-8 ${['', 'sm:grid-cols-1', 'sm:grid-cols-2', 'sm:grid-cols-3'][infoCards.length]}`}>
+            {infoCards.map(card => (
+              <div key={card.key} className="border border-[#00272B]/10 rounded-2xl p-6 sm:p-8 text-center">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 border border-[#00272B]/15 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-5">
+                  <i className={`${card.icon} text-xl sm:text-2xl text-[#0D8C2E]`}></i>
+                </div>
+                <h3 className="text-lg sm:text-xl font-bold text-[#00272B] mb-2 sm:mb-3">{card.title}</h3>
+                {card.lines.map(line => (
+                  <p key={line} className="text-sm sm:text-base text-[#4A4A4A] mb-1 break-words">
+                    {card.href ? <a href={card.href} className="hover:text-[#1AAA3F]">{line}</a> : line}
+                  </p>
+                ))}
+                {card.hint && <p className="text-xs sm:text-sm text-[#4A4A4A] mt-2 sm:mt-3">{card.hint}</p>}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+      )}
+
+      {/* Formulaire + Carte */}
+      <section className="py-12 sm:py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-16">
+            {/* Formulaire */}
+            <div>
+              <h2 className="text-2xl sm:text-4xl font-bold text-[#00272B] mb-3 sm:mb-4">{t('contact.formTitle')}</h2>
+              <p className="text-base sm:text-lg text-[#4A4A4A] mb-6 sm:mb-8">
+                {t('contact.formHint')}
+              </p>
+
+              <form id="contact-form" data-readdy-form onSubmit={handleSubmit} className="space-y-6">
+                <div>
+                  <label htmlFor="nom" className="block text-sm font-semibold text-[#00272B] mb-2">
+                    {t('contact.fullName')}
+                  </label>
+                  <input
+                    type="text"
+                    id="nom"
+                    name="nom"
+                    value={formData.nom}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-[#1AAA3F] focus:border-transparent"
+                    placeholder={t('contact.namePlaceholder')}
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="email" className="block text-sm font-semibold text-[#00272B] mb-2">
+                    {t('contact.emailLabel')}
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-[#1AAA3F] focus:border-transparent"
+                    placeholder={t('contact.emailPlaceholder')}
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="telephone" className="block text-sm font-semibold text-[#00272B] mb-2">
+                    {t('contact.phoneLabel')}
+                  </label>
+                  <input
+                    type="tel"
+                    id="telephone"
+                    name="telephone"
+                    value={formData.telephone}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-[#1AAA3F] focus:border-transparent"
+                    placeholder={t('contact.phonePlaceholder')}
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="sujet" className="block text-sm font-semibold text-[#00272B] mb-2">
+                    {t('contact.subject')}
+                  </label>
+                  <select
+                    id="sujet"
+                    name="sujet"
+                    value={formData.sujet}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-[#1AAA3F] focus:border-transparent cursor-pointer"
+                  >
+                    <option value="">{t('contact.selectSubject')}</option>
+                    <option value="Demande de devis">{t('contact.subjectQuote')}</option>
+                    <option value="Information produit">{t('contact.subjectProduct')}</option>
+                    <option value="Support technique">{t('contact.subjectSupport')}</option>
+                    <option value="Partenariat">{t('contact.subjectPartnership')}</option>
+                    <option value="Autre">{t('contact.subjectOther')}</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label htmlFor="message" className="block text-sm font-semibold text-[#00272B] mb-2">
+                    {t('contact.message')}
+                  </label>
+                  <textarea
+                    id="message"
+                    name="message"
+                    value={formData.message}
+                    onChange={handleChange}
+                    required
+                    maxLength={500}
+                    rows={6}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-[#1AAA3F] focus:border-transparent resize-none"
+                    placeholder={t('contact.messagePlaceholder')}
+                  />
+                  <p className="text-sm text-[#4A4A4A] mt-2">
+                    {t('contact.charCount', { count: formData.message.length })}
+                  </p>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full bg-[#1AAA3F] text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-[#158f35] transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed whitespace-nowrap cursor-pointer"
+                >
+                  {isSubmitting ? t('contact.sending') : t('contact.send')}
+                </button>
+
+                {submitStatus === 'success' && (
+                  <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <i className="ri-checkbox-circle-line text-xl"></i>
+                      <span className="font-semibold">{t('contact.successTitle')}</span>
+                    </div>
+                    <p className="text-sm mt-1">{t('contact.successHint')}</p>
+                  </div>
+                )}
+
+                {submitStatus === 'error' && (
+                  <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <i className="ri-error-warning-line text-xl"></i>
+                      <span className="font-semibold">{t('contact.errorTitle')}</span>
+                    </div>
+                    <p className="text-sm mt-1">{t('contact.errorHint')}</p>
+                  </div>
+                )}
+              </form>
+            </div>
+
+            {/* Carte + Horaires */}
+            <div>
+              <div className="bg-[#F6F3EC] rounded-2xl p-6 sm:p-8 mb-6 sm:mb-8">
+                <h3 className="text-2xl font-bold text-[#00272B] mb-6">{t('contact.hoursTitle')}</h3>
+                
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center pb-4 border-b border-gray-200">
+                    <span className="text-base font-semibold text-[#00272B]">{t('contact.weekdays')}</span>
+                    <span className="text-base text-[#4A4A4A]">8h00 - 18h00</span>
+                  </div>
+                  <div className="flex justify-between items-center pb-4 border-b border-gray-200">
+                    <span className="text-base font-semibold text-[#00272B]">{t('contact.saturday')}</span>
+                    <span className="text-base text-[#4A4A4A]">9h00 - 13h00</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-base font-semibold text-[#00272B]">{t('contact.sunday')}</span>
+                    <span className="text-base text-red-600">{t('contact.closed')}</span>
+                  </div>
+                </div>
+
+                {company.phone && (
+                  <div className="mt-8 pt-8 border-t border-gray-200">
+                    <h4 className="text-lg font-bold text-[#00272B] mb-4">{t('contact.support247')}</h4>
+                    <p className="text-base text-[#4A4A4A] mb-3">
+                      {t('contact.hotlineHint')}
+                    </p>
+                    <a href={telHref(company.phone)} className="flex items-center gap-2 text-[#1AAA3F] font-semibold hover:underline">
+                      <i className="ri-phone-line text-xl"></i>
+                      <span>{company.phone}</span>
+                    </a>
+                  </div>
+                )}
+              </div>
+
+              {/* Carte Google Maps */}
+              <div className="rounded-2xl overflow-hidden h-64 sm:h-96">
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3858.9876543210123!2d-17.4676!3d14.7167!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTTCsDQzJzAwLjEiTiAxN8KwMjgnMDMuNCJX!5e0!3m2!1sfr!2ssn!4v1234567890"
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title={t('contact.mapTitle')}
+                ></iframe>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section : seulement si un numéro est renseigné */}
+      {ctaButtons.length > 0 && (
+        <CTABanner
+          badge={t('contact.ctaBadge')}
+          title={t('contact.ctaTitle')}
+          subtitle={t('contact.ctaSubtitle')}
+          buttons={ctaButtons}
+        />
+      )}
+
+      <Footer />
+    </div>
+  );
+}

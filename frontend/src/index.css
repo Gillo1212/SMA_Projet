@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-gray-200;
+  }
+
+  body {
+    @apply bg-white text-gray-900 antialiased;
+    font-family: 'Manrope', system-ui, sans-serif;
+    letter-spacing: 0.01em;
+  }
+
+  /*
+   * Titres en Fraunces. La graisse est imposée ici pour que les anciennes
+   * classes font-bold / font-extrabold des pages ne rendent pas le serif trop lourd.
+   */
+  h1, h2, h3 {
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 500 !important;
+    letter-spacing: -0.02em;
+    font-optical-sizing: auto;
+  }
+
+  h1, h2 {
+    line-height: 1.08;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer components {
+  /* Surtitre : petites capitales espacées, comme le menu */
+  .eyebrow {
+    font-family: 'ADLaM Display', 'Manrope', sans-serif;
+    font-size: 11px;
+    line-height: 1.6;
+    text-transform: uppercase;
+    letter-spacing: 0.24em;
+  }
+}
