@@ -44,9 +44,6 @@ backend/uploads/*
 Thumbs.db
 desktop.ini
 
-# Le frontend est versionné dans son propre dépôt (voir frontend/.git)
-frontend/
-
 # Divers
 *.tsbuildinfo
 .eslintcache
