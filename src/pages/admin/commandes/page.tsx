@@ -45,6 +45,7 @@ export default function AdminCommandesPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [savedMessage, setSavedMessage] = useState<string | null>(null);
 
   // La liste ne porte pas les lignes de commande : on charge le détail à part.
   const { order: detail, isLoading: detailLoading } = useOrder(selectedId);
@@ -62,14 +63,22 @@ export default function AdminCommandesPage() {
     return matchSearch && matchStatut;
   });
 
-  // La ligne de liste suffit tant que le détail n'est pas arrivé
-  const selected = detail ?? orders.find(o => o.id === selectedId) ?? null;
+  // Le détail (chargé à part) apporte les lignes de commande ; le statut vient
+  // de la liste, seule mise à jour par un changement de statut.
+  const listItem = orders.find(o => o.id === selectedId);
+  const selected = detail
+    ? { ...detail, statut: listItem?.statut ?? detail.statut }
+    : listItem ?? null;
 
   const handleUpdateStatut = async (id: string, statut: OrderStatus) => {
+    if (selected?.statut === statut) return;
     setSaving(true);
     setActionError(null);
+    setSavedMessage(null);
     try {
       await updateStatus(id, statut);
+      setSavedMessage(`Statut enregistré : ${statut}`);
+      setTimeout(() => setSavedMessage(null), 3000);
     } catch (e) {
       setActionError(e instanceof Error ? e.message : 'Mise à jour impossible');
     } finally {
@@ -270,6 +279,11 @@ export default function AdminCommandesPage() {
             {actionError && (
               <div className="p-3 bg-red-50 border border-red-100 rounded-xl">
                 <p className="text-xs text-red-600">{actionError}</p>
+              </div>
+            )}
+            {savedMessage && (
+              <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-xl" role="status">
+                <p className="text-xs text-emerald-700"><i className="ri-check-line mr-1"></i>{savedMessage}</p>
               </div>
             )}
 

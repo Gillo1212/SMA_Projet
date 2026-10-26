@@ -22,6 +22,7 @@ export default function AdminDevisPage() {
   const [montantInput, setMontantInput] = useState('');
   const [saving, setSaving] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [savedMessage, setSavedMessage] = useState<string | null>(null);
 
   if (isLoading) return <LoadingState label="Chargement des devis…" />;
   if (error) return <ErrorState message={error} onRetry={refetch} />;
@@ -38,11 +39,19 @@ export default function AdminDevisPage() {
 
   const selected = quotes.find(q => q.id === selectedId) ?? null;
 
+  const flashSaved = (message: string) => {
+    setSavedMessage(message);
+    setTimeout(() => setSavedMessage(null), 3000);
+  };
+
   const updateStatut = async (id: string, statut: QuoteStatus) => {
+    if (selected?.statut === statut) return;
     setSaving(true);
     setActionError(null);
+    setSavedMessage(null);
     try {
       await updateStatus(id, statut);
+      flashSaved(`Statut enregistré : ${statut}`);
     } catch (e) {
       setActionError(e instanceof Error ? e.message : 'Mise à jour impossible');
     } finally {
@@ -63,6 +72,7 @@ export default function AdminDevisPage() {
       // Chiffrer un devis le fait passer à « Devis envoyé » côté backend.
       await updateAmount(selected.id, val);
       setMontantInput('');
+      flashSaved('Montant enregistré, devis envoyé au client');
     } catch (e) {
       setActionError(e instanceof Error ? e.message : 'Enregistrement impossible');
     } finally {
@@ -229,6 +239,11 @@ export default function AdminDevisPage() {
               {actionError && (
                 <div className="p-3 bg-red-50 border border-red-100 rounded-xl">
                   <p className="text-xs text-red-600">{actionError}</p>
+                </div>
+              )}
+              {savedMessage && (
+                <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-xl" role="status">
+                  <p className="text-xs text-emerald-700"><i className="ri-check-line mr-1"></i>{savedMessage}</p>
                 </div>
               )}
             </div>

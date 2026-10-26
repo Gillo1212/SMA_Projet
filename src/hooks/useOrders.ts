@@ -43,14 +43,20 @@ export function useOrders(params?: OrderListParams): UseOrdersReturn {
   const updateStatus = useCallback(
     async (id: string, statut: OrderStatus) => {
       // Mise à jour optimiste locale
+      let previous: OrderStatus | undefined;
       setOrders(prev =>
-        prev.map(o => (o.id === id ? { ...o, statut } : o)),
+        prev.map(o => {
+          if (o.id !== id) return o;
+          previous = o.statut;
+          return { ...o, statut };
+        }),
       );
       try {
         await ordersService.updateStatus(id, statut);
       } catch (e) {
-        // Rollback si erreur
-        setTick(t => t + 1);
+        // Retour à l'ancien statut, sans recharger la page : un rechargement
+        // remplacerait l'écran par le chargement et effacerait l'erreur.
+        if (previous) setOrders(prev => prev.map(o => (o.id === id ? { ...o, statut: previous! } : o)));
         throw e;
       }
     },

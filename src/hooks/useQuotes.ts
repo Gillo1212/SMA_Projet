@@ -40,15 +40,29 @@ export function useQuotes(params?: QuoteListParams): UseQuotesReturn {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paramsKey, tick]);
 
-  const updateStatus = useCallback(async (id: string, statut: QuoteStatus) => {
-    setQuotes(prev => prev.map(q => (q.id === id ? { ...q, statut } : q)));
+  /**
+   * Applique une modification optimiste ; en cas d'échec, remet le devis tel
+   * qu'il était sans recharger la page (un rechargement effacerait l'erreur).
+   */
+  const optimistic = useCallback(async (id: string, patch: Partial<Quote>, call: () => Promise<void>) => {
+    let previous: Quote | undefined;
+    setQuotes(prev => prev.map(q => {
+      if (q.id !== id) return q;
+      previous = q;
+      return { ...q, ...patch };
+    }));
     try {
-      await quotesService.updateStatus(id, statut);
+      await call();
     } catch (e) {
-      setTick(t => t + 1);
+      if (previous) setQuotes(prev => prev.map(q => (q.id === id ? previous! : q)));
       throw e;
     }
   }, []);
+
+  const updateStatus = useCallback(
+    (id: string, statut: QuoteStatus) => optimistic(id, { statut }, () => quotesService.updateStatus(id, statut)),
+    [optimistic],
+  );
 
   /**
    * Chiffre un devis. Le backend n'expose que PATCH /quotes/:id/status, qui
@@ -56,18 +70,9 @@ export function useQuotes(params?: QuoteListParams): UseQuotesReturn {
    * à « Devis envoyé », sauf statut explicite.
    */
   const updateAmount = useCallback(
-    async (id: string, montantPropose: number, statut: QuoteStatus = 'Devis envoyé') => {
-      setQuotes(prev =>
-        prev.map(q => (q.id === id ? { ...q, montantPropose, statut } : q)),
-      );
-      try {
-        await quotesService.updateAmount(id, montantPropose, statut);
-      } catch (e) {
-        setTick(t => t + 1);
-        throw e;
-      }
-    },
-    [],
+    (id: string, montantPropose: number, statut: QuoteStatus = 'Devis envoyé') =>
+      optimistic(id, { montantPropose, statut }, () => quotesService.updateAmount(id, montantPropose, statut)),
+    [optimistic],
   );
 
   const refetch = useCallback(() => setTick(t => t + 1), []);
