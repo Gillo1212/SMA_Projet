@@ -157,4 +157,5 @@ export interface SmtpTestResult {
   step?: 'config' | 'connect' | 'send';
   /** D'où vient la configuration testée */
   source?: 'database' | 'env';
+  provider?: 'smtp' | 'gmail' | 'sendgrid';
 }
