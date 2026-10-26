@@ -62,7 +62,10 @@ const EMPTY_DASHBOARD: ClientDashboardData = {
   stats: {
     totalCommandes: 0,
     totalDepense: 0,
+    machinesTotal: 0,
     machinesActives: 0,
+    commandesEnCours: 0,
+    devisARepondre: 0,
     facturesEnAttente: 0,
     facturesEnAttenteMontant: 0,
     ticketsOuverts: 0,

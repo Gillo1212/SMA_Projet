@@ -287,11 +287,25 @@ export interface SupportTicket {
   machineNom?: string;
 }
 
+/** Pastilles de l'espace client (GET /dashboard/client/counters) */
+export interface ClientCounters {
+  ordersInProgress: number;
+  quotesAwaitingAnswer: number;
+  invoicesToPay: number;
+  openTickets: number;
+}
+
 /** KPIs de GET /dashboard/client */
 export interface ClientDashboardStats {
   totalCommandes: number;
+  /** Commandes payées, hors annulées / remboursées */
   totalDepense: number;
+  machinesTotal: number;
   machinesActives: number;
+  /** En attente → expédiée */
+  commandesEnCours: number;
+  /** Propositions reçues, encore valables */
+  devisARepondre: number;
   facturesEnAttente: number;
   facturesEnAttenteMontant: number;
   ticketsOuverts: number;

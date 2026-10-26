@@ -46,6 +46,8 @@ interface BackendOrderItem {
 interface BackendOrder {
   id: number;
   order_number: string;
+  /** « 2× Gobelets, 1× Café » — renvoyé par la liste seulement */
+  items_summary?: string | null;
   client_id?: number;
   status: string;
   total_amount: number | string;
@@ -98,8 +100,8 @@ function normalizeOrder(raw: BackendOrder): Order {
     client: raw.company_name || fullName(raw.first_name, raw.last_name) || 'Client supprimé',
     email: raw.email ?? '',
     phone: raw.phone ?? undefined,
-    // La liste ne renvoie pas les articles : le résumé n'existe qu'après getById
-    produits: items?.map(i => `${i.quantity}× ${i.name}`).join(', ') ?? '',
+    // La liste renvoie un résumé ; le détail (getById) renvoie les lignes
+    produits: items?.map(i => `${i.quantity}× ${i.name}`).join(', ') ?? raw.items_summary ?? '',
     items,
     montant: toNumber(raw.total_amount),
     statut: toOrderStatus(raw.status),

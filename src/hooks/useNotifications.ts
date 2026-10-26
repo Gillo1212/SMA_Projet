@@ -2,10 +2,12 @@
  * Hook Notifications
  * ───────────────────
  * Le backend n'expose pas de flux de notifications dédié : on le dérive des
- * données déjà disponibles (dernières commandes, devis à traiter). Les
- * notifications ne sont donc pas persistées — « lu » vaut pour la session.
+ * données déjà disponibles (commandes, devis, factures, tickets), rechargées
+ * toutes les minutes et après chaque action. L'état « lu » est gardé dans le
+ * navigateur (localStorage), un compte client à la fois.
  *
  *   const { notifications, markAsRead, markAllAsRead } = useAdminNotifications();
+ *   const { notifications, markAsRead, markAllAsRead } = useClientNotifications();
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
@@ -16,7 +18,7 @@ import { useClientAuth } from '../contexts/ClientAuthContext';
 import { ADMIN_POLL_MS, onAdminDataChanged } from '../services/adminEvents';
 import { useTranslation } from 'react-i18next';
 import { useStatusLabels } from '../i18n/useStatusLabels';
-import type { Invoice, SupportTicket } from '../types/models';
+import type { Invoice, Order, Quote, SupportTicket } from '../types/models';
 
 export interface AppNotification {
   id: string;
@@ -47,153 +49,178 @@ function relativeTime(dateStr: string): string {
   return d.toLocaleDateString('fr-FR');
 }
 
-/** État « lu » partagé par les deux hooks — non persisté côté serveur */
-function useReadState(notifications: AppNotification[]) {
-  const [readIds, setReadIds] = useState<Set<string>>(new Set());
-
-  const markAsRead = useCallback((id: string) => {
-    setReadIds(prev => new Set(prev).add(id));
-  }, []);
-
-  const markAllAsRead = useCallback(() => {
-    setReadIds(new Set(notifications.map(n => n.id)));
-  }, [notifications]);
-
-  const withReadState = useMemo(
-    () => notifications.map(n => ({ ...n, read: readIds.has(n.id) })),
-    [notifications, readIds],
-  );
-
-  return { notifications: withReadState, markAsRead, markAllAsRead };
-}
-
-const ADMIN_READ_KEY = 'smalim_admin_notif_read';
-
-function readStoredIds(): Set<string> {
+function readStoredIds(key: string): Set<string> {
   try {
-    return new Set(JSON.parse(localStorage.getItem(ADMIN_READ_KEY) ?? '[]') as string[]);
+    return new Set(JSON.parse(localStorage.getItem(key) ?? '[]') as string[]);
   } catch {
     return new Set();
   }
 }
 
 /**
- * Notifications du back-office : ce qui attend une prise en charge
- * (commandes « En attente », devis « Nouveau »). Un élément traité sort de la
- * liste au rafraîchissement suivant ; l'état « lu » est conservé d'une visite
- * à l'autre (localStorage), contrairement à l'espace client.
+ * État « lu » conservé d'une visite à l'autre (localStorage, par navigateur).
+ * Changer de clé (autre compte client) recharge l'état correspondant.
  */
-export function useAdminNotifications() {
-  const [notifications, setNotifications] = useState<AppNotification[]>([]);
-  const [readIds, setReadIds] = useState<Set<string>>(readStoredIds);
+function usePersistedReadState(storageKey: string | null, notifications: AppNotification[]) {
+  const [state, setState] = useState(() => ({
+    key: storageKey,
+    ids: storageKey ? readStoredIds(storageKey) : new Set<string>(),
+  }));
+  // Changement de compte : on relit l'état du nouveau compte pendant le rendu
+  if (state.key !== storageKey) {
+    setState({ key: storageKey, ids: storageKey ? readStoredIds(storageKey) : new Set<string>() });
+  }
 
-  useEffect(() => {
-    let cancelled = false;
-
-    const load = () =>
-      Promise.all([
-        ordersService.getAll({ statut: 'En attente', limit: 10 }),
-        quotesService.getAll({ statut: 'Nouveau', limit: 10 }),
-      ])
-        .then(([orders, quotes]) => {
-          if (cancelled) return;
-
-          const fromQuotes: AppNotification[] = quotes.map(q => ({
-            id: `quote-${q.id}`,
-            type: 'quote',
-            title: 'Nouvelle demande de devis',
-            message: `${q.entreprise} · ${q.machine}`,
-            time: relativeTime(q.date),
-            read: false,
-            link: '/admin/devis',
-          }));
-
-          const fromOrders: AppNotification[] = orders.map(o => ({
-            id: `order-${o.id}`,
-            type: 'order',
-            title: `Commande à traiter · ${o.reference}`,
-            message: `${o.client} · ${o.montant.toLocaleString('fr-FR')} FCFA`,
-            time: relativeTime(o.date),
-            read: false,
-            link: '/admin/commandes',
-          }));
-
-          setNotifications([...fromQuotes, ...fromOrders]);
-        })
-        // Une notification manquante ne doit jamais casser la page qui l'affiche
-        .catch(() => { /* on garde la dernière liste connue */ });
-
-    load();
-    const timer = setInterval(load, ADMIN_POLL_MS);
-    const unsubscribe = onAdminDataChanged(load);
-    return () => { cancelled = true; clearInterval(timer); unsubscribe(); };
+  const update = useCallback((add: string[]) => {
+    setState(prev => {
+      const ids = new Set([...prev.ids, ...add]);
+      if (prev.key) {
+        try { localStorage.setItem(prev.key, JSON.stringify([...ids].slice(-200))); } catch { /* stockage indisponible */ }
+      }
+      return { key: prev.key, ids };
+    });
   }, []);
 
-  const persist = useCallback((ids: Set<string>) => {
-    // Seuls les identifiants encore affichés méritent d'être gardés
-    try { localStorage.setItem(ADMIN_READ_KEY, JSON.stringify([...ids].slice(-200))); } catch { /* stockage indisponible */ }
-  }, []);
-
-  const markAsRead = useCallback((id: string) => {
-    setReadIds(prev => {
-      const next = new Set(prev).add(id);
-      persist(next);
-      return next;
-    });
-  }, [persist]);
-
-  const markAllAsRead = useCallback(() => {
-    setReadIds(prev => {
-      const next = new Set([...prev, ...notifications.map(n => n.id)]);
-      persist(next);
-      return next;
-    });
-  }, [notifications, persist]);
+  const markAsRead = useCallback((id: string) => update([id]), [update]);
+  const markAllAsRead = useCallback(() => update(notifications.map(n => n.id)), [notifications, update]);
 
   const withReadState = useMemo(
-    () => notifications.map(n => ({ ...n, read: readIds.has(n.id) })),
-    [notifications, readIds],
+    () => notifications.map(n => ({ ...n, read: state.ids.has(n.id) })),
+    [notifications, state.ids],
   );
 
   return { notifications: withReadState, markAsRead, markAllAsRead };
 }
 
+/** Recharge `load` au montage, toutes les minutes et à chaque action signalée */
+function usePolling(load: (() => void) | null) {
+  useEffect(() => {
+    if (!load) return;
+    load();
+    const timer = setInterval(load, ADMIN_POLL_MS);
+    const unsubscribe = onAdminDataChanged(load);
+    return () => { clearInterval(timer); unsubscribe(); };
+  }, [load]);
+}
+
 /**
- * Notifications de l'espace client : factures à régler et suivi des tickets.
- * Le chargement ne démarre qu'une fois le client authentifié. Les textes sont
- * construits à l'affichage, pour suivre la langue choisie sans recharger.
+ * Notifications du back-office : ce qui attend une prise en charge
+ * (commandes « En attente », devis « Nouveau »). Un élément traité sort de la
+ * liste au rafraîchissement suivant.
+ */
+export function useAdminNotifications() {
+  const [notifications, setNotifications] = useState<AppNotification[]>([]);
+
+  const load = useCallback(() => {
+    Promise.all([
+      ordersService.getAll({ statut: 'En attente', limit: 10 }),
+      quotesService.getAll({ statut: 'Nouveau', limit: 10 }),
+    ])
+      .then(([orders, quotes]) => {
+        const fromQuotes: AppNotification[] = quotes.map(q => ({
+          id: `quote-${q.id}`,
+          type: 'quote',
+          title: 'Nouvelle demande de devis',
+          message: `${q.entreprise} · ${q.machine}`,
+          time: relativeTime(q.date),
+          read: false,
+          link: '/admin/devis',
+        }));
+
+        const fromOrders: AppNotification[] = orders.map(o => ({
+          id: `order-${o.id}`,
+          type: 'order',
+          title: `Commande à traiter · ${o.reference}`,
+          message: `${o.client} · ${o.montant.toLocaleString('fr-FR')} FCFA`,
+          time: relativeTime(o.date),
+          read: false,
+          link: '/admin/commandes',
+        }));
+
+        setNotifications([...fromQuotes, ...fromOrders]);
+      })
+      // Une notification manquante ne doit jamais casser la page qui l'affiche
+      .catch(() => { /* on garde la dernière liste connue */ });
+  }, []);
+
+  usePolling(load);
+  return usePersistedReadState('smalim_admin_notif_read', notifications);
+}
+
+/** Étapes d'une commande qui méritent une notification au client */
+const NOTIFIED_ORDER_STEPS: Order['statut'][] = ['Confirmée', 'En préparation', 'Expédiée'];
+
+/**
+ * Notifications de l'espace client : propositions de devis à examiner, suivi
+ * des commandes en cours, factures à régler et tickets ouverts. Un changement
+ * de statut de commande produit une nouvelle notification (l'identifiant
+ * inclut le statut). Les textes sont construits à l'affichage, pour suivre la
+ * langue choisie sans recharger.
  */
 export function useClientNotifications() {
   const { client } = useClientAuth();
   const { t } = useTranslation();
   const status = useStatusLabels();
   const clientId = client?.id ? String(client.id) : null;
-  const [data, setData] = useState<{ invoices: Invoice[]; tickets: SupportTicket[] }>({
-    invoices: [],
-    tickets: [],
-  });
+  const [data, setData] = useState<{
+    owner: string | null;
+    invoices: Invoice[];
+    tickets: SupportTicket[];
+    quotes: Quote[];
+    orders: Order[];
+  }>({ owner: null, invoices: [], tickets: [], quotes: [], orders: [] });
 
-  useEffect(() => {
-    if (!clientId) return;
-    let cancelled = false;
-
-    Promise.all([
-      clientPortalService.getInvoices(clientId),
-      clientPortalService.getTickets(clientId),
-    ])
-      .then(([invoices, tickets]) => {
-        if (!cancelled) setData({ invoices, tickets });
-      })
-      .catch(() => { if (!cancelled) setData({ invoices: [], tickets: [] }); });
-
-    return () => { cancelled = true; };
+  const load = useMemo(() => {
+    if (!clientId) return null;
+    return () => {
+      Promise.all([
+        clientPortalService.getInvoices(clientId),
+        clientPortalService.getTickets(clientId),
+        quotesService.getAll({ statut: 'Devis envoyé', limit: 20 }),
+        ordersService.getAll({ limit: 20 }),
+      ])
+        .then(([invoices, tickets, quotes, orders]) => setData({ owner: clientId, invoices, tickets, quotes, orders }))
+        .catch(() => { /* on garde la dernière liste connue */ });
+    };
   }, [clientId]);
 
+  usePolling(load);
+
   const notifications = useMemo<AppNotification[]>(() => {
+    if (data.owner !== clientId) return [];
+    const now = new Date();
+
+    const proposals: AppNotification[] = data.quotes
+      .filter(q => !q.validite || new Date(q.validite) >= now)
+      .map(q => ({
+        id: `quote-${q.id}-sent`,
+        type: 'quote',
+        title: t('clientPortal.notifications.quoteReceived'),
+        message: t('clientPortal.notifications.quoteMessage', {
+          machine: q.machine || q.reference,
+          amount: (q.montantPropose ?? 0).toLocaleString('fr-FR'),
+        }),
+        time: q.date,
+        read: false,
+        link: '/espace-client/devis',
+      }));
+
+    const orders: AppNotification[] = data.orders
+      .filter(o => NOTIFIED_ORDER_STEPS.includes(o.statut))
+      .map(o => ({
+        id: `order-${o.id}-${o.statut}`,
+        type: 'order',
+        title: t('clientPortal.notifications.orderUpdate', { reference: o.reference, status: status.order(o.statut) }),
+        message: `${o.montant.toLocaleString('fr-FR')} FCFA`,
+        time: o.date,
+        read: false,
+        link: '/espace-client/commandes',
+      }));
+
     const dues: AppNotification[] = data.invoices
       .filter(i => i.statut === 'En attente' || i.statut === 'En retard')
       .map(i => ({
-        id: `invoice-${i.id}`,
+        id: `invoice-${i.id}-${i.statut}`,
         type: 'invoice',
         title: i.statut === 'En retard'
           ? t('clientPortal.notifications.invoiceOverdue')
@@ -204,10 +231,10 @@ export function useClientNotifications() {
         link: '/espace-client/factures',
       }));
 
-    const actifs: AppNotification[] = data.tickets
+    const tickets: AppNotification[] = data.tickets
       .filter(tk => tk.statut !== 'Fermé')
       .map(tk => ({
-        id: `ticket-${tk.id}`,
+        id: `ticket-${tk.id}-${tk.statut}`,
         type: 'support',
         title: t('clientPortal.notifications.ticket', { status: status.ticket(tk.statut) }),
         message: tk.sujet,
@@ -216,8 +243,8 @@ export function useClientNotifications() {
         link: '/espace-client/support',
       }));
 
-    return [...dues, ...actifs];
-  }, [data, t, status]);
+    return [...proposals, ...orders, ...dues, ...tickets];
+  }, [data, clientId, t, status]);
 
-  return useReadState(notifications);
+  return usePersistedReadState(clientId ? `smalim_client_notif_read_${clientId}` : null, notifications);
 }

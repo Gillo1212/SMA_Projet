@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useClientAuth } from '../../contexts/ClientAuthContext';
 import { useOrders } from '../../hooks/useOrders';
@@ -9,6 +10,7 @@ import {
 import { LoadingState, ErrorState } from '../../components/feature/AsyncState';
 import { useTranslation } from 'react-i18next';
 import { useStatusLabels } from '../../i18n/useStatusLabels';
+import { onAdminDataChanged } from '../../services/adminEvents';
 
 const statusOrder: Record<string, string> = {
   'En attente': 'bg-amber-50 text-amber-700',
@@ -42,6 +44,8 @@ export default function ClientDashboardPage() {
   const { orders } = useOrders();
   const { invoices } = useClientInvoices();
   const { tickets } = useClientTickets();
+  // Une réponse à un devis change les chiffres : on les relit aussitôt
+  useEffect(() => onAdminDataChanged(refetch), [refetch]);
 
   if (isLoading) return <LoadingState label={t('clientPortal.dashboard.loading')} />;
   if (error) return <ErrorState message={error} onRetry={refetch} />;
@@ -74,11 +78,11 @@ export default function ClientDashboardPage() {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
         {[
-          { label: t('clientPortal.dashboard.totalOrders'), value: stats.totalCommandes, icon: 'ri-shopping-bag-line', color: 'text-[#1AAA3F]', bg: 'bg-[#1AAA3F]/10', sub: t('clientPortal.dashboard.pendingOrders', { count: orders.filter(o => o.statut === 'En attente').length }) },
-          { label: t('clientPortal.dashboard.installedMachines'), value: machines.length, icon: 'ri-settings-2-line', color: 'text-sky-600', bg: 'bg-sky-50', sub: t('clientPortal.dashboard.operationalMachines', { count: stats.machinesActives }) },
-          { label: t('clientPortal.dashboard.totalSpent'), value: `${(stats.totalDepense / 1000000).toFixed(2)}M FCFA`, icon: 'ri-money-dollar-circle-line', color: 'text-emerald-600', bg: 'bg-emerald-50', sub: t('clientPortal.dashboard.deliveredOrders') },
+          { label: t('clientPortal.dashboard.totalOrders'), value: stats.totalCommandes, icon: 'ri-shopping-bag-line', color: 'text-[#1AAA3F]', bg: 'bg-[#1AAA3F]/10', sub: t('clientPortal.dashboard.inProgressOrders', { count: stats.commandesEnCours }) },
+          { label: t('clientPortal.dashboard.installedMachines'), value: stats.machinesTotal, icon: 'ri-settings-2-line', color: 'text-sky-600', bg: 'bg-sky-50', sub: t('clientPortal.dashboard.operationalMachines', { count: stats.machinesActives }) },
+          { label: t('clientPortal.dashboard.totalSpent'), value: `${stats.totalDepense.toLocaleString('fr-FR')} FCFA`, icon: 'ri-money-dollar-circle-line', color: 'text-emerald-600', bg: 'bg-emerald-50', sub: t('clientPortal.dashboard.paidOrders') },
           { label: t('clientPortal.dashboard.openTickets'), value: stats.ticketsOuverts, icon: 'ri-customer-service-2-line', color: 'text-amber-600', bg: 'bg-amber-50', sub: t('clientPortal.dashboard.invoicesToPay', { count: stats.facturesEnAttente }) },
         ].map((k, i) => (
           <div key={i} className="bg-white rounded-2xl p-5 border border-gray-100">
@@ -148,8 +152,20 @@ export default function ClientDashboardPage() {
       </div>
 
       {/* Alerts */}
-      {(openTickets.length > 0 || unpaidInvoices.length > 0) && (
+      {(openTickets.length > 0 || unpaidInvoices.length > 0 || stats.devisARepondre > 0) && (
         <div className="grid xl:grid-cols-2 gap-4">
+          {stats.devisARepondre > 0 && (
+            <div className="bg-indigo-50 border border-indigo-200 rounded-2xl p-5 flex items-start gap-4">
+              <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                <i className="ri-mail-open-line text-indigo-600 text-lg"></i>
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-bold text-indigo-900">{t('clientPortal.dashboard.quotesToAnswer', { count: stats.devisARepondre })}</p>
+                <p className="text-xs text-indigo-800/70 mt-0.5">{t('clientPortal.dashboard.quotesToAnswerHint')}</p>
+                <Link to="/espace-client/devis" className="text-xs text-indigo-700 font-semibold underline mt-1 inline-block">{t('clientPortal.dashboard.seeQuotes')}</Link>
+              </div>
+            </div>
+          )}
           {unpaidInvoices.length > 0 && (
             <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 flex items-start gap-4">
               <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center flex-shrink-0">

@@ -4,6 +4,7 @@
  * Émis après une action qui change des chiffres (statut de commande ou de
  * devis…) ; les compteurs du menu, la cloche et le tableau de bord l'écoutent
  * pour se rafraîchir sans attendre leur prochain rafraîchissement périodique.
+ * L'espace client écoute le même signal (réponse à un devis…).
  */
 const EVENT = 'smalim:admin-data-changed';
 

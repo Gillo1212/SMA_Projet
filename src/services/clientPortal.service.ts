@@ -28,6 +28,7 @@ import type {
   TicketPriority,
   TicketCategory,
   ClientDashboardStats,
+  ClientCounters,
   ClientProfile,
   Order,
 } from '../types/models';
@@ -137,7 +138,10 @@ interface BackendClientDashboard {
   kpis: {
     total_orders: number | string;
     total_spent: number | string;
+    machines_total: number | string;
     active_machines: number | string;
+    orders_in_progress: number | string;
+    quotes_awaiting_answer: number | string;
     pending_invoices: number | string;
     pending_invoices_amount: number | string;
     open_tickets: number | string;
@@ -228,7 +232,10 @@ export const clientPortalService = {
         stats: {
           totalCommandes: 0,
           totalDepense: 0,
+          machinesTotal: mockMachines.length,
           machinesActives: mockMachines.length,
+          commandesEnCours: 0,
+          devisARepondre: 0,
           facturesEnAttente: 0,
           facturesEnAttenteMontant: 0,
           ticketsOuverts: 0,
@@ -243,12 +250,27 @@ export const clientPortalService = {
       stats: {
         totalCommandes: toNumber(raw.kpis?.total_orders),
         totalDepense: toNumber(raw.kpis?.total_spent),
+        machinesTotal: toNumber(raw.kpis?.machines_total),
         machinesActives: toNumber(raw.kpis?.active_machines),
+        commandesEnCours: toNumber(raw.kpis?.orders_in_progress),
+        devisARepondre: toNumber(raw.kpis?.quotes_awaiting_answer),
         facturesEnAttente: toNumber(raw.kpis?.pending_invoices),
         facturesEnAttenteMontant: toNumber(raw.kpis?.pending_invoices_amount),
         ticketsOuverts: toNumber(raw.kpis?.open_tickets),
       },
       machines: (raw.machines ?? []).map(normalizeMachine),
+    };
+  },
+
+  /** @endpoint GET /dashboard/client/counters — pastilles du menu */
+  async getCounters(): Promise<ClientCounters> {
+    if (USE_MOCK) return { ordersInProgress: 0, quotesAwaitingAnswer: 0, invoicesToPay: 0, openTickets: 0 };
+    const raw = await apiClient.get<Record<string, unknown>>(ENDPOINTS.DASHBOARD.CLIENT_COUNTERS);
+    return {
+      ordersInProgress: toNumber(raw.orders_in_progress),
+      quotesAwaitingAnswer: toNumber(raw.quotes_awaiting_answer),
+      invoicesToPay: toNumber(raw.invoices_to_pay),
+      openTickets: toNumber(raw.open_tickets),
     };
   },
 

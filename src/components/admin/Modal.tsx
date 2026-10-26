@@ -11,6 +11,8 @@ interface ModalProps {
   size?: 'md' | 'lg' | 'xl';
   /** Barre d'actions collée en bas de la fenêtre */
   footer?: ReactNode;
+  /** Libellé accessible de la croix (traduit dans l'espace client) */
+  closeLabel?: string;
   children: ReactNode;
 }
 
@@ -24,7 +26,7 @@ const openStack: string[] = [];
  * Échap et clic à côté ferment ; le focus entre dans la fenêtre puis revient
  * sur l'élément qui l'a ouverte ; la page ne défile plus derrière.
  */
-export default function Modal({ open, onClose, title, subtitle, headerExtra, size = 'lg', footer, children }: ModalProps) {
+export default function Modal({ open, onClose, title, subtitle, headerExtra, size = 'lg', footer, closeLabel = 'Fermer', children }: ModalProps) {
   const titleId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
   const onCloseRef = useRef(onClose);
@@ -78,7 +80,7 @@ export default function Modal({ open, onClose, title, subtitle, headerExtra, siz
           <div className="flex items-center gap-2 flex-shrink-0">
             {headerExtra}
             <button
-              type="button" onClick={onClose} data-close aria-label="Fermer"
+              type="button" onClick={onClose} data-close aria-label={closeLabel}
               className="w-8 h-8 flex items-center justify-center rounded-lg text-[#00272B]/40 hover:bg-gray-100 hover:text-[#00272B] cursor-pointer"
             >
               <i className="ri-close-line text-lg"></i>

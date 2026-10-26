@@ -38,7 +38,11 @@ const STYLES: Record<Toast['tone'], { box: string; icon: string }> = {
   info: { box: 'bg-white text-[#00272B] border border-gray-200', icon: 'ri-information-fill text-sky-500' },
 };
 
-export default function Toasts({ toasts, onDismiss }: { toasts: Toast[]; onDismiss: (id: number) => void }) {
+export default function Toasts({ toasts, onDismiss, dismissLabel = 'Fermer la notification' }: {
+  toasts: Toast[];
+  onDismiss: (id: number) => void;
+  dismissLabel?: string;
+}) {
   return createPortal(
     <div className="fixed bottom-4 right-4 left-4 sm:left-auto z-[70] flex flex-col gap-2 sm:w-96" aria-live="polite" role="status">
       {toasts.map(t => (
@@ -48,7 +52,7 @@ export default function Toasts({ toasts, onDismiss }: { toasts: Toast[]; onDismi
             <p className="text-sm font-semibold">{t.title}</p>
             {t.detail && <p className="text-xs opacity-75 mt-0.5 break-words">{t.detail}</p>}
           </div>
-          <button type="button" onClick={() => onDismiss(t.id)} aria-label="Fermer la notification"
+          <button type="button" onClick={() => onDismiss(t.id)} aria-label={dismissLabel}
             className="opacity-60 hover:opacity-100 cursor-pointer">
             <i className="ri-close-line"></i>
           </button>

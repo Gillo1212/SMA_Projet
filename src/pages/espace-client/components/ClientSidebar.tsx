@@ -1,6 +1,7 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useClientAuth } from '../../../contexts/ClientAuthContext';
+import { useClientCounters } from '../../../hooks/useClientCounters';
 
 const navItems = [
   { path: '/espace-client', icon: 'ri-dashboard-line', label: 'dashboard', exact: true },
@@ -21,6 +22,14 @@ export default function ClientSidebar({ onClose }: ClientSidebarProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const { client, logout } = useClientAuth();
+  const { counters } = useClientCounters();
+
+  // Pastilles : ce qui demande l'attention du client (masquées à zéro)
+  const badges: Record<string, { value: number; title: string; tone: string } | undefined> = counters ? {
+    '/espace-client/commandes': { value: counters.ordersInProgress, title: t('clientPortal.nav.ordersBadge', { count: counters.ordersInProgress }), tone: 'bg-white/15 text-white' },
+    '/espace-client/devis': { value: counters.quotesAwaitingAnswer, title: t('clientPortal.nav.quotesBadge', { count: counters.quotesAwaitingAnswer }), tone: 'bg-indigo-500 text-white' },
+    '/espace-client/factures': { value: counters.invoicesToPay, title: t('clientPortal.nav.invoicesBadge', { count: counters.invoicesToPay }), tone: 'bg-amber-500 text-white' },
+  } : {};
 
   const handleLogout = () => {
     logout();
@@ -81,7 +90,16 @@ export default function ClientSidebar({ onClose }: ClientSidebarProps) {
               <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
                 <i className={`${item.icon} text-base`}></i>
               </div>
-              <span>{t(`clientPortal.nav.${item.label}`)}</span>
+              <span className="flex-1">{t(`clientPortal.nav.${item.label}`)}</span>
+              {!!badges[item.path]?.value && (
+                <span
+                  title={badges[item.path]!.title}
+                  aria-label={badges[item.path]!.title}
+                  className={`min-w-[20px] h-5 px-1.5 rounded-full text-[11px] font-bold flex items-center justify-center ${badges[item.path]!.tone}`}
+                >
+                  {badges[item.path]!.value}
+                </span>
+              )}
             </Link>
           );
         })}

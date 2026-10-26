@@ -10,13 +10,16 @@ interface ConfirmDialogProps {
   busy?: boolean;
   onConfirm: () => void;
   onCancel: () => void;
+  /** Libellé du bouton d'abandon (traduit dans l'espace client) */
+  cancelLabel?: string;
+  closeLabel?: string;
   /** Contenu supplémentaire (champ de motif…) */
   children?: ReactNode;
 }
 
 /** Confirmation d'une action sensible (annulation, remboursement, envoi au client…) */
 export default function ConfirmDialog({
-  open, title, message, confirmLabel, tone = 'primary', busy, onConfirm, onCancel, children,
+  open, title, message, confirmLabel, tone = 'primary', busy, onConfirm, onCancel, cancelLabel = 'Annuler', closeLabel, children,
 }: ConfirmDialogProps) {
   const confirmClass = tone === 'danger'
     ? 'bg-red-500 hover:bg-red-600'
@@ -27,11 +30,12 @@ export default function ConfirmDialog({
       onClose={busy ? () => {} : onCancel}
       size="md"
       title={title}
+      closeLabel={closeLabel}
       footer={
         <div className="flex justify-end gap-3">
           <button type="button" onClick={onCancel} disabled={busy}
             className="px-4 h-10 border border-gray-200 text-sm font-medium text-[#00272B]/70 rounded-lg hover:bg-white cursor-pointer disabled:opacity-50">
-            Annuler
+            {cancelLabel}
           </button>
           <button type="button" onClick={onConfirm} disabled={busy} data-autofocus
             className={`px-5 h-10 text-white text-sm font-semibold rounded-lg cursor-pointer disabled:opacity-60 flex items-center gap-2 ${confirmClass}`}>
