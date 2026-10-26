@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Suivi de votre commande - SMALIM</title>
+</head>
+<body style="margin:0;padding:0;background:#f5f9f6;font-family:'Helvetica Neue',Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f9f6;padding:40px 20px;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
+        <tr>
+          <td style="background:#00272B;border-radius:16px 16px 0 0;padding:28px 40px;text-align:center;">
+            <p style="color:#ffffff;font-size:22px;font-weight:700;letter-spacing:1px;margin:0;">SMALIM</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="background:#ffffff;padding:44px 40px;">
+            <div style="text-align:center;margin-bottom:28px;">
+              <p style="color:#1AAA3F;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px;">Suivi de commande</p>
+              <h1 style="color:#00272B;font-size:22px;font-weight:700;margin:0 0 6px;">Votre commande est {{statusLower}}</h1>
+              <p style="color:rgba(0,39,43,0.5);font-size:14px;margin:0;">Commande n° {{orderNumber}}</p>
+            </div>
+            <p style="color:rgba(0,39,43,0.7);font-size:15px;line-height:1.6;margin:0 0 24px;">
+              Bonjour {{firstName}},<br/><br/>
+              {{message}}
+            </p>
+            <div style="text-align:center;margin:32px 0 0;">
+              <a href="{{trackingUrl}}" style="display:inline-block;background:#1AAA3F;color:#ffffff;text-decoration:none;font-size:14px;font-weight:600;padding:13px 30px;border-radius:10px;">
+                Suivre ma commande
+              </a>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td style="background:#f0f9f4;border-radius:0 0 16px 16px;padding:24px 40px;text-align:center;border-top:1px solid #e8f5ee;">
+            <p style="color:rgba(0,39,43,0.4);font-size:12px;margin:0;">© {{year}} SMALIM - Une question ? Répondez simplement à cet email.</p>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>

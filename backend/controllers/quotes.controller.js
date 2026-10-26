@@ -91,16 +91,19 @@ exports.updateStatus = async (req, res, next) => {
       [status, proposed_amount || quote.proposed_amount, admin_response || quote.admin_response, expires_at || quote.expires_at, req.params.id]
     );
 
-    // Email de notification au contact du devis (non bloquant)
+    // Email au contact uniquement quand une proposition chiffrée lui est
+    // envoyée : les étapes internes (« en cours »…) ne le concernent pas.
     const updatedQuote = await queryOne('SELECT * FROM quotes WHERE id = ?', [req.params.id]);
-    const emailTarget = quote.client_id
-      ? await queryOne('SELECT email, first_name FROM clients WHERE id = ?', [quote.client_id])
-      : { email: quote.contact_email, first_name: quote.contact_name };
-
-    if (emailTarget?.email) {
-      sendQuoteUpdate(emailTarget, updatedQuote, status).catch(err =>
-        console.error('[Email] Notification devis non envoyée:', err.message)
-      );
+    const proposalSent = status === 'quoted' && quote.status !== 'quoted' && updatedQuote.proposed_amount;
+    if (proposalSent) {
+      const emailTarget = quote.client_id
+        ? await queryOne('SELECT email, first_name FROM clients WHERE id = ?', [quote.client_id])
+        : { email: quote.contact_email, first_name: quote.contact_name };
+      if (emailTarget?.email) {
+        sendQuoteUpdate(emailTarget, updatedQuote).catch(err =>
+          console.error('[Email] Notification devis non envoyée:', err.message)
+        );
+      }
     }
 
     res.json({ success: true, message: 'Devis mis à jour' });

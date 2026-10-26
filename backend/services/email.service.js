@@ -48,7 +48,19 @@ function loadTemplate(templateName, variables = {}) {
 /**
  * Envoi générique d'un email
  */
-async function sendEmail({ to, subject, templateName, variables, text }) {
+/**
+ * Hors production, EMAIL_REDIRECT_TO détourne tous les envois vers une seule
+ * adresse : les comptes de démonstration portent des adresses réelles, qu'un
+ * test ne doit jamais atteindre. Le destinataire d'origine reste visible
+ * dans le sujet. Sans effet si NODE_ENV=production.
+ */
+function devRedirect(to, subject) {
+  const target = process.env.NODE_ENV !== 'production' && process.env.EMAIL_REDIRECT_TO;
+  return target ? { to: target, subject: `[DEV → ${to}] ${subject}` } : { to, subject };
+}
+
+async function sendEmail({ to: originalTo, subject: originalSubject, templateName, variables, text }) {
+  const { to, subject } = devRedirect(originalTo, originalSubject);
   try {
     const html = templateName ? loadTemplate(templateName, variables) : undefined;
     const { cfg, transport } = await getTransport();
@@ -162,21 +174,23 @@ async function sendOrderConfirmation(user, order) {
  * Email de mise à jour statut commande
  */
 async function sendOrderStatusUpdate(user, order, newStatus) {
-  const statusLabels = {
-    confirmed: 'Confirmée',
-    shipped: 'Expédiée',
-    delivered: 'Livrée',
-    cancelled: 'Annulée',
+  const statuses = {
+    confirmed: { label: 'Confirmée', message: 'Bonne nouvelle : votre commande est confirmée. Notre équipe la prépare.' },
+    shipped:   { label: 'Expédiée', message: 'Votre commande a été expédiée et est en route vers vous.' },
+    delivered: { label: 'Livrée', message: 'Votre commande a été livrée. Merci pour votre confiance !' },
+    cancelled: { label: 'Annulée', message: "Votre commande a été annulée. Contactez-nous si vous n'en êtes pas à l'origine." },
   };
+  const s = statuses[newStatus] ?? { label: newStatus, message: 'Le statut de votre commande a changé.' };
 
   return sendEmail({
     to: user.email,
-    subject: `Votre commande #${order.order_number} - ${statusLabels[newStatus] || newStatus}`,
+    subject: `Votre commande #${order.order_number} - ${s.label}`,
     templateName: 'order-status',
     variables: {
       firstName: user.first_name,
       orderNumber: order.order_number,
-      status: statusLabels[newStatus] || newStatus,
+      statusLower: s.label.toLowerCase(),
+      message: s.message,
       trackingUrl: `${process.env.FRONTEND_URL}/espace-client/commandes`,
       year: new Date().getFullYear(),
     },
@@ -186,17 +200,17 @@ async function sendOrderStatusUpdate(user, order, newStatus) {
 /**
  * Email de réponse à un devis
  */
-async function sendQuoteUpdate(user, quote, status) {
+async function sendQuoteUpdate(user, quote) {
   return sendEmail({
     to: user.email,
-    subject: `Votre devis ${quote.quote_number} - ${status === 'approved' ? 'Approuvé' : 'Mis à jour'}`,
+    subject: `Votre devis ${quote.quote_number} est prêt - SMALIM`,
     templateName: 'quote-update',
     variables: {
       firstName: user.first_name,
       quoteNumber: quote.quote_number,
-      status: status === 'approved' ? 'approuvé' : 'mis à jour',
-      amount: Number(quote.total_amount).toLocaleString('fr-FR'),
-      validUntil: quote.valid_until ? new Date(quote.valid_until).toLocaleDateString('fr-FR') : 'N/A',
+      status: 'envoyé',
+      amount: Number(quote.proposed_amount).toLocaleString('fr-FR'),
+      validUntil: quote.expires_at ? new Date(quote.expires_at).toLocaleDateString('fr-FR') : 'sans date limite',
       quoteUrl: `${process.env.FRONTEND_URL}/espace-client/devis`,
       year: new Date().getFullYear(),
     },
@@ -276,6 +290,11 @@ async function logEmailConfig() {
     const cfg = await settings.getSmtpConfig();
     const where = cfg.source === 'database' ? 'back-office' : '.env';
     console.log(` Email : ${cfg.provider} via ${cfg.host || '?'}:${cfg.port} (${where}), expéditeur ${cfg.from || '?'}`);
+    const redirect = process.env.NODE_ENV !== 'production' && process.env.EMAIL_REDIRECT_TO;
+    if (redirect) console.log(` Email : redirection de développement, tous les envois vont à ${redirect}`);
+    else if (process.env.NODE_ENV !== 'production') {
+      console.warn(' Email : aucune redirection (EMAIL_REDIRECT_TO) — les emails partent aux vrais destinataires');
+    }
     if (cfg.problems.length) {
       const log = process.env.NODE_ENV === 'production' ? console.error : console.warn;
       log(` Email : configuration incomplète — ${cfg.problems.join(' ; ')}`);

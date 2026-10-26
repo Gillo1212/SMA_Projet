@@ -220,7 +220,8 @@ exports.updateStatus = async (req, res, next) => {
 
     // Email de mise à jour statut (non bloquant, pour les statuts significatifs)
     const notifiableStatuses = ['confirmed', 'shipped', 'delivered', 'cancelled'];
-    if (order.client_id && notifiableStatuses.includes(status)) {
+    // Pas d'email si le statut ne change pas (clic répété sur le statut actuel)
+    if (order.client_id && order.status !== status && notifiableStatuses.includes(status)) {
       const client = await queryOne('SELECT email, first_name FROM clients WHERE id = ?', [order.client_id]);
       if (client) {
         sendOrderStatusUpdate(client, order, status).catch(err =>
