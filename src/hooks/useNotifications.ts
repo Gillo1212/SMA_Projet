@@ -13,6 +13,7 @@ import { ordersService } from '../services/orders.service';
 import { quotesService } from '../services/quotes.service';
 import { clientPortalService } from '../services/clientPortal.service';
 import { useClientAuth } from '../contexts/ClientAuthContext';
+import { ADMIN_POLL_MS, onAdminDataChanged } from '../services/adminEvents';
 import { useTranslation } from 'react-i18next';
 import { useStatusLabels } from '../i18n/useStatusLabels';
 import type { Invoice, SupportTicket } from '../types/models';
@@ -66,48 +67,95 @@ function useReadState(notifications: AppNotification[]) {
   return { notifications: withReadState, markAsRead, markAllAsRead };
 }
 
+const ADMIN_READ_KEY = 'smalim_admin_notif_read';
+
+function readStoredIds(): Set<string> {
+  try {
+    return new Set(JSON.parse(localStorage.getItem(ADMIN_READ_KEY) ?? '[]') as string[]);
+  } catch {
+    return new Set();
+  }
+}
+
+/**
+ * Notifications du back-office : ce qui attend une prise en charge
+ * (commandes « En attente », devis « Nouveau »). Un élément traité sort de la
+ * liste au rafraîchissement suivant ; l'état « lu » est conservé d'une visite
+ * à l'autre (localStorage), contrairement à l'espace client.
+ */
 export function useAdminNotifications() {
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
+  const [readIds, setReadIds] = useState<Set<string>>(readStoredIds);
 
   useEffect(() => {
     let cancelled = false;
 
-    Promise.all([
-      ordersService.getAll({ limit: 5 }),
-      quotesService.getAll({ statut: 'Nouveau', limit: 5 }),
-    ])
-      .then(([orders, quotes]) => {
-        if (cancelled) return;
+    const load = () =>
+      Promise.all([
+        ordersService.getAll({ statut: 'En attente', limit: 10 }),
+        quotesService.getAll({ statut: 'Nouveau', limit: 10 }),
+      ])
+        .then(([orders, quotes]) => {
+          if (cancelled) return;
 
-        const fromOrders: AppNotification[] = orders.map(o => ({
-          id: `order-${o.id}`,
-          type: 'order',
-          title: 'Commande',
-          message: `${o.client} · ${o.montant.toLocaleString('fr-FR')} FCFA (${o.statut})`,
-          time: relativeTime(o.date),
-          read: false,
-          link: '/admin/commandes',
-        }));
+          const fromQuotes: AppNotification[] = quotes.map(q => ({
+            id: `quote-${q.id}`,
+            type: 'quote',
+            title: 'Nouvelle demande de devis',
+            message: `${q.entreprise} · ${q.machine}`,
+            time: relativeTime(q.date),
+            read: false,
+            link: '/admin/devis',
+          }));
 
-        const fromQuotes: AppNotification[] = quotes.map(q => ({
-          id: `quote-${q.id}`,
-          type: 'quote',
-          title: 'Demande de devis',
-          message: `${q.entreprise} · ${q.machine}`,
-          time: relativeTime(q.date),
-          read: false,
-          link: '/admin/devis',
-        }));
+          const fromOrders: AppNotification[] = orders.map(o => ({
+            id: `order-${o.id}`,
+            type: 'order',
+            title: `Commande à traiter · ${o.reference}`,
+            message: `${o.client} · ${o.montant.toLocaleString('fr-FR')} FCFA`,
+            time: relativeTime(o.date),
+            read: false,
+            link: '/admin/commandes',
+          }));
 
-        setNotifications([...fromQuotes, ...fromOrders]);
-      })
-      // Une notification manquante ne doit jamais casser la page qui l'affiche
-      .catch(() => { if (!cancelled) setNotifications([]); });
+          setNotifications([...fromQuotes, ...fromOrders]);
+        })
+        // Une notification manquante ne doit jamais casser la page qui l'affiche
+        .catch(() => { /* on garde la dernière liste connue */ });
 
-    return () => { cancelled = true; };
+    load();
+    const timer = setInterval(load, ADMIN_POLL_MS);
+    const unsubscribe = onAdminDataChanged(load);
+    return () => { cancelled = true; clearInterval(timer); unsubscribe(); };
   }, []);
 
-  return useReadState(notifications);
+  const persist = useCallback((ids: Set<string>) => {
+    // Seuls les identifiants encore affichés méritent d'être gardés
+    try { localStorage.setItem(ADMIN_READ_KEY, JSON.stringify([...ids].slice(-200))); } catch { /* stockage indisponible */ }
+  }, []);
+
+  const markAsRead = useCallback((id: string) => {
+    setReadIds(prev => {
+      const next = new Set(prev).add(id);
+      persist(next);
+      return next;
+    });
+  }, [persist]);
+
+  const markAllAsRead = useCallback(() => {
+    setReadIds(prev => {
+      const next = new Set([...prev, ...notifications.map(n => n.id)]);
+      persist(next);
+      return next;
+    });
+  }, [notifications, persist]);
+
+  const withReadState = useMemo(
+    () => notifications.map(n => ({ ...n, read: readIds.has(n.id) })),
+    [notifications, readIds],
+  );
+
+  return { notifications: withReadState, markAsRead, markAllAsRead };
 }
 
 /**

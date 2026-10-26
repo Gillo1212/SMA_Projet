@@ -106,6 +106,7 @@ export const ENDPOINTS = {
   DASHBOARD: {
     ADMIN:  '/dashboard/admin',
     CLIENT: '/dashboard/client',
+    COUNTERS: '/dashboard/counters',
   },
 
   // ── Paramètres ────────────────────────────────────────────

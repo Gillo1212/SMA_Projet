@@ -140,6 +140,13 @@ export interface Order {
   fraisLivraison?: number;
   codePromo?: string;
   remise?: number;
+  /** Montants du détail (GET /orders/:id) */
+  sousTotal?: number;
+  tva?: number;
+  /** Taux figé sur la commande, en % (absent des commandes anciennes) */
+  tauxTVA?: number;
+  /** Historique des statuts, du plus récent au plus ancien (date ISO) */
+  historique?: { statut: OrderStatus; note?: string; date: string }[];
   note?: string;
 }
 
@@ -181,7 +188,10 @@ export interface Quote {
   date: string;
   budget?: number;
   montantPropose?: number;
+  /** Réponse de l'équipe jointe à la proposition */
   notes?: string;
+  /** Fin de validité de la proposition (date ISO) */
+  validite?: string;
 }
 
 // ── Client ─────────────────────────────────────────────────────────────────
@@ -336,6 +346,10 @@ export interface DashboardStats {
   devisEnAttente: number;
   ticketsOuverts: number;
   clientsTotal: number;
+  /** Commandes en attente, confirmées ou en préparation */
+  commandesATraiter?: number;
+  /** Devis nouveaux ou en cours */
+  devisATraiter?: number;
 }
 
 export interface RevenueDataPoint {

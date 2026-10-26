@@ -58,16 +58,17 @@ interface BackendDashboard {
     active_machines: number | string;
     pending_quotes: number | string;
     open_tickets: number | string;
+    last_month_orders?: number | string;
+    last_month_revenue?: number | string;
+    orders_to_handle?: number | string;
+    quotes_to_handle?: number | string;
   };
   orders_by_status: Record<string, number | string>;
   monthly_revenue: BackendMonthlyRevenue[];
 }
 
-/** Évolution en % entre les deux derniers mois — undefined si non calculable */
-function evolution(series: number[]): number | undefined {
-  if (series.length < 2) return undefined;
-  const current  = series[series.length - 1];
-  const previous = series[series.length - 2];
+/** Évolution en % du mois en cours par rapport au précédent — undefined sans base de comparaison */
+function evolution(current: number, previous: number): number | undefined {
   if (!previous) return undefined;
   return Math.round(((current - previous) / previous) * 100);
 }
@@ -88,10 +89,12 @@ function normalizeDashboard(raw: BackendDashboard): Omit<DashboardData, 'recentO
     stats: {
       totalCommandes:      toNumber(raw.kpis?.total_orders),
       commandesMoisActuel: toNumber(raw.kpis?.monthly_orders),
-      commandesEvolution:  evolution(months.map(m => toNumber(m.orders))),
+      commandesEvolution:  evolution(toNumber(raw.kpis?.monthly_orders), toNumber(raw.kpis?.last_month_orders)),
       revenusTotal:        toNumber(raw.kpis?.total_revenue),
       revenusMoisActuel:   toNumber(raw.kpis?.monthly_revenue),
-      revenusEvolution:    evolution(months.map(m => toNumber(m.revenue))),
+      revenusEvolution:    evolution(toNumber(raw.kpis?.monthly_revenue), toNumber(raw.kpis?.last_month_revenue)),
+      commandesATraiter:   toNumber(raw.kpis?.orders_to_handle),
+      devisATraiter:       toNumber(raw.kpis?.quotes_to_handle),
       machinesActives:     toNumber(raw.kpis?.active_machines),
       devisEnAttente:      toNumber(raw.kpis?.pending_quotes),
       ticketsOuverts:      toNumber(raw.kpis?.open_tickets),
@@ -102,9 +105,41 @@ function normalizeDashboard(raw: BackendDashboard): Omit<DashboardData, 'recentO
   };
 }
 
+// ── Compteurs du back-office ───────────────────────────────────────────────
+
+/** GET /dashboard/counters : pastilles du menu, cloche, onglets des listes */
+export interface AdminCounters {
+  ordersByStatus: Record<string, number>;
+  quotesByStatus: Record<string, number>;
+  /** Commandes « En attente » */
+  ordersNew: number;
+  /** En attente + confirmées + en préparation */
+  ordersToHandle: number;
+  /** Devis « Nouveau » */
+  quotesNew: number;
+  /** Nouveaux + en cours */
+  quotesToHandle: number;
+  openTickets: number;
+}
+
 // ── Service ────────────────────────────────────────────────────────────────
 
 export const dashboardService = {
+  async getCounters(): Promise<AdminCounters> {
+    const raw = await apiClient.get<Record<string, any>>(ENDPOINTS.DASHBOARD.COUNTERS);
+    const toCounts = (o: Record<string, unknown> = {}) =>
+      Object.fromEntries(Object.entries(o).map(([k, v]) => [k, toNumber(v)]));
+    return {
+      ordersByStatus: toCounts(raw.orders_by_status),
+      quotesByStatus: toCounts(raw.quotes_by_status),
+      ordersNew: toNumber(raw.orders_new),
+      ordersToHandle: toNumber(raw.orders_to_handle),
+      quotesNew: toNumber(raw.quotes_new),
+      quotesToHandle: toNumber(raw.quotes_to_handle),
+      openTickets: toNumber(raw.open_tickets),
+    };
+  },
+
   /**
    * Charge le dashboard admin.
    * @endpoint GET /dashboard/admin + GET /quotes?status=pending

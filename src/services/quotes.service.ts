@@ -41,6 +41,7 @@ interface BackendQuote {
   status: string;
   proposed_amount?: number | string | null;
   admin_response?: string | null;
+  expires_at?: string | null;
   notes?: string | null;
   created_at?: string;
   client_email?: string | null;
@@ -62,6 +63,7 @@ function normalizeQuote(raw: BackendQuote): Quote {
     budget: raw.budget != null ? toNumber(raw.budget) : undefined,
     montantPropose: raw.proposed_amount != null ? toNumber(raw.proposed_amount) : undefined,
     notes: raw.admin_response ?? raw.notes ?? undefined,
+    validite: raw.expires_at ?? undefined,
   };
 }
 
@@ -70,6 +72,7 @@ interface QuoteStatusPayload {
   status: string;
   proposed_amount?: number;
   admin_response?: string;
+  expires_at?: string;
 }
 
 // ── Service ────────────────────────────────────────────────────────────────
@@ -183,6 +186,18 @@ export const quotesService = {
    * pour ne pas être écrasé côté backend.
    * @endpoint PATCH /quotes/:id/status
    */
+  async sendProposal(id: string, proposal: { montant: number; validite?: string; reponse?: string }): Promise<void> {
+    if (USE_MOCK) {
+      await delay(MOCK_DELAY);
+      return;
+    }
+    // « Devis envoyé » : le backend envoie alors la proposition au contact par email
+    const payload: QuoteStatusPayload = { status: 'quoted', proposed_amount: proposal.montant };
+    if (proposal.reponse) payload.admin_response = proposal.reponse;
+    if (proposal.validite) payload.expires_at = proposal.validite;
+    await apiClient.patch(ENDPOINTS.QUOTES.UPDATE_STATUS(id), payload);
+  },
+
   async updateAmount(id: string, montantPropose: number, statut: QuoteStatus): Promise<void> {
     if (USE_MOCK) {
       await delay(MOCK_DELAY);

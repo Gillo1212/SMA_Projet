@@ -6,6 +6,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { ordersService } from '../services/orders.service';
+import { notifyAdminDataChanged } from '../services/adminEvents';
 import type { Order, OrderStatus, OrderListParams } from '../types/models';
 
 interface UseOrdersReturn {
@@ -13,7 +14,8 @@ interface UseOrdersReturn {
   isLoading: boolean;
   error: string | null;
   /** Met à jour le statut localement + appelle l'API */
-  updateStatus: (id: string, statut: OrderStatus) => Promise<void>;
+  /** `note` : motif ajouté à l'historique (et motif d'annulation) */
+  updateStatus: (id: string, statut: OrderStatus, note?: string) => Promise<void>;
   refetch: () => void;
 }
 
@@ -41,7 +43,7 @@ export function useOrders(params?: OrderListParams): UseOrdersReturn {
   }, [paramsKey, tick]);
 
   const updateStatus = useCallback(
-    async (id: string, statut: OrderStatus) => {
+    async (id: string, statut: OrderStatus, note?: string) => {
       // Mise à jour optimiste locale
       let previous: OrderStatus | undefined;
       setOrders(prev =>
@@ -52,7 +54,8 @@ export function useOrders(params?: OrderListParams): UseOrdersReturn {
         }),
       );
       try {
-        await ordersService.updateStatus(id, statut);
+        await ordersService.updateStatus(id, statut, note);
+        notifyAdminDataChanged();
       } catch (e) {
         // Retour à l'ancien statut, sans recharger la page : un rechargement
         // remplacerait l'écran par le chargement et effacerait l'erreur.
@@ -74,6 +77,8 @@ interface UseOrderReturn {
   order: Order | null;
   isLoading: boolean;
   error: string | null;
+  /** Recharge le détail sans le vider (ex. historique après un changement de statut) */
+  reload: () => void;
 }
 
 /**
@@ -84,6 +89,7 @@ export function useOrder(id: string | null): UseOrderReturn {
   const [order, setOrder] = useState<Order | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [version, setVersion] = useState(0);
 
   useEffect(() => {
     if (!id) {
@@ -94,7 +100,8 @@ export function useOrder(id: string | null): UseOrderReturn {
     }
 
     let cancelled = false;
-    setIsLoading(true);
+    // Un rechargement garde l'affichage en place : seul le premier chargement montre l'attente
+    if (version === 0) setIsLoading(true);
     setError(null);
 
     ordersService
@@ -104,7 +111,12 @@ export function useOrder(id: string | null): UseOrderReturn {
       .finally(() => { if (!cancelled) setIsLoading(false); });
 
     return () => { cancelled = true; };
-  }, [id]);
+  }, [id, version]);
 
-  return { order, isLoading, error };
+  // Changer de commande repart d'un chargement complet
+  useEffect(() => { setVersion(0); }, [id]);
+
+  const reload = useCallback(() => setVersion(v => v + 1), []);
+
+  return { order, isLoading, error, reload };
 }

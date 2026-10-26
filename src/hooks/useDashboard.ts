@@ -7,6 +7,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { onAdminDataChanged } from '../services/adminEvents';
 import { dashboardService, DashboardData } from '../services/dashboard.service';
 
 interface UseDashboardReturn extends Partial<DashboardData> {
@@ -42,6 +43,9 @@ export function useDashboard(): UseDashboardReturn {
   }, [tick]);
 
   const refetch = useCallback(() => setTick(t => t + 1), []);
+
+  // Une action ailleurs dans le back-office (statut changé…) rafraîchit les chiffres
+  useEffect(() => onAdminDataChanged(refetch), [refetch]);
 
   return {
     stats: data?.stats,

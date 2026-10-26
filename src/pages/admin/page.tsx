@@ -74,37 +74,37 @@ export default function AdminDashboardPage() {
             icon: 'ri-shopping-bag-line',
             color: 'text-[#1AAA3F]',
             bg: 'bg-[#1AAA3F]/10',
-            sub: `${stats?.totalCommandes ?? 0} au total`,
+            sub: `vs mois précédent · ${stats?.commandesATraiter ?? 0} à traiter`,
           },
           {
             label: 'Revenus du mois',
-            value: `${((stats?.revenusMoisActuel ?? 0) / 1000000).toFixed(1)}M FCFA`,
+            value: `${((stats?.revenusMoisActuel ?? 0) / 1000000).toFixed(2)}M FCFA`,
             evolution: revenusEvo.label,
             positive: revenusEvo.positive,
             icon: 'ri-money-dollar-circle-line',
             color: 'text-emerald-600',
             bg: 'bg-emerald-50',
-            sub: 'vs mois précédent',
+            sub: 'payées, hors annulations · vs mois précédent',
           },
           {
-            label: 'Devis en attente',
-            value: stats?.devisEnAttente ?? 0,
-            evolution: `${recentDevis.length} nouveaux`,
+            label: 'Devis à traiter',
+            value: stats?.devisATraiter ?? stats?.devisEnAttente ?? 0,
+            evolution: `${stats?.devisEnAttente ?? 0} nouveau(x)`,
             positive: true,
             icon: 'ri-file-list-3-line',
             color: 'text-amber-600',
             bg: 'bg-amber-50',
-            sub: 'à traiter',
+            sub: 'nouveaux et en cours',
           },
           {
             label: 'Clients actifs',
             value: stats?.clientsTotal ?? 0,
-            evolution: `${stats?.ticketsOuverts ?? 0} tickets`,
+            evolution: `${stats?.ticketsOuverts ?? 0} ticket(s)`,
             positive: (stats?.ticketsOuverts ?? 0) === 0,
             icon: 'ri-group-line',
             color: 'text-sky-600',
             bg: 'bg-sky-50',
-            sub: 'inscrits',
+            sub: 'tickets de support ouverts',
           },
         ].map((card, i) => (
           <div key={i} className="bg-white rounded-2xl p-6 border border-gray-100">
@@ -167,23 +167,20 @@ export default function AdminDashboardPage() {
 
         {/* Machines actives + répartition des commandes par statut */}
         <div className="bg-white rounded-2xl p-6 border border-gray-100">
-          <h3 className="text-base font-bold text-[#00272B] mb-2">Machines Actives</h3>
-          <p className="text-sm text-[#00272B]/40 mb-6">Parc installé</p>
-          <div className="flex items-center justify-center mb-6">
-            <div className="relative w-32 h-32">
-              <svg viewBox="0 0 36 36" className="w-32 h-32 -rotate-90">
-                <circle cx="18" cy="18" r="15.9" fill="none" stroke="#F0F0F0" strokeWidth="3"></circle>
-                <circle cx="18" cy="18" r="15.9" fill="none" stroke="#1AAA3F" strokeWidth="3" strokeDasharray="75 25" strokeLinecap="round"></circle>
-              </svg>
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-3xl font-bold text-[#00272B]">{stats?.machinesActives ?? 0}</span>
-                <span className="text-xs text-[#00272B]/40">actives</span>
-              </div>
+          <h3 className="text-base font-bold text-[#00272B] mb-1">Catalogue</h3>
+          <p className="text-sm text-[#00272B]/40 mb-5">Machines en vente sur le site</p>
+          <div className="flex items-center gap-4 p-4 bg-[#F6F3EC] rounded-xl mb-6">
+            <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center">
+              <i className="ri-settings-2-line text-[#1AAA3F] text-xl"></i>
+            </div>
+            <div>
+              <p className="text-3xl font-bold text-[#00272B] leading-none">{stats?.machinesActives ?? 0}</p>
+              <p className="text-xs text-[#00272B]/50 mt-1">machine(s) active(s)</p>
             </div>
           </div>
 
           <p className="text-xs font-semibold text-[#00272B]/40 uppercase tracking-wide mb-3">
-            Commandes par statut
+            Toutes les commandes par statut ({stats?.totalCommandes ?? 0})
           </p>
           {breakdown.length === 0 ? (
             <p className="text-sm text-[#00272B]/35">Aucune commande enregistrée.</p>

@@ -49,6 +49,11 @@ interface BackendOrder {
   client_id?: number;
   status: string;
   total_amount: number | string;
+  subtotal?: number | string;
+  tax_amount?: number | string;
+  tax_rate?: number | string | null;
+  /** Historique des statuts (GET /orders/:id), du plus récent au plus ancien */
+  tracking?: { status: string; note: string | null; created_at: string }[];
   payment_method?: string | null;
   payment_status?: string;
   shipping_address?: string | Record<string, unknown> | null;
@@ -106,6 +111,12 @@ function normalizeOrder(raw: BackendOrder): Order {
     fraisLivraison: raw.shipping_amount != null ? toNumber(raw.shipping_amount) : undefined,
     codePromo: raw.promo_code ?? undefined,
     remise: raw.discount_amount != null ? toNumber(raw.discount_amount) : undefined,
+    sousTotal: raw.subtotal != null ? toNumber(raw.subtotal) : undefined,
+    tva: raw.tax_amount != null ? toNumber(raw.tax_amount) : undefined,
+    tauxTVA: raw.tax_rate != null ? toNumber(raw.tax_rate) : undefined,
+    historique: Array.isArray(raw.tracking)
+      ? raw.tracking.map(t => ({ statut: toOrderStatus(t.status), note: t.note ?? undefined, date: t.created_at }))
+      : undefined,
     note: raw.notes ?? undefined,
   };
 }

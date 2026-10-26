@@ -1,16 +1,23 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAuthContext } from '../../../contexts/AuthContext';
+import { useAdminCounters } from '../../../hooks/useAdminCounters';
 
 interface NavItem {
   to: string;
   label: string;
   icon: string;
-  badge?: number;
 }
+
+const ROLE_LABELS: Record<string, string> = {
+  super_admin: 'Super administrateur',
+  admin: 'Administrateur',
+  commercial: 'Commercial',
+};
 
 const navItems: NavItem[] = [
   { to: '/admin', label: 'Tableau de bord', icon: 'ri-dashboard-line' },
-  { to: '/admin/commandes', label: 'Commandes', icon: 'ri-shopping-bag-line', badge: 5 },
-  { to: '/admin/devis', label: 'Devis', icon: 'ri-file-list-3-line', badge: 12 },
+  { to: '/admin/commandes', label: 'Commandes', icon: 'ri-shopping-bag-line' },
+  { to: '/admin/devis', label: 'Devis', icon: 'ri-file-list-3-line' },
   { to: '/admin/machines', label: 'Machines', icon: 'ri-settings-2-line' },
   { to: '/admin/produits', label: 'Produits', icon: 'ri-archive-line' },
   { to: '/admin/clients', label: 'Clients', icon: 'ri-group-line' },
@@ -25,12 +32,17 @@ export default function AdminSidebar({ onClose }: AdminSidebarProps) {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const userRaw = localStorage.getItem('smalim_admin_user');
-  const user = userRaw ? JSON.parse(userRaw) : { name: 'Admin', role: 'Administrateur' };
+  const { user: authUser, logout } = useAuthContext();
+  const user = { name: authUser?.name ?? 'Admin', role: ROLE_LABELS[authUser?.role ?? ''] ?? authUser?.role ?? '' };
+  const { counters } = useAdminCounters();
+  // Pastilles : éléments qui attendent une première prise en charge
+  const badges: Record<string, { value: number; title: string } | undefined> = {
+    '/admin/commandes': counters ? { value: counters.ordersNew, title: `${counters.ordersNew} commande(s) en attente` } : undefined,
+    '/admin/devis': counters ? { value: counters.quotesNew, title: `${counters.quotesNew} nouvelle(s) demande(s) de devis` } : undefined,
+  };
 
-  const handleLogout = () => {
-    localStorage.removeItem('smalim_admin_auth');
-    localStorage.removeItem('smalim_admin_user');
+  const handleLogout = async () => {
+    await logout();
     navigate('/connexion');
   };
 
@@ -79,11 +91,15 @@ export default function AdminSidebar({ onClose }: AdminSidebarProps) {
               </div>
               <span className="text-sm font-medium">{item.label}</span>
             </div>
-            {item.badge && (
-              <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
-                isActive(item.to) ? 'bg-white/20 text-white' : 'bg-[#0D8C2E]/20 text-[#0D8C2E]'
-              }`}>
-                {item.badge}
+            {!!badges[item.to]?.value && (
+              <span
+                title={badges[item.to]!.title}
+                aria-label={badges[item.to]!.title}
+                className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+                  isActive(item.to) ? 'bg-white/20 text-white' : 'bg-[#0D8C2E]/20 text-[#0D8C2E]'
+                }`}
+              >
+                {badges[item.to]!.value}
               </span>
             )}
           </Link>

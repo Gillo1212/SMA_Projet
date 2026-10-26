@@ -6,6 +6,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { quotesService } from '../services/quotes.service';
+import { notifyAdminDataChanged } from '../services/adminEvents';
 import type { Quote, QuoteStatus, QuoteListParams } from '../types/models';
 
 interface UseQuotesReturn {
@@ -14,6 +15,8 @@ interface UseQuotesReturn {
   error: string | null;
   updateStatus: (id: string, statut: QuoteStatus) => Promise<void>;
   updateAmount: (id: string, montantPropose: number, statut?: QuoteStatus) => Promise<void>;
+  /** Envoie la proposition chiffrée au contact (statut « Devis envoyé ») */
+  sendProposal: (id: string, proposal: { montant: number; validite?: string; reponse?: string }) => Promise<void>;
   refetch: () => void;
 }
 
@@ -53,6 +56,7 @@ export function useQuotes(params?: QuoteListParams): UseQuotesReturn {
     }));
     try {
       await call();
+      notifyAdminDataChanged();
     } catch (e) {
       if (previous) setQuotes(prev => prev.map(q => (q.id === id ? previous! : q)));
       throw e;
@@ -75,7 +79,17 @@ export function useQuotes(params?: QuoteListParams): UseQuotesReturn {
     [optimistic],
   );
 
+  const sendProposal = useCallback(
+    (id: string, proposal: { montant: number; validite?: string; reponse?: string }) =>
+      optimistic(
+        id,
+        { statut: 'Devis envoyé', montantPropose: proposal.montant, validite: proposal.validite, notes: proposal.reponse },
+        () => quotesService.sendProposal(id, proposal),
+      ),
+    [optimistic],
+  );
+
   const refetch = useCallback(() => setTick(t => t + 1), []);
 
-  return { quotes, isLoading, error, updateStatus, updateAmount, refetch };
+  return { quotes, isLoading, error, updateStatus, updateAmount, sendProposal, refetch };
 }
