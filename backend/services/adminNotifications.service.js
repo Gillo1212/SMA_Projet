@@ -92,6 +92,28 @@ function newQuote(quote) {
   })());
 }
 
+/** Réponse du client à une proposition (même réglage que les nouveaux devis) */
+function quoteAnswered(quote) {
+  fireAndForget('réponse devis', (async () => {
+    const to = await recipientFor('notif_new_quote');
+    if (!to) return;
+    const accepted = quote.status === 'accepted';
+    await sendAdminNotification(to, {
+      subject: `Devis ${quote.quote_number} ${accepted ? 'accepté' : 'refusé'} par le client`,
+      title: accepted ? 'Proposition acceptée' : 'Proposition refusée',
+      intro: `${quote.contact_name || 'Le client'}${quote.company_name ? ` (${quote.company_name})` : ''} a ${accepted ? 'accepté' : 'refusé'} la proposition depuis son espace client.`,
+      lines: [
+        ['Machine(s)', quote.machine_type || '-'],
+        ['Montant proposé', quote.proposed_amount ? fcfa(quote.proposed_amount) : '-'],
+        ['Email', quote.contact_email || '-'],
+        ['Téléphone', quote.contact_phone || '-'],
+      ],
+      linkPath: '/admin/devis',
+      linkLabel: 'Voir les devis',
+    });
+  })());
+}
+
 /** Nouveau compte client */
 function newClient(client) {
   fireAndForget('nouveau client', (async () => {
@@ -113,4 +135,4 @@ function newClient(client) {
   })());
 }
 
-module.exports = { newOrder, lowStockAfterOrder, newQuote, newClient };
+module.exports = { newOrder, lowStockAfterOrder, newQuote, quoteAnswered, newClient };

@@ -101,6 +101,32 @@ exports.getStats = async (req, res, next) => {
   } catch (error) { next(error); }
 };
 
+/**
+ * Compteurs de l'espace client (pastilles du menu, cloche).
+ * GET /api/dashboard/client/counters
+ */
+async function loadClientCounters(clientId) {
+  const [orders, quotes, invoices, tickets] = await Promise.all([
+    queryOne("SELECT COUNT(*) AS n FROM orders WHERE client_id = ? AND status IN ('pending','confirmed','processing','shipped')", [clientId]),
+    // Une proposition expirée n'attend plus de réponse
+    queryOne("SELECT COUNT(*) AS n FROM quotes WHERE client_id = ? AND status = 'quoted' AND (expires_at IS NULL OR expires_at >= NOW())", [clientId]),
+    queryOne("SELECT COUNT(*) AS n FROM invoices WHERE client_id = ? AND status IN ('sent','overdue')", [clientId]),
+    queryOne("SELECT COUNT(*) AS n FROM support_tickets WHERE client_id = ? AND status IN ('open','in_progress')", [clientId]),
+  ]);
+  return {
+    orders_in_progress: orders.n,
+    quotes_awaiting_answer: quotes.n,
+    invoices_to_pay: invoices.n,
+    open_tickets: tickets.n,
+  };
+}
+
+exports.getClientCounters = async (req, res, next) => {
+  try {
+    res.json({ success: true, data: await loadClientCounters(req.user.id) });
+  } catch (error) { next(error); }
+};
+
 exports.getClientDashboard = async (req, res, next) => {
   try {
     const clientId = req.user.id;
@@ -124,19 +150,25 @@ exports.getClientDashboard = async (req, res, next) => {
     ]);
 
     const statsMap = Object.fromEntries(ordersStats.map(s => [s.status, { count: s.count, total: s.total }]));
+    // Même règle que le back-office : payé, hors annulé / remboursé.
     // SUM() sur un DECIMAL revient en chaîne : sans Number() on concatène.
-    const totalSpent = ordersStats.reduce(
-      (sum, s) => sum + (s.status === 'delivered' ? Number(s.total || 0) : 0),
-      0
-    );
+    const [spent, fleet, counters] = await Promise.all([
+      queryOne(`SELECT COALESCE(SUM(total_amount), 0) AS total FROM orders WHERE client_id = ? AND ${REVENUE_FILTER}`, [clientId]),
+      // La liste des machines est limitée à 6 : les totaux se comptent à part
+      queryOne("SELECT COUNT(*) AS total, SUM(status = 'active') AS active FROM client_machines WHERE client_id = ?", [clientId]),
+      loadClientCounters(clientId),
+    ]);
 
     res.json({
       success: true,
       data: {
         kpis: {
           total_orders: ordersStats.reduce((sum, s) => sum + s.count, 0),
-          total_spent: totalSpent,
-          active_machines: machines.filter(m => m.status === 'active').length,
+          total_spent: Number(spent.total),
+          machines_total: Number(fleet.total || 0),
+          active_machines: Number(fleet.active || 0),
+          orders_in_progress: counters.orders_in_progress,
+          quotes_awaiting_answer: counters.quotes_awaiting_answer,
           pending_invoices: pendingInvoices[0]?.count || 0,
           pending_invoices_amount: pendingInvoices[0]?.total || 0,
           open_tickets: openTickets[0]?.count || 0,

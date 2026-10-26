@@ -43,7 +43,10 @@ exports.getAll = async (req, res, next) => {
 
     const [orders, countResult] = await Promise.all([
       query(`
-        SELECT o.*, c.first_name, c.last_name, c.email, c.company_name
+        SELECT o.*, c.first_name, c.last_name, c.email, c.company_name,
+          -- Résumé des articles pour les listes (le détail reste dans GET /orders/:id)
+          (SELECT GROUP_CONCAT(CONCAT(oi.quantity, '× ', oi.item_name) ORDER BY oi.id SEPARATOR ', ')
+             FROM order_items oi WHERE oi.order_id = o.id) AS items_summary
         FROM orders o LEFT JOIN clients c ON o.client_id = c.id
         ${whereClause} ORDER BY o.created_at DESC LIMIT ? OFFSET ?
       `, [...params, parseInt(limit), offset]),

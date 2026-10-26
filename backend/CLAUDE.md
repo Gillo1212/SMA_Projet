@@ -177,7 +177,9 @@ Voir `.env.example`, section Paiement : `BACKEND_URL`, `WAVE_API_KEY`, `WAVE_WEB
 - **Redirection en développement** : hors production, `EMAIL_REDIRECT_TO` détourne tous les envois (`sendEmail`) vers une seule adresse, avec le destinataire d'origine dans le sujet. À garder en développement : le seed contient des adresses sur de vrais domaines.
 - **Emails clients sur changement de statut** : commande → seulement `confirmed`, `shipped`, `delivered`, `cancelled`, et si le statut change ; devis → seulement à l'envoi d'une proposition chiffrée (`quoted`).
 - **Passage en production sur SendGrid** : `EMAIL_PROVIDER=sendgrid`, `SENDGRID_API_KEY` (permission « Mail Send ») et `EMAIL_FROM` vérifié dans SendGrid (Sender Authentication), puis redémarrer.
-- **Notifications équipe** : `services/adminNotifications.service.js` (nouvelle commande, devis, client, stock faible), selon les clés `notif_*`. Toujours non bloquantes.
+- **Notifications équipe** : `services/adminNotifications.service.js` (nouvelle commande, devis, réponse du client à une proposition, client, stock faible), selon les clés `notif_*`. Toujours non bloquantes.
+- **Réponse du client à un devis** (`PATCH /quotes/:id/status` avec un token client) : seulement `accepted` / `refused`, sur son propre devis (404 sinon), au statut `quoted` et avant `expires_at` (409 sinon).
+- **Compteurs** : `GET /dashboard/counters` (admin) et `GET /dashboard/client/counters` (client) alimentent les pastilles du menu ; le frontend les relit toutes les minutes et après chaque action.
 - **Comptes admin** : `/api/settings/admins` (écriture `super_admin`) ; on ne peut ni se désactiver, ni se supprimer, ni changer son propre rôle.
 
 ## Uploads de fichiers

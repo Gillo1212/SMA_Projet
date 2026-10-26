@@ -77,12 +77,22 @@ exports.updateStatus = async (req, res, next) => {
     const quote = await queryOne('SELECT * FROM quotes WHERE id = ?', [req.params.id]);
     if (!quote) return res.status(404).json({ success: false, message: 'Devis introuvable' });
 
-    // Client peut seulement accepter/refuser
+    // Client : seulement répondre à une proposition reçue, encore valable
     if (req.user?.type === 'client') {
       if (!['accepted', 'refused'].includes(status)) {
         return res.status(403).json({ success: false, message: 'Action non autorisée' });
       }
-      await query('UPDATE quotes SET status = ? WHERE id = ? AND client_id = ?', [status, req.params.id, req.user.id]);
+      if (quote.client_id !== req.user.id) {
+        return res.status(404).json({ success: false, message: 'Devis introuvable' });
+      }
+      if (quote.status !== 'quoted') {
+        return res.status(409).json({ success: false, message: "Ce devis n'attend plus de réponse" });
+      }
+      if (quote.expires_at && new Date(quote.expires_at) < new Date()) {
+        return res.status(409).json({ success: false, message: 'Cette proposition a expiré : contactez-nous pour la renouveler' });
+      }
+      await query('UPDATE quotes SET status = ? WHERE id = ?', [status, quote.id]);
+      adminNotifications.quoteAnswered({ ...quote, status });
       return res.json({ success: true, message: `Devis ${status === 'accepted' ? 'accepté' : 'refusé'}` });
     }
 
