@@ -237,6 +237,36 @@ exports.updateStatus = async (req, res, next) => {
   } catch (error) { next(error); }
 };
 
+/**
+ * Le client confirme la réception de sa commande expédiée (ou prête au retrait).
+ * Seul passage de statut ouvert au client : shipped → delivered, sur sa propre
+ * commande. Pas d'email au client (c'est lui qui agit) ; l'équipe est prévenue.
+ * POST /api/orders/:id/confirm-delivery
+ */
+exports.confirmDelivery = async (req, res, next) => {
+  try {
+    const order = await queryOne('SELECT * FROM orders WHERE id = ? AND client_id = ?', [req.params.id, req.user.id]);
+    if (!order) return res.status(404).json({ success: false, message: 'Commande introuvable' });
+    if (order.status === 'delivered') {
+      return res.status(409).json({ success: false, message: 'La réception de cette commande est déjà confirmée' });
+    }
+    if (order.status !== 'shipped') {
+      return res.status(409).json({ success: false, message: "Cette commande n'a pas encore été expédiée" });
+    }
+
+    await query("UPDATE orders SET status = 'delivered', delivered_at = NOW() WHERE id = ?", [order.id]);
+    await query(
+      "INSERT INTO order_tracking (order_id, status, note, created_by) VALUES (?, 'delivered', 'Réception confirmée par le client', NULL)",
+      [order.id]
+    );
+
+    const client = await queryOne('SELECT first_name, last_name, company_name FROM clients WHERE id = ?', [req.user.id]);
+    adminNotifications.deliveryConfirmed(order, client?.company_name || [client?.first_name, client?.last_name].filter(Boolean).join(' '));
+
+    res.json({ success: true, message: 'Réception confirmée' });
+  } catch (error) { next(error); }
+};
+
 exports.validatePromo = async (req, res, next) => {
   try {
     const { code, subtotal } = req.body;

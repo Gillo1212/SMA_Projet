@@ -92,6 +92,25 @@ function newQuote(quote) {
   })());
 }
 
+/** Réception confirmée par le client (même réglage que les nouvelles commandes) */
+function deliveryConfirmed(order, clientName) {
+  fireAndForget('réception confirmée', (async () => {
+    const to = await recipientFor('notif_new_order');
+    if (!to) return;
+    await sendAdminNotification(to, {
+      subject: `Commande ${order.order_number} : réception confirmée`,
+      title: `Commande ${order.order_number} livrée`,
+      intro: `${clientName || 'Le client'} a confirmé la réception de sa commande depuis son espace client.`,
+      lines: [
+        ['Montant TTC', fcfa(order.total_amount)],
+        ['Livraison', { pickup: 'Retrait en magasin', standard: 'Standard', express: 'Express' }[order.delivery_mode] ?? '-'],
+      ],
+      linkPath: '/admin/commandes',
+      linkLabel: 'Voir les commandes',
+    });
+  })());
+}
+
 /** Réponse du client à une proposition (même réglage que les nouveaux devis) */
 function quoteAnswered(quote) {
   fireAndForget('réponse devis', (async () => {
@@ -135,4 +154,4 @@ function newClient(client) {
   })());
 }
 
-module.exports = { newOrder, lowStockAfterOrder, newQuote, quoteAnswered, newClient };
+module.exports = { newOrder, lowStockAfterOrder, deliveryConfirmed, newQuote, quoteAnswered, newClient };

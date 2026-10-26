@@ -174,9 +174,13 @@ async function sendOrderConfirmation(user, order) {
  * Email de mise à jour statut commande
  */
 async function sendOrderStatusUpdate(user, order, newStatus) {
+  // En retrait magasin, « expédiée » signifie « prête à être retirée »
+  const pickup = order.delivery_mode === 'pickup';
   const statuses = {
     confirmed: { label: 'Confirmée', message: 'Bonne nouvelle : votre commande est confirmée. Notre équipe la prépare.' },
-    shipped:   { label: 'Expédiée', message: 'Votre commande a été expédiée et est en route vers vous.' },
+    shipped: pickup
+      ? { label: 'Prête au retrait', message: 'Votre commande vous attend en magasin. Après le retrait, confirmez la réception depuis votre espace client.' }
+      : { label: 'Expédiée', message: 'Votre commande a été expédiée et est en route vers vous. À réception, confirmez-la depuis votre espace client, ou signalez-nous un problème.' },
     delivered: { label: 'Livrée', message: 'Votre commande a été livrée. Merci pour votre confiance !' },
     cancelled: { label: 'Annulée', message: "Votre commande a été annulée. Contactez-nous si vous n'en êtes pas à l'origine." },
   };
