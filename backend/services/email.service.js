@@ -7,21 +7,15 @@ const settings = require('./settings.service');
 // ===================================================
 // Transport SMTP
 // La configuration vient du back-office (Paramètres → Email & SMTP), à défaut
-// du fichier .env. Le transport est reconstruit dès qu'un paramètre smtp_* change.
+// du fichier .env (EMAIL_PROVIDER = smtp | gmail | sendgrid). SendGrid passe
+// par son relais SMTP : settings.getSmtpConfig() résout chaque fournisseur en
+// hôte / port / identifiants, le transport est donc le même pour tous.
+// Il est reconstruit dès qu'un paramètre email change.
 // ===================================================
 
 let transporterPromise = null;
 
 function buildTransport(cfg) {
-  // Compte Gmail sans hôte explicite : réglages du service Gmail de nodemailer
-  if (cfg.source === 'env' && process.env.EMAIL_PROVIDER === 'gmail') {
-    return nodemailer.createTransport({ service: 'gmail', auth: { user: cfg.user, pass: cfg.pass } });
-  }
-  if (cfg.source === 'env' && process.env.EMAIL_PROVIDER === 'sendgrid') {
-    return nodemailer.createTransport({
-      host: 'smtp.sendgrid.net', port: 587, auth: { user: 'apikey', pass: process.env.SENDGRID_API_KEY },
-    });
-  }
   return nodemailer.createTransport({
     host: cfg.host,
     port: cfg.port,
@@ -36,7 +30,7 @@ async function getTransport() {
 }
 
 settings.onChange(keys => {
-  if (keys.some(k => k.startsWith('smtp_') || k === 'app_name')) transporterPromise = null;
+  if (keys.some(k => /^(smtp_|email_|sendgrid_)/.test(k) || k === 'app_name')) transporterPromise = null;
 });
 
 /**
@@ -235,14 +229,15 @@ async function sendInvoiceNotification(user, invoice) {
  */
 async function testSmtp(to) {
   const cfg = await settings.getSmtpConfig();
-  if (!cfg.host && process.env.EMAIL_PROVIDER !== 'gmail') {
-    return { success: false, step: 'config', error: 'Aucun serveur SMTP configuré', source: cfg.source };
+  const meta = { source: cfg.source, provider: cfg.provider };
+  if (cfg.problems.length) {
+    return { success: false, step: 'config', error: cfg.problems.join(' ; '), ...meta };
   }
   const transport = buildTransport(cfg);
   try {
     await transport.verify();
   } catch (err) {
-    return { success: false, step: 'connect', error: err.message, source: cfg.source };
+    return { success: false, step: 'connect', error: explainSmtpError(cfg, err), ...meta };
   }
   try {
     await transport.sendMail({
@@ -253,9 +248,41 @@ async function testSmtp(to) {
       html: '<p>Cet email confirme que la configuration SMTP du back-office fonctionne.</p>',
     });
   } catch (err) {
-    return { success: false, step: 'send', error: err.message, source: cfg.source };
+    return { success: false, step: 'send', error: explainSmtpError(cfg, err), ...meta };
   }
-  return { success: true, source: cfg.source };
+  return { success: true, ...meta };
+}
+
+/** Message d'erreur SMTP, complété d'une piste selon le fournisseur */
+function explainSmtpError(cfg, err) {
+  const msg = err.message;
+  if (/\b535\b|Invalid login|authentication failed/i.test(msg)) {
+    if (cfg.provider === 'sendgrid') return `${msg} — clé API SendGrid refusée : vérifiez-la et sa permission « Mail Send ».`;
+    if (/gmail/i.test(cfg.host)) return `${msg} — Gmail exige un mot de passe d'application (validation en deux étapes activée).`;
+  }
+  if (/\b550\b|sender identity|not verified/i.test(msg) && cfg.provider === 'sendgrid') {
+    return `${msg} — l'expéditeur ${cfg.from} doit être vérifié dans SendGrid (Settings → Sender Authentication).`;
+  }
+  return msg;
+}
+
+/**
+ * Résumé de la configuration email, journalisé au démarrage du serveur
+ * (sans secret). En production, une configuration incomplète est signalée
+ * en erreur : aucun email (confirmation, mot de passe) ne partirait.
+ */
+async function logEmailConfig() {
+  try {
+    const cfg = await settings.getSmtpConfig();
+    const where = cfg.source === 'database' ? 'back-office' : '.env';
+    console.log(` Email : ${cfg.provider} via ${cfg.host || '?'}:${cfg.port} (${where}), expéditeur ${cfg.from || '?'}`);
+    if (cfg.problems.length) {
+      const log = process.env.NODE_ENV === 'production' ? console.error : console.warn;
+      log(` Email : configuration incomplète — ${cfg.problems.join(' ; ')}`);
+    }
+  } catch (err) {
+    console.error(' Email : lecture de la configuration impossible —', err.message);
+  }
 }
 
 /**
@@ -286,6 +313,7 @@ async function sendAdminNotification(to, { subject, title, intro, lines = [], li
 module.exports = {
   sendEmail,
   testSmtp,
+  logEmailConfig,
   sendAdminNotification,
   sendEmailVerification,
   sendWelcomeEmail,

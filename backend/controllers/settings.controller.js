@@ -49,6 +49,7 @@ exports.testSmtp = async (req, res, next) => {
       message: result.success ? `Email de test envoyé à ${to}` : result.error,
       step: result.step,
       source: result.source,
+      provider: result.provider,
     });
   } catch (error) { next(error); }
 };

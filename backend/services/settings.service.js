@@ -60,6 +60,12 @@ const hostname = v => {
   return s;
 };
 
+const sendgridKey = v => {
+  const s = String(v ?? '').trim();
+  if (s && !/^SG\.[\w-]+\.[\w-]+$/.test(s)) throw new Error('clé SendGrid invalide (format attendu : SG.xxxx.yyyy)');
+  return s;
+};
+
 const oneOf = values => v => {
   if (!values.includes(v)) throw new Error(`valeur attendue : ${values.join(', ')}`);
   return v;
@@ -102,8 +108,10 @@ const DEFINITIONS = {
   /** Alerte « stock faible » quand le stock d'un article passe à ce niveau ou en dessous */
   notif_low_stock_threshold: { default: '5', validate: amount },
 
-  // Email (SMTP). Vide = valeur du fichier .env. Le mot de passe est chiffré
-  // en base et n'est jamais renvoyé au navigateur.
+  // Email. email_provider vide = configuration du fichier .env. Les secrets
+  // (mot de passe SMTP, clé SendGrid) sont chiffrés et jamais renvoyés.
+  email_provider: { default: '', validate: oneOf(['', 'smtp', 'sendgrid']) },
+  sendgrid_api_key: { default: '', validate: sendgridKey, secret: true },
   smtp_host:      { default: '', validate: hostname },
   smtp_port:      { default: '', validate: port },
   smtp_secure:    { default: '0', validate: bool },
@@ -148,8 +156,17 @@ async function getAllForAdmin() {
     all[`${key}_set`] = all[key] ? '1' : '0';
     all[key] = '';
   }
+  // Résumé (lecture seule, sans secret) de la configuration email du .env,
+  // pour l'afficher quand le back-office ne la remplace pas
+  const env = process.env;
+  all.email_env_provider = String(env.EMAIL_PROVIDER || 'smtp').toLowerCase();
+  all.email_env_host = all.email_env_provider === 'sendgrid' ? SENDGRID_SMTP.host : (env.SMTP_HOST || '');
+  all.email_env_from = env.EMAIL_FROM || '';
   return all;
 }
+
+/** Clés calculées par getAllForAdmin, ignorées si le formulaire les renvoie */
+const READ_ONLY_KEYS = /^(email_env_|.+_set$)/;
 
 /** Valeur déchiffrée d'un secret, ou null */
 async function getSecret(key) {
@@ -166,8 +183,8 @@ async function update(changes, adminId) {
   const errors = [];
   const normalized = {};
   for (const [key, value] of Object.entries(changes ?? {})) {
-    // Indicateurs renvoyés par getAllForAdmin : à ignorer s'ils reviennent
-    if (SECRET_KEYS.some(k => key === `${k}_set`)) continue;
+    // Valeurs calculées par getAllForAdmin : à ignorer si elles reviennent
+    if (READ_ONLY_KEYS.test(key) && !DEFINITIONS[key]) continue;
     const def = DEFINITIONS[key];
     if (!def) { errors.push({ field: key, message: 'Paramètre inconnu' }); continue; }
     if (def.secret && (value === '' || value == null)) continue;
@@ -249,36 +266,63 @@ async function getCompany() {
   };
 }
 
+const EMAIL_PROVIDERS = ['smtp', 'gmail', 'sendgrid'];
+const SENDGRID_SMTP = { host: 'smtp.sendgrid.net', port: 587, secure: false, user: 'apikey' };
+
 /**
- * Configuration SMTP effective. Tout ou rien, pour ne jamais mélanger un hôte
- * et des identifiants de sources différentes :
- *   - hôte renseigné dans le back-office → configuration du back-office ;
- *   - sinon → fichier .env.
+ * Configuration email effective, résolue en paramètres SMTP. Tout ou rien,
+ * pour ne jamais mélanger des identifiants de sources différentes :
+ *   - fournisseur choisi dans le back-office → configuration du back-office ;
+ *   - sinon → fichier .env (EMAIL_PROVIDER = smtp | gmail | sendgrid).
+ *
+ * SendGrid passe par son relais SMTP (smtp.sendgrid.net, utilisateur
+ * « apikey », mot de passe = clé API) : même transport que Gmail.
+ *
+ * `problems` liste ce qui empêche l'envoi (clé absente, expéditeur manquant…).
  */
 async function getSmtpConfig() {
   const s = await getAll();
-  if (s.smtp_host) {
-    return {
-      source: 'database',
-      host: s.smtp_host,
-      port: Number(s.smtp_port || 587),
-      secure: s.smtp_secure === '1',
-      user: s.smtp_user,
-      pass: decrypt(s.smtp_pass) ?? '',
-      from: s.smtp_from || s.smtp_user,
-      fromName: s.smtp_from_name || s.app_name || 'SMALIM',
-    };
-  }
   const env = process.env;
+  // Compatibilité : hôte saisi avant l'ajout du choix de fournisseur
+  const dbProvider = s.email_provider || (s.smtp_host ? 'smtp' : '');
+  const source = dbProvider ? 'database' : 'env';
+  const fromDb = source === 'database';
+  let provider = fromDb ? dbProvider : String(env.EMAIL_PROVIDER || 'smtp').toLowerCase();
+  const problems = [];
+  if (!EMAIL_PROVIDERS.includes(provider)) {
+    problems.push(`EMAIL_PROVIDER inconnu : « ${provider} » (attendu : ${EMAIL_PROVIDERS.join(', ')})`);
+    provider = 'smtp';
+  }
+
+  let transport;
+  if (provider === 'sendgrid') {
+    const key = fromDb ? decrypt(s.sendgrid_api_key) : env.SENDGRID_API_KEY;
+    if (!key) problems.push('Clé API SendGrid manquante');
+    else if (!key.startsWith('SG.')) problems.push('La clé API SendGrid doit commencer par « SG. »');
+    transport = { ...SENDGRID_SMTP, pass: key || '' };
+  } else if (provider === 'gmail') {
+    transport = { host: 'smtp.gmail.com', port: 587, secure: false, user: env.SMTP_USER || '', pass: env.SMTP_PASS || '' };
+  } else {
+    transport = fromDb
+      ? { host: s.smtp_host, port: Number(s.smtp_port || 587), secure: s.smtp_secure === '1', user: s.smtp_user, pass: decrypt(s.smtp_pass) ?? '' }
+      : { host: env.SMTP_HOST || '', port: Number(env.SMTP_PORT || 587), secure: env.SMTP_SECURE === 'true', user: env.SMTP_USER || '', pass: env.SMTP_PASS || '' };
+    if (!transport.host) problems.push('Serveur SMTP non renseigné');
+  }
+
+  // L'utilisateur SendGrid (« apikey ») n'est pas une adresse : l'expéditeur doit être fourni
+  const loginAsFrom = provider === 'sendgrid' ? '' : transport.user;
+  const from = (fromDb ? s.smtp_from : env.EMAIL_FROM) || loginAsFrom || '';
+  if (!from) problems.push(provider === 'sendgrid'
+    ? 'Expéditeur manquant (adresse vérifiée dans SendGrid)'
+    : 'Expéditeur manquant');
+
   return {
-    source: 'env',
-    host: env.SMTP_HOST || '',
-    port: Number(env.SMTP_PORT || 587),
-    secure: env.SMTP_SECURE === 'true',
-    user: env.SMTP_USER || '',
-    pass: env.SMTP_PASS || '',
-    from: env.EMAIL_FROM || env.SMTP_USER || '',
-    fromName: env.EMAIL_FROM_NAME || s.app_name || 'SMALIM',
+    source,
+    provider,
+    ...transport,
+    from,
+    fromName: (fromDb ? s.smtp_from_name : env.EMAIL_FROM_NAME) || s.app_name || 'SMALIM',
+    problems,
   };
 }
 

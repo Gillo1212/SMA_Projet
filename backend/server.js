@@ -8,6 +8,7 @@ const path = require('path');
 
 const { testConnection } = require('./config/database');
 const errorHandler = require('./middleware/errorHandler');
+const { logEmailConfig } = require('./services/email.service');
 
 // Routes
 const authRoutes = require('./routes/auth');
@@ -116,7 +117,8 @@ async function startServer() {
     app.listen(PORT, () => {
       console.log(`\nSMALIM Backend démarré sur http://localhost:${PORT}`);
       console.log(` Environment: ${process.env.NODE_ENV || 'development'}`);
-      console.log(` Base de données: ${process.env.DB_NAME}@${process.env.DB_HOST}\n`);
+      console.log(` Base de données: ${process.env.DB_NAME}@${process.env.DB_HOST}`);
+      logEmailConfig().then(() => console.log(''));
     });
   } catch (error) {
     console.error(' Impossible de démarrer le serveur:', error.message);
