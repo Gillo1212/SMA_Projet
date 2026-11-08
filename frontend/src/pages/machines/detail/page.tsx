@@ -174,7 +174,7 @@ export default function MachineDetailPage() {
                   {t('machineDetail.requestFreeQuote')}
                 </Link>
                 <Link 
-                  to="/machines/comparateur"
+                  to={`/machines/comparateur?machines=${machine.slug}`}
                   className="w-full h-14 border border-[#00272B]/20 text-[#00272B] text-sm font-semibold rounded-md hover:border-[#00272B] transition-colors flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap"
                 >
                   <i className="ri-scales-line text-lg"></i>

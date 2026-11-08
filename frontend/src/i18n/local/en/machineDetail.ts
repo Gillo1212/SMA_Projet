@@ -90,6 +90,12 @@ export default {
   compare: {
     price: 'Price',
     type: 'Type',
+    category: 'Category',
+    brand: 'Brand',
+    model: 'Model',
+    techSection: 'Technical specifications',
+    notProvided: 'Not provided',
+    noSpecs: 'The technical specifications of these machines are not available yet. Request a quote to get the full datasheet.',
     totalCapacity: 'Total capacity',
     dimensions: 'Dimensions',
     power: 'Power',

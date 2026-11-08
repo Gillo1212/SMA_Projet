@@ -125,7 +125,6 @@ function normalizeMachine(raw: BackendMachine): Machine {
     features: [],
     paymentMethods,
     idealFor: [],
-    maintenanceIncluded: false,
     deliveryTime: raw.delivery_delay ?? '',
     stock: stockLabel(Number(raw.stock) || 0),
     stockQuantity: Number(raw.stock) || 0,

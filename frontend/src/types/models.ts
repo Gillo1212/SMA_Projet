@@ -55,7 +55,8 @@ export interface Machine {
   features: string[];
   paymentMethods: string[];
   idealFor: string[];
-  maintenanceIncluded: boolean;
+  /** Absent quand la donnée n'existe pas (l'API ne la fournit pas) : le comparateur masque alors la ligne */
+  maintenanceIncluded?: boolean;
   deliveryTime: string;
   /** Libellé dérivé de la quantité réelle */
   stock: 'En stock' | 'Stock limité' | 'Rupture de stock';

@@ -48,9 +48,14 @@ Périmètre décidé le 2026-10-25 : **site public + espace client**. Le portail
 - Vérifié dans Chrome : connexion admin (mauvais puis bon mot de passe), connexion client avec un ancien hachage, inscription, connexion du nouveau compte, changement de mot de passe. Compte de test supprimé.
 - À faire : décider de la règle de livraison (l'implémenter côté backend, ou retirer la mention), et faire valider les codes promo par l'API.
 
-## 2 ter. Comparateur : données manquantes
+## 2 ter. ~~Comparateur : données manquantes~~ ✅ fait le 2026-11-08
 
-- `machines.service.ts` force `capacity: {}` et `maintenanceIncluded: false` : le comparateur affiche « N/A » et « ✗ maintenance » pour toutes les machines.
+- Le comparateur cherchait des clés anglaises (`power`, `weight`…) alors que la base stocke des clés françaises (`alimentation`, `poids`…), et affichait une capacité et une « maintenance incluse » qui n'existent pas en base (toujours « N/A » et ✗).
+- Les lignes techniques sont maintenant construites à partir des caractéristiques réellement renseignées pour les machines comparées ; une valeur absente s'affiche « — » (« Non renseigné »). Ajout de Marque et Modèle. La ligne Maintenance n'apparaît que si la donnée existe.
+- « Ajouter au comparateur » sur la fiche machine pré-remplit le comparateur ; la sélection est dans l'URL (`?machines=slug1,slug2`), donc partageable.
+- Mobile : colonnes plus compactes, titre de section qui reste visible au défilement horizontal.
+- Vérifié dans Chrome : depuis la fiche, ajout / retrait, lien avec machine inconnue ou en double, FR / EN, mobile 390 px.
+- **Reste** : seule la Lecon Good Taste 50S a une fiche technique complète (voir §3) ; tant que les autres ne sont pas renseignées, le comparateur montre surtout des « — ». Si « Maintenance incluse » doit revenir, il faut un vrai champ en base et dans l'admin.
 
 ## 3. Catalogue et contenus réels à compléter
 

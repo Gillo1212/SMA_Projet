@@ -90,6 +90,12 @@ export default {
   compare: {
     price: 'Prix',
     type: 'Type',
+    category: 'Catégorie',
+    brand: 'Marque',
+    model: 'Modèle',
+    techSection: 'Caractéristiques techniques',
+    notProvided: 'Non renseigné',
+    noSpecs: "Les caractéristiques techniques de ces machines ne sont pas encore renseignées. Demandez un devis pour obtenir la fiche complète.",
     totalCapacity: 'Capacité totale',
     dimensions: 'Dimensions',
     power: 'Puissance',
