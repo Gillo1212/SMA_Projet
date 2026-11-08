@@ -113,7 +113,7 @@ router.get('/public/blog', optionalAuth, controller.method);
 
 ## Sécurité
 
-- **Mots de passe** : bcryptjs, 12 rounds - ne jamais retourner le hash dans les réponses
+- **Mots de passe** : `bcrypt` (paquet natif), 12 rounds - ne jamais retourner le hash dans les réponses. Il vérifie aussi les anciens hachages `$2a$` créés par `bcryptjs`.
 - **CORS** : limité à l'origine frontend (configurable via `FRONTEND_URL` dans `.env`)
 - **Rate limiting** : 200 req/15min général, 10 req/15min sur les routes auth
 - **Helmet** : headers HTTP de sécurité activés

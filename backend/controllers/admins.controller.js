@@ -5,7 +5,7 @@
  * Garde-fous : on ne peut ni se désactiver, ni se supprimer, ni changer son
  * propre rôle, et il reste toujours au moins un super_admin actif.
  */
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
 const { query, queryOne } = require('../config/database');
 
 const PUBLIC_FIELDS = 'id, email, first_name, last_name, role, is_active, last_login, created_at';

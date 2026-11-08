@@ -1,7 +1,7 @@
 const path = require('path');
 // Chemin absolu : le script doit fonctionner quel que soit le répertoire courant
 require('dotenv').config({ path: path.join(__dirname, '../.env') });
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
 const { query } = require('../config/database');
 
 /** Date relative à aujourd'hui, au format MySQL DATETIME */

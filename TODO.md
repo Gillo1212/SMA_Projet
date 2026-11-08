@@ -41,9 +41,11 @@ Périmètre décidé le 2026-10-25 : **site public + espace client**. Le portail
 - Le panier valide les codes promo avec une liste codée en dur (`BIENVENUE10`, `SMA2026`, `FIRST20`) au lieu d'appeler l'API. (Le message d'erreur, qui affichait les codes valides, est maintenant générique.)
 - Le checkout n'exige pas d'être connecté, alors que `POST /orders` le demande : un visiteur anonyme remplit tout le tunnel puis reçoit une erreur. Rediriger vers la connexion client avant l'étape adresse (ou proposer la création de compte, déjà amorcée dans le formulaire).
 
-## 2 quater. Connexion lente (~3 à 4 s)
+## 2 quater. ~~Connexion lente~~ ✅ fait le 2026-11-08
 
-- `bcryptjs` (JavaScript pur) à 12 tours prend environ 4 s par hachage sur la machine de dev : chaque connexion et inscription attend autant. Passer au paquet natif `bcrypt` (compatible avec les hachages existants), ou mesurer sur le serveur de production avant de décider.
+- `bcryptjs` remplacé par le paquet natif `bcrypt` 6. Les hachages existants (`$2a$`) restent valides, les nouveaux sont en `$2b$`.
+- Mesuré sur la machine de dev (Celeron N5100) : environ 0,5 s par connexion avant, 0,4 s après. Les 4 s notées au départ venaient surtout de l'ancien disque G:. Le vrai gain est sous charge : 4 connexions simultanées passent de 2,1 s à 0,6 s, et le serveur n'est plus bloqué pendant le calcul (jusqu'à 400 ms avant, environ 25 ms après).
+- Vérifié dans Chrome : connexion admin (mauvais puis bon mot de passe), connexion client avec un ancien hachage, inscription, connexion du nouveau compte, changement de mot de passe. Compte de test supprimé.
 - À faire : décider de la règle de livraison (l'implémenter côté backend, ou retirer la mention), et faire valider les codes promo par l'API.
 
 ## 2 ter. Comparateur : données manquantes

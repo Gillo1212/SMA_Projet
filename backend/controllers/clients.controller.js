@@ -1,4 +1,4 @@
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
 const { query, queryOne } = require('../config/database');
 
 exports.getAll = async (req, res, next) => {
