@@ -158,7 +158,8 @@ const orderCreateRules = [
   body('items.*.quantity')
     .isInt({ min: 1 }).withMessage('Quantité invalide (minimum 1)'),
   body('payment_method')
-    .isIn(['wave', 'orange_money', 'bank_transfer', 'cash', 'card'])
+    // Pas de paiement par carte (Stripe abandonné) : le paiement en ligne passe par Wave ou Orange Money
+    .isIn(['wave', 'orange_money', 'bank_transfer', 'cash'])
     .withMessage('Mode de paiement invalide'),
   body('shipping_address').notEmpty().withMessage('Adresse de livraison requise'),
   // La TVA et les frais de port sont calculés par le serveur : le client

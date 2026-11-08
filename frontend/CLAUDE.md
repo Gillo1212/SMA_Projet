@@ -194,7 +194,6 @@ npm test             # Tests Vitest (*.test.ts) — dont la parité des montants
 
 ```env
 VITE_API_URL=http://localhost:5000/api
-VITE_STRIPE_PUBLIC_KEY=pk_test_...
 ```
 
 ## Conventions de code

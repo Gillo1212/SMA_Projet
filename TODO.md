@@ -103,11 +103,12 @@ Le catalogue ne contient plus que les produits de la banque d'images : 5 machine
   - blog : une image envoyée depuis l'admin était refusée à l'enregistrement ; **créer un article depuis l'admin échouait toujours** (catégorie jamais envoyée) ; aucun moyen de **publier** un article (tout restait en brouillon malgré le message « publié »).
 - **À faire ensuite** : quelques tests de bout en bout dans le navigateur (Playwright) ; lancer les tests automatiquement à chaque push (GitHub Actions, avec un service MySQL).
 
-## 6. Paiement Stripe
+## 6. ~~Paiement Stripe~~ ✅ décidé le 2026-11-08 : Wave à la place de Stripe
 
-- `STRIPE_SECRET_KEY` figure dans `.env.example` mais aucun fournisseur Stripe n'existe dans `backend/services/payment/` (seuls Wave, Orange Money et le simulateur sont codés).
-- Décider : implémenter Stripe (paiement par carte) ou retirer la variable et la mention du CLAUDE.md.
-- Wave et Orange Money n'ont jamais été testés contre les vraies API : à valider avec les contrats marchands avant la production.
+- Stripe abandonné : paquet `@stripe/react-stripe-js` retiré du frontend, `STRIPE_SECRET_KEY` / `VITE_STRIPE_PUBLIC_KEY` retirées de `.env.example` et des CLAUDE.md, mention « Carte bancaire » retirée du devis PDF.
+- L'API refuse désormais `payment_method: 'card'` (400). Une ancienne commande « carte » encore en attente se règle par Wave (`POST /api/payments/initiate` la bascule sur Wave). La valeur `card` reste dans l'ENUM de la base et son libellé reste affiché, pour l'historique.
+- Les « Carte bancaire » des fiches machines (moyens de paiement acceptés par le distributeur lui-même) ne sont pas concernées.
+- **Reste** : Wave et Orange Money n'ont jamais été testés contre les vraies API : à valider avec les contrats marchands avant la production.
 
 ## 7. ~~Nettoyage du dépôt~~ ✅ fait le 2026-11-08
 

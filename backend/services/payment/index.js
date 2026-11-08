@@ -16,6 +16,9 @@ const simulator = require('./simulator.provider');
 /** Modes de paiement qui passent par un prestataire en ligne */
 const ONLINE_METHODS = ['wave', 'orange_money'];
 
+/** Mode utilisé quand une commande n'a pas de mode en ligne valable (ex. ancien « card ») */
+const DEFAULT_ONLINE_METHOD = 'wave';
+
 /** Modes réglés hors ligne : pas de redirection, la commande reste à confirmer */
 const OFFLINE_METHODS = ['bank_transfer', 'cash'];
 
@@ -72,4 +75,5 @@ module.exports = {
   configurationStatus,
   ONLINE_METHODS,
   OFFLINE_METHODS,
+  DEFAULT_ONLINE_METHOD,
 };

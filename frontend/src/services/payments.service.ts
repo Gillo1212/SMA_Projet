@@ -16,7 +16,7 @@ function delay(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export type PaymentProvider = 'wave' | 'orange_money' | 'bank_transfer' | 'cash' | 'card';
+export type PaymentProvider = 'wave' | 'orange_money' | 'bank_transfer' | 'cash';
 
 export type PaymentStatus =
   | 'pending'

@@ -40,6 +40,12 @@ exports.initiate = async (req, res, next) => {
       });
     }
 
+    // Ancienne commande « carte » (mode retiré) ou sans mode : elle se règle par Wave
+    if (!payment.isOnlineMethod(order.payment_method)) {
+      order.payment_method = payment.DEFAULT_ONLINE_METHOD;
+      await query('UPDATE orders SET payment_method = ? WHERE id = ?', [order.payment_method, order.id]);
+    }
+
     const { provider, simulated } = payment.getProvider(order.payment_method);
 
     const reference = generateReference(order.order_number);

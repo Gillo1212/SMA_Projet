@@ -127,6 +127,7 @@ CREATE TABLE IF NOT EXISTS orders (
   discount_amount     DECIMAL(15,2) NOT NULL DEFAULT 0.00,
   total_amount        DECIMAL(15,2) NOT NULL DEFAULT 0.00,
   currency            VARCHAR(10) NOT NULL DEFAULT 'XOF',
+  -- 'card' : ancien mode (Stripe abandonné), refusé par l'API, gardé pour l'historique
   payment_method      ENUM('wave','orange_money','bank_transfer','cash','card') NULL,
   payment_status      ENUM('pending','paid','failed','refunded') NOT NULL DEFAULT 'pending',
   payment_reference   VARCHAR(255) NULL,

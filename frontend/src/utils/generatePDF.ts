@@ -161,7 +161,7 @@ export function generateInvoicePDF(invoice: InvoiceData) {
   doc.setFontSize(8);
   doc.setFont('helvetica', 'italic');
   doc.setTextColor(...GRAY);
-  doc.text('Paiement accepté via : Wave · Orange Money · Carte Bancaire · Virement', 14, y);
+  doc.text('Paiement accepté via : Wave · Orange Money · Virement', 14, y);
 
   drawFooter(doc);
   doc.save(`Facture-${invoice.numero}.pdf`);

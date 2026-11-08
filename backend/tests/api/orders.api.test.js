@@ -236,6 +236,22 @@ describe('paiement en ligne (simulateur)', () => {
     expect((await api.post('/api/payments/initiate').set(auth('client')).send({ order_id: cash.body.data.id })).status).toBe(400);
   });
 
+  test('paiement par carte : plus accepté à la commande (400)', async () => {
+    const res = await api.post('/api/orders').set(auth('client')).send(orderBody({ payment_method: 'card' }));
+    expect(res.status).toBe(400);
+  });
+
+  test('ancienne commande « carte » : réglée par Wave', async () => {
+    const created = await api.post('/api/orders').set(auth('client')).send(orderBody({ items: [{ id: ids.product, type: 'product', quantity: 1 }] }));
+    const legacyId = created.body.data.id;
+    await query("UPDATE orders SET payment_method = 'card' WHERE id = ?", [legacyId]);
+    const res = await api.post('/api/payments/initiate').set(auth('client')).send({ order_id: legacyId });
+    expect(res.status).toBe(200);
+    expect(res.body.data.provider).toBe('wave');
+    const [order] = await query('SELECT payment_method FROM orders WHERE id = ?', [legacyId]);
+    expect(order.payment_method).toBe('wave');
+  });
+
   test('GET /api/payments/status/:reference : en cours ; autre client : 403 ; inconnue : 404', async () => {
     const res = await api.get(`/api/payments/status/${reference}`).set(auth('client'));
     expect(res.status).toBe(200);

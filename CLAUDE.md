@@ -22,7 +22,7 @@ SMA-PROJECT/
 | Frontend | React 19, TypeScript 5.8, Vite 7 |
 | Style | Tailwind CSS 3 |
 | Auth | JWT (access + refresh tokens, 7j) |
-| Paiement | Stripe, Wave, Orange Money |
+| Paiement | Wave (principal), Orange Money — pas de carte bancaire |
 | Email | SMTP via nodemailer |
 | i18n | i18next (FR/EN) |
 
@@ -68,7 +68,7 @@ Voir `backend/.env.example` pour la liste complète. Les clés essentielles :
 - `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` - connexion MySQL
 - `JWT_SECRET` - secret de signature des tokens JWT
 - `SMTP_*` - configuration email
-- `STRIPE_SECRET_KEY` - clé Stripe
+- `WAVE_API_KEY`, `WAVE_WEBHOOK_SECRET` - paiement Wave (sans clé : simulateur, hors production)
 
 ## Conventions importantes
 
