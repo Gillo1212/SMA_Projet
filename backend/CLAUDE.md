@@ -202,7 +202,22 @@ npm run dev        # Démarrer avec nodemon (rechargement auto)
 npm start          # Démarrer en mode production
 npm run migrate    # Créer/mettre à jour la BDD depuis schema.sql
 npm run seed       # Charger les données de démonstration
+npm test           # Tous les tests (unitaires + API), ~1 min — MySQL doit tourner
+npm run test:unit  # Tests unitaires seuls (MySQL simulé), quelques secondes
+npm run test:api   # Tests d'API sur la base de test
 ```
+
+## Tests
+
+Deux groupes Jest (`projects` dans package.json) :
+
+- **unit** (`tests/*.test.js`) : contrôleurs appelés directement, `config/database` simulé (`tests/helpers/http.js` fournit de faux `req` / `res`). Montants, création de commande, webhooks (signature Wave), authentification.
+- **api** (`tests/api/*.test.js`) : vraies requêtes HTTP (supertest) sur `app.js`, contre une **base de test dédiée** `smalim_test` (ou `TEST_DB_NAME`), recréée depuis `sql/schema.sql` à chaque lancement (`tests/api/globalSetup.js`). Chaque fichier repart d'un jeu de données connu (`tests/api/setup.js` : comptes de chaque rôle, catalogue, commandes, devis…). Tous les endpoints sont couverts.
+  - Garde-fou : refus de tourner sur une base dont le nom ne finit pas par `_test` ; la base de travail n'est jamais touchée.
+  - `tests/api/env.js` force l'environnement : `NODE_ENV=test`, aucun prestataire de paiement réel (simulateur), emails gardés en mémoire (`outbox` d'email.service, rien n'est envoyé), images dans `tests/.tmp-uploads/`, limiteurs de débit désactivés.
+- `server.js` ne fait que démarrer `app.js` (l'application Express), que les tests importent sans ouvrir de port.
+- `tests/fixtures/order-totals.cases.json` est partagé avec le frontend : `lib/orderTotals.js` et `frontend/src/utils/orderTotals.ts` doivent donner les mêmes montants. Toute règle de calcul modifiée se change aux deux endroits et dans ces cas.
+- Nouvel endpoint = nouveau test dans `tests/api/` (cas nominal, droits d'accès par rôle, validation, ressource inconnue).
 
 ## Ajouter une nouvelle ressource
 

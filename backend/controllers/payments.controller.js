@@ -95,11 +95,18 @@ exports.initiate = async (req, res, next) => {
  * Applique le résultat d'un paiement de façon idempotente : un même événement
  * reçu deux fois ne doit pas repasser la commande ni réenvoyer l'email.
  *
+ * @param {string} [expectedProvider] prestataire dont vient l'événement : il
+ *   doit être celui de la transaction (une notification Orange Money ne peut
+ *   pas confirmer un paiement Wave). Absent pour la simulation de développement.
  * @returns {Promise<{ applied: boolean, reason?: string }>}
  */
-async function applyPaymentResult({ reference, status, amount, providerRef, rawEvent }) {
+async function applyPaymentResult({ reference, status, amount, providerRef, rawEvent, expectedProvider }) {
   const tx = await queryOne('SELECT * FROM payment_transactions WHERE reference = ?', [reference]);
   if (!tx) return { applied: false, reason: 'transaction inconnue' };
+
+  if (expectedProvider && tx.provider !== expectedProvider) {
+    return { applied: false, reason: 'prestataire différent de celui de la transaction' };
+  }
 
   // Déjà traitée : on ne rejoue rien
   if (tx.status === 'succeeded') return { applied: false, reason: 'déjà confirmée' };
@@ -179,6 +186,14 @@ exports.webhook = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'Prestataire inconnu' });
     }
 
+    // Prestataire sans identifiants : le simulateur prend le relais en
+    // développement, mais il ne vérifie rien. En production, une notification
+    // non vérifiable est refusée (sinon n'importe qui pourrait déclarer payée
+    // une commande dont il connaît la référence).
+    if (provider.name === 'simulator' && process.env.NODE_ENV === 'production') {
+      return res.status(404).json({ success: false, message: 'Prestataire non configuré' });
+    }
+
     // `req.rawBody` est capté par le body-parser (voir server.js) : la
     // signature se calcule sur les octets reçus, pas sur le JSON re-sérialisé.
     if (provider.name === 'wave') {
@@ -205,7 +220,7 @@ exports.webhook = async (req, res, next) => {
       }
     }
 
-    const result = await applyPaymentResult({ ...parsed, rawEvent: req.body });
+    const result = await applyPaymentResult({ ...parsed, rawEvent: req.body, expectedProvider: providerName });
 
     // On répond 200 même si l'événement est ignoré : sinon le prestataire
     // rejoue indéfiniment une notification déjà traitée.
@@ -280,3 +295,6 @@ exports.getConfiguration = async (req, res, next) => {
     res.json({ success: true, data: payment.configurationStatus() });
   } catch (error) { next(error); }
 };
+
+// Exposé pour les tests
+exports._applyPaymentResult = applyPaymentResult;

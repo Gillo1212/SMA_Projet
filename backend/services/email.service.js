@@ -15,7 +15,23 @@ const settings = require('./settings.service');
 
 let transporterPromise = null;
 
+/**
+ * Tests d'API : aucun email ne quitte la machine. Les messages sont gardés
+ * dans `outbox` (exporté) pour que les tests vérifient ce qui serait parti.
+ */
+const outbox = [];
+
 function buildTransport(cfg) {
+  if (process.env.NODE_ENV === 'test') {
+    const transport = nodemailer.createTransport({ jsonTransport: true });
+    const send = transport.sendMail.bind(transport);
+    transport.sendMail = async (message) => {
+      outbox.push(message);
+      return send(message);
+    };
+    transport.verify = async () => true;
+    return transport;
+  }
   return nodemailer.createTransport({
     host: cfg.host,
     port: cfg.port,
@@ -345,4 +361,5 @@ module.exports = {
   sendOrderStatusUpdate,
   sendQuoteUpdate,
   sendInvoiceNotification,
+  outbox,
 };

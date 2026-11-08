@@ -2,6 +2,7 @@ const { query, queryOne, transaction } = require('../config/database');
 const { sendOrderConfirmation, sendOrderStatusUpdate } = require('../services/email.service');
 const settings = require('../services/settings.service');
 const adminNotifications = require('../services/adminNotifications.service');
+const { promoDiscount, deliveryFee, computeOrderTotals } = require('../lib/orderTotals');
 
 const generateOrderNumber = () => {
   const date = new Date();
@@ -9,17 +10,6 @@ const generateOrderNumber = () => {
   const rand = Math.floor(Math.random() * 100000).toString().padStart(5, '0');
   return `CMD-${year}-${rand}`;
 };
-
-/**
- * Remise d'un code promo sur un sous-total. Une remise fixe ne peut pas
- * dépasser le sous-total : le montant dû ne devient jamais négatif.
- */
-function promoDiscount(promo, subtotal) {
-  const raw = promo.type === 'percentage'
-    ? subtotal * (Number(promo.value) / 100)
-    : Number(promo.value);
-  return Math.round(Math.min(raw, subtotal));
-}
 
 exports.getAll = async (req, res, next) => {
   try {
@@ -96,6 +86,13 @@ exports.create = async (req, res, next) => {
       if (!dbItem) {
         return res.status(400).json({ success: false, message: `Article introuvable : ${item.name || item.id}` });
       }
+      // Prix 0 = « sur devis » : pas de commande directe (sinon facturé 0 FCFA)
+      if (!(Number(dbItem.price) > 0)) {
+        return res.status(400).json({
+          success: false,
+          message: `« ${dbItem.name} » est disponible sur devis uniquement : faites une demande de devis.`,
+        });
+      }
       // Pré-vérification rapide du stock (confort utilisateur — la vérification atomique est dans la transaction)
       if (dbItem.stock < item.quantity) {
         return res.status(400).json({
@@ -113,14 +110,14 @@ exports.create = async (req, res, next) => {
     const subtotal = resolvedItems.reduce((sum, i) => sum + Number(i.realPrice) * i.quantity, 0);
     const shopConfig = await settings.getShopConfig();
     const deliveryMode = delivery_mode || 'standard';
-    if (settings.deliveryFee(shopConfig, deliveryMode, subtotal) === null) {
+    if (deliveryFee(shopConfig, deliveryMode, subtotal) === null) {
       return res.status(400).json({ success: false, message: "Ce mode de livraison n'est pas proposé actuellement" });
     }
 
     // ── 3. Tout dans une transaction atomique ──
     const result = await transaction(async (conn) => {
       // ── 3a. Code promo : incrément atomique dans la transaction ──
-      let discount = 0;
+      let promo = null;
       if (promo_code) {
         const [promoResult] = await conn.execute(
           `UPDATE promo_codes SET uses_count = uses_count + 1
@@ -132,8 +129,7 @@ exports.create = async (req, res, next) => {
         );
         if (promoResult.affectedRows > 0) {
           const [promoRows] = await conn.execute('SELECT * FROM promo_codes WHERE code = ?', [promo_code]);
-          const promo = promoRows[0];
-          if (promo) discount = promoDiscount(promo, subtotal);
+          promo = promoRows[0] ?? null;
         } else {
           // Code refusé (inconnu, expiré, épuisé, minimum non atteint) : on le
           // signale plutôt que de facturer sans la remise que le client attend.
@@ -142,10 +138,9 @@ exports.create = async (req, res, next) => {
       }
 
       // Livraison et TVA portent sur le montant réellement dû, remise déduite
-      const amountDue = subtotal - discount;
-      const shipping_amount = settings.deliveryFee(shopConfig, deliveryMode, amountDue);
-      const tax_amount = Math.round(amountDue * shopConfig.taxRate / 100);
-      const total_amount = amountDue + shipping_amount + tax_amount;
+      const {
+        discount, shipping: shipping_amount, tax: tax_amount, total: total_amount,
+      } = computeOrderTotals(shopConfig, subtotal, promo, deliveryMode);
       const orderNumber = generateOrderNumber();
 
       // ── 3b. Créer la commande ──

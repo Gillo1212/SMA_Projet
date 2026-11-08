@@ -41,7 +41,8 @@ export default function AdminBlogPage() {
     try {
       if (modalMode === 'add') {
         await create(article);
-        showToast(`Article "${article.title.substring(0, 40)}…" publié`);
+        const label = { published: 'publié', archived: 'archivé' }[article.status ?? ''] ?? 'enregistré en brouillon';
+        showToast(`Article "${article.title.substring(0, 40)}…" ${label}`);
       } else {
         await update(article.id, article);
         showToast('Article mis à jour avec succès');

@@ -9,7 +9,9 @@ exports.getAll = async (req, res, next) => {
     let params = [];
 
     if (category) { where.push('pc.slug = ?'); params.push(category); }
-    if (active !== undefined) { where.push('p.is_active = ?'); params.push(active === 'true' ? 1 : 0); }
+    // Le public ne voit que le catalogue actif ; le back-office voit tout (filtre `active` facultatif)
+    if (req.user?.type !== 'admin') where.push('p.is_active = 1');
+    else if (active !== undefined) { where.push('p.is_active = ?'); params.push(active === 'true' ? 1 : 0); }
     if (search) { where.push('(p.name LIKE ? OR p.brand LIKE ? OR p.reference LIKE ?)'); params.push(`%${search}%`, `%${search}%`, `%${search}%`); }
 
     const whereClause = where.length ? `WHERE ${where.join(' AND ')}` : '';
@@ -72,15 +74,16 @@ exports.create = async (req, res, next) => {
 
 exports.update = async (req, res, next) => {
   try {
-    const product = await queryOne('SELECT id FROM products WHERE id = ?', [req.params.id]);
+    const product = await queryOne('SELECT * FROM products WHERE id = ?', [req.params.id]);
     if (!product) return res.status(404).json({ success: false, message: 'Produit introuvable' });
-    const { category_id, name, description, price, stock, unit, brand, reference, image_url, gallery, specifications, is_active, is_featured } = req.body;
+    // Un champ absent du corps garde sa valeur actuelle (sinon il passerait à NULL)
+    const b = { ...product, ...Object.fromEntries(Object.entries(req.body).filter(([, v]) => v !== undefined)) };
 
     await query(
       `UPDATE products SET category_id=?, name=?, description=?, price=?, stock=?, unit=?, brand=?, reference=?,
        image_url=?, gallery=?, specifications=?, is_active=?, is_featured=? WHERE id=?`,
-      [category_id, name, description, price, stock, unit, brand, reference, image_url,
-       JSON.stringify(gallery || []), JSON.stringify(specifications || {}), is_active, is_featured ? 1 : 0, req.params.id]
+      [b.category_id, b.name, b.description, b.price, b.stock, b.unit || 'unité', b.brand, b.reference, b.image_url,
+       JSON.stringify(b.gallery || []), JSON.stringify(b.specifications || {}), b.is_active ? 1 : 0, b.is_featured ? 1 : 0, req.params.id]
     );
     const updated = await queryOne(
       // Avec la catégorie : le back-office l'affiche dès la réponse

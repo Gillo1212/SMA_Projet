@@ -47,6 +47,7 @@ npm install
 npm run migrate        # Créer la BDD et les tables
 npm run seed           # Charger les données de démonstration
 npm run dev            # Démarrer sur le port 5000
+npm test               # Tests (unitaires + API sur la base smalim_test)
 
 # Frontend
 cd frontend

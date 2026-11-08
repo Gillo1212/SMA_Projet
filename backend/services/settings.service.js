@@ -236,19 +236,8 @@ async function getShopConfig() {
   };
 }
 
-/**
- * Frais de livraison d'un mode, pour un montant (remise déduite, hors TVA).
- * Renvoie null si le mode n'existe pas ou n'est pas proposé.
- * La gratuité au-delà du seuil ne concerne que la livraison standard.
- */
-function deliveryFee(config, mode, amountAfterDiscount) {
-  const option = config.delivery[mode];
-  if (!option || !option.enabled) return null;
-  if (mode === 'standard' && config.freeShippingThreshold > 0 && amountAfterDiscount >= config.freeShippingThreshold) {
-    return 0;
-  }
-  return option.fee;
-}
+// Calcul des frais de livraison : voir lib/orderTotals (ré-exporté ici pour compatibilité)
+const { deliveryFee } = require('../lib/orderTotals');
 
 /** Coordonnées publiques de l'entreprise (site, emails) */
 async function getCompany() {

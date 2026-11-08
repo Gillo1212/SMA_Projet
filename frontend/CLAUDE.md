@@ -187,6 +187,7 @@ npm run build        # Build production vers dist/
 npm run preview      # Prévisualiser le build de production
 npm run lint         # ESLint
 npm run type-check   # Vérification TypeScript (tsc --noEmit)
+npm test             # Tests Vitest (*.test.ts) — dont la parité des montants avec le backend
 ```
 
 ## Variables d'environnement

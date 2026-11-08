@@ -2,7 +2,12 @@
  * Gestionnaire d'erreurs global Express
  */
 const errorHandler = (err, req, res, next) => {
-  console.error(`[ERROR] ${req.method} ${req.originalUrl}:`, err);
+  // Pendant les tests d'API, les refus attendus (4xx) ne polluent pas la sortie
+  const expected = (err.statusCode && err.statusCode < 500)
+    || ['ER_DUP_ENTRY', 'ER_ROW_IS_REFERENCED_2', 'ER_NO_REFERENCED_ROW_2'].includes(err.code);
+  if (!(process.env.NODE_ENV === 'test' && expected)) {
+    console.error(`[ERROR] ${req.method} ${req.originalUrl}:`, err);
+  }
 
   // Erreurs de validation express-validator
   if (err.type === 'validation') {
@@ -18,6 +23,12 @@ const errorHandler = (err, req, res, next) => {
     return res.status(409).json({
       success: false,
       message: 'Cette entrée existe déjà (doublon)',
+    });
+  }
+  if (err.code === 'ER_ROW_IS_REFERENCED_2') {
+    return res.status(409).json({
+      success: false,
+      message: 'Suppression impossible : cet élément est encore utilisé (par exemple une machine installée chez un client). Désactivez-le plutôt.',
     });
   }
   if (err.code === 'ER_NO_REFERENCED_ROW_2') {

@@ -270,7 +270,11 @@ const blogCreateRules = [
   body('content').trim().notEmpty().withMessage('Contenu requis'),
   body('category_id').isInt({ min: 1 }).withMessage('Catégorie invalide'),
   body('excerpt').optional().trim(),
-  body('image_url').optional().isURL().withMessage('URL image invalide'),
+  // Adresse complète (http/https) ou chemin du site : /uploads/… (envoi depuis
+  // l'admin) ou /images/… (dossier public du frontend)
+  body('image_url').optional({ values: 'falsy' }).trim()
+    .custom(v => /^\/(uploads|images)\/[\w./-]+$/.test(v) || /^https?:\/\/[^\s"'<>]+$/i.test(v))
+    .withMessage('URL image invalide'),
   body('read_time').optional().isInt({ min: 1 }).withMessage('Temps de lecture invalide'),
   body('status')
     .optional()

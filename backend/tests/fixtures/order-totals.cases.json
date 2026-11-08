@@ -1,0 +1,70 @@
+{
+  "_comment": "Cas partagés : backend (lib/orderTotals.js) et frontend (src/utils/orderTotals.ts) doivent donner exactement ces montants. Valeurs calculées à la main.",
+  "baseConfig": {
+    "taxRate": 18,
+    "currency": "XOF",
+    "delivery": {
+      "pickup":   { "enabled": true, "fee": 0 },
+      "standard": { "enabled": true, "fee": 2500 },
+      "express":  { "enabled": true, "fee": 5000 }
+    },
+    "freeShippingThreshold": 0
+  },
+  "cases": [
+    {
+      "name": "sans code promo, livraison standard",
+      "subtotal": 14500, "promo": null, "mode": "standard",
+      "expected": { "discount": 0, "amountDue": 14500, "shipping": 2500, "tax": 2610, "total": 19610 }
+    },
+    {
+      "name": "remise de 10 %",
+      "subtotal": 14500, "promo": { "type": "percentage", "value": 10 }, "mode": "standard",
+      "expected": { "discount": 1450, "amountDue": 13050, "shipping": 2500, "tax": 2349, "total": 17899 }
+    },
+    {
+      "name": "remise fixe plafonnée au sous-total",
+      "subtotal": 3000, "promo": { "type": "fixed", "value": 5000 }, "mode": "standard",
+      "expected": { "discount": 3000, "amountDue": 0, "shipping": 2500, "tax": 0, "total": 2500 }
+    },
+    {
+      "name": "livraison standard offerte au-delà du seuil",
+      "subtotal": 60000, "promo": null, "mode": "standard",
+      "config": { "freeShippingThreshold": 50000 },
+      "expected": { "discount": 0, "amountDue": 60000, "shipping": 0, "tax": 10800, "total": 70800 }
+    },
+    {
+      "name": "le seuil s'apprécie après la remise",
+      "subtotal": 52000, "promo": { "type": "percentage", "value": 10 }, "mode": "standard",
+      "config": { "freeShippingThreshold": 50000 },
+      "expected": { "discount": 5200, "amountDue": 46800, "shipping": 2500, "tax": 8424, "total": 57724 }
+    },
+    {
+      "name": "la gratuité ne concerne pas l'express",
+      "subtotal": 60000, "promo": null, "mode": "express",
+      "config": { "freeShippingThreshold": 50000 },
+      "expected": { "discount": 0, "amountDue": 60000, "shipping": 5000, "tax": 10800, "total": 75800 }
+    },
+    {
+      "name": "retrait sur place",
+      "subtotal": 14500, "promo": null, "mode": "pickup",
+      "expected": { "discount": 0, "amountDue": 14500, "shipping": 0, "tax": 2610, "total": 17110 }
+    },
+    {
+      "name": "arrondis de la remise et de la TVA",
+      "subtotal": 33333, "promo": { "type": "percentage", "value": 15 }, "mode": "standard",
+      "expected": { "discount": 5000, "amountDue": 28333, "shipping": 2500, "tax": 5100, "total": 35933 }
+    },
+    {
+      "name": "mode de livraison désactivé",
+      "subtotal": 14500, "promo": null, "mode": "express",
+      "config": { "delivery": { "express": { "enabled": false, "fee": 5000 } } },
+      "expected": { "discount": 0, "amountDue": 14500, "shipping": null, "tax": 2610, "total": 17110 }
+    },
+    {
+      "name": "TVA à 0 %",
+      "subtotal": 10000, "promo": null, "mode": "standard",
+      "config": { "taxRate": 0 },
+      "expected": { "discount": 0, "amountDue": 10000, "shipping": 2500, "tax": 0, "total": 12500 }
+    }
+  ]
+}

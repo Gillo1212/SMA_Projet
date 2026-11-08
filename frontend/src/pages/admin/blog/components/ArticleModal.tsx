@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import type { BlogPost } from '../../../../types/models';
+import type { BlogPost, BlogStatus, Category } from '../../../../types/models';
+import { blogService } from '../../../../services/blog.service';
 import { ImageField } from '../../../../components/admin/ImageUpload';
 
 type Article = BlogPost;
@@ -11,20 +12,16 @@ interface Props {
   onSave: (article: Article) => void;
 }
 
-const categories = [
-  { id: 'actualites', label: 'Actualités' },
-  { id: 'conseils', label: 'Conseils' },
-  { id: 'innovations', label: 'Innovations' },
-  { id: 'temoignages', label: 'Témoignages' },
-];
 
 const defaultForm = {
   title: '',
   excerpt: '',
-  category: 'actualites',
+  category: '',
+  categoryId: '',
   author: '',
   authorRole: '',
   readTime: '5 min',
+  status: 'draft' as BlogStatus,
   date: new Date().toISOString().split('T')[0],
   image: '',
   content: '',
@@ -40,6 +37,23 @@ function slugify(text: string): string {
 export default function ArticleModal({ mode, article, onClose, onSave }: Props) {
   const [form, setForm] = useState({ ...defaultForm });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  // Catégories réelles : l'API exige leur identifiant (category_id)
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    blogService.getCategories()
+      .then(list => { if (!cancelled) setCategories(list); })
+      .catch(() => { if (!cancelled) setCategories([]); });
+    return () => { cancelled = true; };
+  }, []);
+
+  // Nouvel article : première catégorie proposée par défaut
+  useEffect(() => {
+    if (!form.categoryId && categories.length) {
+      setForm(f => ({ ...f, categoryId: categories[0].id, category: categories[0].slug }));
+    }
+  }, [categories, form.categoryId]);
 
   useEffect(() => {
     if (mode === 'edit' && article) {
@@ -47,9 +61,11 @@ export default function ArticleModal({ mode, article, onClose, onSave }: Props) 
         title: article.title,
         excerpt: article.excerpt,
         category: article.category,
+        categoryId: article.categoryId ?? '',
         author: article.author,
         authorRole: article.authorRole,
         readTime: article.readTime,
+        status: article.status ?? (article.published ? 'published' : 'draft'),
         date: article.date,
         image: article.image,
         content: article.content,
@@ -81,9 +97,12 @@ export default function ArticleModal({ mode, article, onClose, onSave }: Props) 
       title: form.title,
       excerpt: form.excerpt,
       category: form.category,
+      categoryId: form.categoryId,
       author: form.author,
       authorRole: form.authorRole,
       readTime: form.readTime,
+      status: form.status,
+      published: form.status === 'published',
       date: form.date,
       image: form.image || 'https://readdy.ai/api/search-image?query=modern%20professional%20business%20article%20cover%20image%20clean%20minimal&width=800&height=500&seq=article-new-001&orientation=landscape',
       content: form.content,
@@ -130,11 +149,15 @@ export default function ArticleModal({ mode, article, onClose, onSave }: Props) 
             <div>
               <label className="block text-xs font-semibold text-[#00272B]/60 mb-1.5">Catégorie</label>
               <select
-                value={form.category}
-                onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
+                value={form.categoryId}
+                onChange={e => {
+                  const cat = categories.find(c => c.id === e.target.value);
+                  setForm(f => ({ ...f, categoryId: e.target.value, category: cat?.slug ?? f.category }));
+                }}
                 className="w-full h-9 px-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#1AAA3F] bg-white cursor-pointer"
               >
-                {categories.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
+                {!form.categoryId && <option value="">{categories.length ? 'Choisir…' : 'Chargement…'}</option>}
+                {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
               </select>
             </div>
 
@@ -149,6 +172,21 @@ export default function ArticleModal({ mode, article, onClose, onSave }: Props) 
                 className="w-full h-9 px-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#1AAA3F]"
               />
             </div>
+          </div>
+
+          {/* Statut : seul un article publié apparaît sur le site */}
+          <div>
+            <label htmlFor="article-status" className="block text-xs font-semibold text-[#00272B]/60 mb-1.5">Statut</label>
+            <select
+              id="article-status"
+              value={form.status}
+              onChange={e => setForm(f => ({ ...f, status: e.target.value as BlogStatus }))}
+              className="w-full h-9 px-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#1AAA3F] bg-white cursor-pointer"
+            >
+              <option value="draft">Brouillon (non visible sur le site)</option>
+              <option value="published">Publié</option>
+              <option value="archived">Archivé</option>
+            </select>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -222,7 +260,7 @@ export default function ArticleModal({ mode, article, onClose, onSave }: Props) 
             className="px-5 py-2 bg-[#1AAA3F] text-white text-sm font-semibold rounded-xl hover:bg-[#158f35] cursor-pointer flex items-center gap-2 whitespace-nowrap"
           >
             <i className="ri-save-line"></i>
-            {mode === 'add' ? 'Publier' : 'Enregistrer'}
+            {form.status === 'published' ? 'Enregistrer et publier' : 'Enregistrer'}
           </button>
         </div>
       </div>

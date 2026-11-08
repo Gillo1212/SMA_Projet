@@ -88,10 +88,20 @@ Le catalogue ne contient plus que les produits de la banque d'images : 5 machine
 - Vérifié dans Chrome : envoi, refus d'un faux fichier, photo principale, enregistrement, affichage sur la fiche publique ; ajout, modification et suppression d'un consommable ; couverture de blog. Données de test retirées.
 - **Reste** : les images retirées d'une fiche restent sur le disque (`backend/uploads/`) ; en production, prévoir un stockage persistant (volume ou stockage objet) pour ce dossier.
 
-## 5. Tests
+## 5. ~~Tests~~ ✅ fait le 2026-11-08
 
-- Aucun test, ni backend ni frontend.
-- Priorités suggérées : calcul des montants de commande (TVA 18 %, frais de port), webhooks de paiement (idempotence, contrôle de montant), auth (login, refresh, reset password).
+- **Backend** (`npm test`, ~1 min, 227 tests) :
+  - unitaires (MySQL simulé) : montants, création de commande, webhooks de paiement, authentification ;
+  - **API sur une base de test dédiée** `smalim_test`, recréée à chaque lancement depuis `schema.sql` : **tous les endpoints** (auth, catalogue, envoi d'images, commandes, paiements, devis, clients, parc, tickets, factures, tableaux de bord, blog, paramètres, comptes admin, codes promo), avec les droits de chaque rôle. Aucun email envoyé, aucun prestataire réel, base de travail jamais touchée.
+- **Frontend** (`npm test`, Vitest) : calcul du panier, sur les mêmes cas que le backend.
+- **Bugs trouvés et corrigés grâce aux tests** :
+  - faille de paiement : un prestataire non configuré (simulateur) acceptait des notifications non vérifiées, même en production ; une notification Orange Money pouvait confirmer un paiement Wave ;
+  - les machines et consommables **retirés du catalogue restaient visibles** sur le site public ;
+  - une machine « sur devis » (prix 0) pouvait être **commandée pour 0 FCFA** via l'API ;
+  - modifier une machine ou un produit sans envoyer tous les champs les remettait à NULL (erreur 500) ;
+  - supprimer une machine installée chez un client renvoyait une erreur 500 (maintenant 409 avec un message clair) ;
+  - blog : une image envoyée depuis l'admin était refusée à l'enregistrement ; **créer un article depuis l'admin échouait toujours** (catégorie jamais envoyée) ; aucun moyen de **publier** un article (tout restait en brouillon malgré le message « publié »).
+- **À faire ensuite** : quelques tests de bout en bout dans le navigateur (Playwright) ; lancer les tests automatiquement à chaque push (GitHub Actions, avec un service MySQL).
 
 ## 6. Paiement Stripe
 

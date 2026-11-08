@@ -11,7 +11,9 @@ exports.getAll = async (req, res, next) => {
     let params = [];
 
     if (category) { where.push('mc.slug = ?'); params.push(category); }
-    if (active !== undefined) { where.push('m.is_active = ?'); params.push(active === 'true' ? 1 : 0); }
+    // Le public ne voit que le catalogue actif ; le back-office voit tout (filtre `active` facultatif)
+    if (req.user?.type !== 'admin') where.push('m.is_active = 1');
+    else if (active !== undefined) { where.push('m.is_active = ?'); params.push(active === 'true' ? 1 : 0); }
     if (featured === 'true') { where.push('m.is_featured = 1'); }
     if (search) { where.push('(m.name LIKE ? OR m.brand LIKE ? OR m.model_ref LIKE ?)'); params.push(`%${search}%`, `%${search}%`, `%${search}%`); }
 
@@ -93,17 +95,18 @@ exports.create = async (req, res, next) => {
 
 exports.update = async (req, res, next) => {
   try {
-    const machine = await queryOne('SELECT id FROM machines WHERE id = ?', [req.params.id]);
+    const machine = await queryOne('SELECT * FROM machines WHERE id = ?', [req.params.id]);
     if (!machine) return res.status(404).json({ success: false, message: 'Machine introuvable' });
 
-    const { category_id, name, description, price, stock, unit, brand, model_ref, delivery_delay, image_url, gallery, specifications, payment_modes, is_active, is_featured } = req.body;
+    // Un champ absent du corps garde sa valeur actuelle (sinon il passerait à NULL)
+    const b = { ...machine, ...Object.fromEntries(Object.entries(req.body).filter(([, v]) => v !== undefined)) };
 
     await query(
       `UPDATE machines SET category_id=?, name=?, description=?, price=?, stock=?, unit=?, brand=?, model_ref=?,
        delivery_delay=?, image_url=?, gallery=?, specifications=?, payment_modes=?, is_active=?, is_featured=? WHERE id = ?`,
-      [category_id, name, description, price, stock, unit, brand, model_ref, delivery_delay, image_url,
-       JSON.stringify(gallery || []), JSON.stringify(specifications || {}), JSON.stringify(payment_modes || []),
-       is_active, is_featured ? 1 : 0, req.params.id]
+      [b.category_id, b.name, b.description, b.price, b.stock, b.unit || 'unité', b.brand, b.model_ref, b.delivery_delay, b.image_url,
+       JSON.stringify(b.gallery || []), JSON.stringify(b.specifications || {}), JSON.stringify(b.payment_modes || []),
+       b.is_active ? 1 : 0, b.is_featured ? 1 : 0, req.params.id]
     );
 
     const updated = await queryOne(
