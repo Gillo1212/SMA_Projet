@@ -1,11 +1,63 @@
 import { useState } from 'react';
 import { useProducts } from '../../../hooks/useProducts';
 import { LoadingState, ErrorState, EmptyState } from '../../../components/feature/AsyncState';
+import { productsService } from '../../../services/products.service';
+import ConfirmDialog from '../../../components/admin/ConfirmDialog';
+import Toasts, { useToasts } from '../../../components/admin/Toasts';
+import ProductModal from './components/ProductModal';
+import type { Product } from '../../../types/models';
 
 export default function AdminProduitsPage() {
   const { products, isLoading, error, refetch } = useProducts();
   const [search, setSearch] = useState('');
   const [filterCat, setFilterCat] = useState('Tous');
+  const [modalMode, setModalMode] = useState<'add' | 'edit' | null>(null);
+  const [selected, setSelected] = useState<Product | null>(null);
+  const [toDelete, setToDelete] = useState<Product | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const { toasts, notify, dismiss } = useToasts();
+
+  function openAdd() {
+    setSelected(null);
+    setModalMode('add');
+  }
+
+  function openEdit(product: Product) {
+    setSelected(product);
+    setModalMode('edit');
+  }
+
+  async function handleSave(data: Partial<Product> & { categoryId?: string }) {
+    try {
+      if (modalMode === 'edit' && selected) {
+        await productsService.update(selected.id, data);
+        notify('success', 'Consommable mis à jour', data.name);
+      } else {
+        await productsService.create(data);
+        notify('success', 'Consommable ajouté', data.name);
+      }
+      setModalMode(null);
+      setSelected(null);
+      refetch();
+    } catch (e) {
+      notify('error', 'Enregistrement impossible', e instanceof Error ? e.message : undefined);
+    }
+  }
+
+  async function handleDelete() {
+    if (!toDelete) return;
+    setDeleting(true);
+    try {
+      await productsService.delete(toDelete.id);
+      notify('success', 'Consommable supprimé', toDelete.name);
+      refetch();
+    } catch (e) {
+      notify('error', 'Suppression impossible', e instanceof Error ? e.message : undefined);
+    } finally {
+      setDeleting(false);
+      setToDelete(null);
+    }
+  }
 
   if (isLoading) return <LoadingState label="Chargement des consommables…" />;
   if (error) return <ErrorState message={error} onRetry={refetch} />;
@@ -76,7 +128,7 @@ export default function AdminProduitsPage() {
               ))}
             </div>
           </div>
-          <button className="px-4 py-2 bg-[#1AAA3F] text-white text-sm font-semibold rounded-lg hover:bg-[#158f35] cursor-pointer flex items-center gap-2 whitespace-nowrap">
+          <button type="button" onClick={openAdd} className="px-4 py-2 bg-[#1AAA3F] text-white text-sm font-semibold rounded-lg hover:bg-[#158f35] cursor-pointer flex items-center gap-2 whitespace-nowrap">
             <i className="ri-add-line"></i>
             Ajouter
           </button>
@@ -143,10 +195,10 @@ export default function AdminProduitsPage() {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
-                      <button className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 cursor-pointer text-[#00272B]/40 hover:text-[#00272B]">
+                      <button type="button" onClick={() => openEdit(prod)} aria-label={`Modifier ${prod.name}`} title="Modifier" className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 cursor-pointer text-[#00272B]/40 hover:text-[#00272B]">
                         <i className="ri-edit-line text-sm"></i>
                       </button>
-                      <button className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-red-50 cursor-pointer text-[#00272B]/40 hover:text-red-500">
+                      <button type="button" onClick={() => setToDelete(prod)} aria-label={`Supprimer ${prod.name}`} title="Supprimer" className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-red-50 cursor-pointer text-[#00272B]/40 hover:text-red-500">
                         <i className="ri-delete-bin-line text-sm"></i>
                       </button>
                     </div>
@@ -158,6 +210,28 @@ export default function AdminProduitsPage() {
         </div>
         )}
       </div>
+
+      {modalMode && (
+        <ProductModal
+          mode={modalMode}
+          product={selected}
+          onClose={() => { setModalMode(null); setSelected(null); }}
+          onSave={handleSave}
+        />
+      )}
+
+      <ConfirmDialog
+        open={toDelete !== null}
+        title="Supprimer ce consommable ?"
+        message={<>« {toDelete?.name} » sera retiré du catalogue. Les commandes passées gardent leur historique.</>}
+        confirmLabel="Supprimer"
+        tone="danger"
+        busy={deleting}
+        onConfirm={handleDelete}
+        onCancel={() => setToDelete(null)}
+      />
+
+      <Toasts toasts={toasts} onDismiss={dismiss} />
     </div>
   );
 }

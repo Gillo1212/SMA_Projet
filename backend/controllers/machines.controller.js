@@ -81,7 +81,12 @@ exports.create = async (req, res, next) => {
        is_active !== undefined ? is_active : 1, is_featured ? 1 : 0]
     );
 
-    const machine = await queryOne('SELECT * FROM machines WHERE id = ?', [result.insertId]);
+    const machine = await queryOne(
+      // Avec la catégorie : le back-office l'affiche dès la réponse
+      `SELECT m.*, mc.name AS category_name, mc.slug AS category_slug
+       FROM machines m LEFT JOIN machine_categories mc ON m.category_id = mc.id WHERE m.id = ?`,
+      [result.insertId],
+    );
     res.status(201).json({ success: true, message: 'Machine créée', data: machine });
   } catch (error) { next(error); }
 };
@@ -101,7 +106,12 @@ exports.update = async (req, res, next) => {
        is_active, is_featured ? 1 : 0, req.params.id]
     );
 
-    const updated = await queryOne('SELECT * FROM machines WHERE id = ?', [req.params.id]);
+    const updated = await queryOne(
+      // Avec la catégorie : le back-office l'affiche dès la réponse
+      `SELECT m.*, mc.name AS category_name, mc.slug AS category_slug
+       FROM machines m LEFT JOIN machine_categories mc ON m.category_id = mc.id WHERE m.id = ?`,
+      [req.params.id],
+    );
     res.json({ success: true, message: 'Machine mise à jour', data: updated });
   } catch (error) { next(error); }
 };

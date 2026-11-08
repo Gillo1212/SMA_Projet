@@ -60,7 +60,12 @@ exports.create = async (req, res, next) => {
       [category_id, name, slug, description, price, stock || 0, unit || 'unité', brand, reference, image_url,
        JSON.stringify(gallery || []), JSON.stringify(specifications || {}), is_active !== undefined ? is_active : 1, is_featured ? 1 : 0]
     );
-    const product = await queryOne('SELECT * FROM products WHERE id = ?', [result.insertId]);
+    const product = await queryOne(
+      // Avec la catégorie : le back-office l'affiche dès la réponse
+      `SELECT p.*, pc.name AS category_name, pc.slug AS category_slug
+       FROM products p LEFT JOIN product_categories pc ON p.category_id = pc.id WHERE p.id = ?`,
+      [result.insertId],
+    );
     res.status(201).json({ success: true, message: 'Produit créé', data: product });
   } catch (error) { next(error); }
 };
@@ -77,7 +82,12 @@ exports.update = async (req, res, next) => {
       [category_id, name, description, price, stock, unit, brand, reference, image_url,
        JSON.stringify(gallery || []), JSON.stringify(specifications || {}), is_active, is_featured ? 1 : 0, req.params.id]
     );
-    const updated = await queryOne('SELECT * FROM products WHERE id = ?', [req.params.id]);
+    const updated = await queryOne(
+      // Avec la catégorie : le back-office l'affiche dès la réponse
+      `SELECT p.*, pc.name AS category_name, pc.slug AS category_slug
+       FROM products p LEFT JOIN product_categories pc ON p.category_id = pc.id WHERE p.id = ?`,
+      [req.params.id],
+    );
     res.json({ success: true, message: 'Produit mis à jour', data: updated });
   } catch (error) { next(error); }
 };

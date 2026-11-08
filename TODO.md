@@ -72,12 +72,14 @@ Le catalogue ne contient plus que les produits de la banque d'images : 5 machine
 - La refonte (polices Fraunces / Manrope / ADLaM Display, en-têtes bleu nuit, cartes) couvre le site public. Le **portail admin** et l'**espace client** ont hérité des polices, mais gardent l'ancien style (vert menthe, badges colorés).
 - Pages publiques retouchées sur les couleurs et la casse seulement, à reprendre plus en détail : comparateur, demande de devis, panier, checkout, détail produit, détail d'article.
 
-## 4. Upload d'images depuis l'admin
+## 4. ~~Upload d'images depuis l'admin~~ ✅ fait le 2026-11-08
 
-- Le backend expose `POST /api/upload` (renvoie `/uploads/<fichier>`), mais aucun service frontend ne l'appelle : l'admin ne peut pas téléverser d'image pour une machine ou un produit.
-- Deux obstacles à lever en même temps :
-  - l'URL renvoyée est relative (`/uploads/...`) : servie depuis le port 5173, elle ne pointe pas vers le backend (port 5000). Préfixer avec l'origine de l'API côté frontend, ou ajouter un proxy Vite.
-  - `helmet()` est utilisé avec sa config par défaut, qui envoie `Cross-Origin-Resource-Policy: same-origin` : le navigateur bloquera les images `/uploads` chargées depuis un autre port/domaine. Régler `crossOriginResourcePolicy: { policy: 'cross-origin' }`.
+- Champ d'envoi (clic ou glisser-déposer, aperçu, erreurs, repli sur une URL) dans les fiches **machine** (plusieurs photos, la première est la principale), **consommable** et **article de blog**.
+- La page **Consommables** a maintenant ses fenêtres Ajouter / Modifier / Supprimer (les boutons ne faisaient rien).
+- Backend : `helmet` autorise l'affichage cross-origin des `/uploads`, le type MIME est contrôlé. La base garde `/uploads/…` en relatif, le frontend ajoute l'origine de l'API (`utils/media.ts`).
+- Corrigé au passage dans la fiche machine : l'ajout échouait (catégorie jamais envoyée), l'enregistrement écrasait la marque par la catégorie et vidait la référence du modèle et l'unité, le résumé modifié n'était pas pris en compte, le stock choisi était ignoré. Le backend renvoie la catégorie après création / modification.
+- Vérifié dans Chrome : envoi, refus d'un faux fichier, photo principale, enregistrement, affichage sur la fiche publique ; ajout, modification et suppression d'un consommable ; couverture de blog. Données de test retirées.
+- **Reste** : les images retirées d'une fiche restent sur le disque (`backend/uploads/`) ; en production, prévoir un stockage persistant (volume ou stockage objet) pour ce dossier.
 
 ## 5. Tests
 

@@ -186,7 +186,11 @@ export default function AdminMachinesPage() {
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-12 h-12 bg-gray-50 rounded-lg overflow-hidden flex-shrink-0">
-                          <img src={machine.image} alt={machine.name} className="w-full h-full object-cover" />
+                          {machine.image ? (
+                            <img src={machine.image} alt={machine.name} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center"><i className="ri-image-line text-[#00272B]/20"></i></div>
+                          )}
                         </div>
                         <div>
                           <p className="text-sm font-semibold text-[#00272B]">{machine.name}</p>

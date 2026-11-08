@@ -200,6 +200,27 @@ async function del<T = void>(
   return handleResponse<T>(response);
 }
 
+/**
+ * Envoi multipart (fichiers). Pas de Content-Type : le navigateur pose
+ * lui-même `multipart/form-data` avec la bonne délimitation.
+ */
+async function postForm<T>(
+  endpoint: string,
+  form: FormData,
+  options?: RequestOptions,
+): Promise<T> {
+  const response = await fetch(`${API_URL}${endpoint}`, {
+    method: 'POST',
+    headers: {
+      ...getAuthHeader(),
+      ...options?.headers,
+    },
+    body: form,
+    signal: options?.signal,
+  });
+  return handleResponse<T>(response);
+}
+
 // ── Export ─────────────────────────────────────────────────────────────────
 
-export const apiClient = { get, post, put, patch, delete: del };
+export const apiClient = { get, post, put, patch, delete: del, postForm };

@@ -21,8 +21,10 @@ const storage = multer.diskStorage({
 
 const fileFilter = (_req, file, cb) => {
   const allowed = ['.jpg', '.jpeg', '.png', '.webp', '.gif'];
+  const allowedMime = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
   const ext = path.extname(file.originalname).toLowerCase();
-  if (allowed.includes(ext)) {
+  // Extension ET type MIME : un .jpg qui n'est pas une image est refusé
+  if (allowed.includes(ext) && allowedMime.includes(file.mimetype)) {
     cb(null, true);
   } else {
     cb(new Error('Type de fichier non autorisé. Formats acceptés : jpg, jpeg, png, webp, gif'));

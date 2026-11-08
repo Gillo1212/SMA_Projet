@@ -129,6 +129,12 @@ export const ENDPOINTS = {
     DELETE: (id: number) => `/promo-codes/${id}`,
   },
 
+  // ── Images (back-office) ──────────────────────────────────
+  // Backend : POST /api/upload/image (multipart, champ `image`) → { url: '/uploads/…' }
+  UPLOAD: {
+    IMAGE: '/upload/image',
+  },
+
   // ── Paiements ─────────────────────────────────────────────
   // Backend : POST /api/payments/initiate → URL de redirection prestataire
   PAYMENTS: {

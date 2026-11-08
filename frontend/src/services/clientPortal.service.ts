@@ -11,6 +11,7 @@
  */
 
 import { apiClient } from './apiClient';
+import { resolveMediaUrl } from '../utils/media';
 import { USE_MOCK, MOCK_DELAY, ENDPOINTS } from '../config/api';
 import {
   clientMachines as mockMachines,
@@ -164,7 +165,7 @@ function normalizeMachine(raw: BackendClientMachine): ClientMachine {
     id: String(raw.id),
     nom: raw.machine_name ?? 'Machine',
     type: raw.category_name ?? raw.brand ?? '-',
-    image: raw.image_url ?? '',
+    image: resolveMediaUrl(raw.image_url) ?? '',
     numeroSerie: raw.serial_number ?? undefined,
     // Dates laissées en ISO : les pages calculent des échéances dessus
     dateInstallation: isoDate(raw.installation_date),

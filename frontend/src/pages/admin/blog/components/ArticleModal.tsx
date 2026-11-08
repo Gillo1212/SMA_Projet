@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { BlogPost } from '../../../../types/models';
+import { ImageField } from '../../../../components/admin/ImageUpload';
 
 type Article = BlogPost;
 
@@ -177,24 +178,13 @@ export default function ArticleModal({ mode, article, onClose, onSave }: Props) 
             </div>
           </div>
 
-          {/* Image URL */}
-          <div>
-            <label className="block text-xs font-semibold text-[#00272B]/60 mb-1.5">URL de l&apos;image</label>
-            <div className="flex gap-3">
-              {form.image && (
-                <div className="w-16 h-10 bg-gray-50 rounded-lg overflow-hidden flex-shrink-0 border border-gray-100">
-                  <img src={form.image} alt="preview" className="w-full h-full object-cover" />
-                </div>
-              )}
-              <input
-                type="text"
-                value={form.image}
-                onChange={e => setForm(f => ({ ...f, image: e.target.value }))}
-                placeholder="https://..."
-                className="flex-1 h-9 px-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#1AAA3F]"
-              />
-            </div>
-          </div>
+          {/* Image de couverture */}
+          <ImageField
+            label="Image de couverture"
+            value={form.image}
+            onChange={image => setForm(f => ({ ...f, image }))}
+            hint="Format paysage conseillé (ex. 1200 × 750). JPG, PNG, WebP ou GIF, 10 Mo maximum."
+          />
 
           {/* Résumé */}
           <div>

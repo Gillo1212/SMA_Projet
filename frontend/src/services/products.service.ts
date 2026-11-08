@@ -6,6 +6,7 @@
  */
 
 import { apiClient } from './apiClient';
+import { resolveMediaUrl, toStoredMediaUrl } from '../utils/media';
 import { USE_MOCK, MOCK_DELAY, ENDPOINTS } from '../config/api';
 import { products as mockProducts } from '../mocks/products';
 import { parseJSON, toNumber, normalizeCategory } from './normalize';
@@ -42,9 +43,9 @@ interface BackendProduct {
 const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
 
 function normalizeProduct(raw: BackendProduct): Product {
-  const gallery = parseJSON<string[]>(raw.gallery, []);
+  const gallery = parseJSON<string[]>(raw.gallery, []).map(resolveMediaUrl);
   const specs   = parseJSON<Record<string, unknown>>(raw.specifications, {});
-  const image   = raw.image_url ?? gallery[0] ?? '';
+  const image   = resolveMediaUrl(raw.image_url) ?? gallery[0] ?? '';
 
   const createdAt = raw.created_at ? new Date(raw.created_at).getTime() : NaN;
   const isNew = Number.isFinite(createdAt) && Date.now() - createdAt < THIRTY_DAYS_MS;
@@ -71,12 +72,14 @@ function normalizeProduct(raw: BackendProduct): Product {
     volumeDiscounts: [],
     relatedProducts: [],
     weight: typeof specs.weight === 'string' ? specs.weight : undefined,
+    categoryId: raw.category_id != null ? String(raw.category_id) : undefined,
+    specifications: specs,
   };
 }
 
 /** Frontend → corps attendu par POST/PUT /products */
 function denormalizeProduct(data: Partial<Product> & { categoryId?: string }): Record<string, unknown> {
-  const specifications: Record<string, unknown> = {};
+  const specifications: Record<string, unknown> = { ...data.specifications };
   if (data.ingredients) specifications.ingredients = data.ingredients;
   if (data.allergens)   specifications.allergens = data.allergens;
   if (data.taste)       specifications.taste = data.taste;
@@ -92,8 +95,8 @@ function denormalizeProduct(data: Partial<Product> & { categoryId?: string }): R
     unit: data.format ?? 'unité',
     brand: data.brand ?? '',
     reference: data.sku ?? '',
-    image_url: data.images?.[0] ?? '',
-    gallery: data.images ?? [],
+    image_url: toStoredMediaUrl(data.images?.[0] ?? ''),
+    gallery: (data.images ?? []).map(toStoredMediaUrl),
     specifications,
     is_active: data.isAvailable ?? true,
     is_featured: data.isPopular ?? false,

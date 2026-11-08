@@ -189,7 +189,11 @@ Voir `.env.example`, section Paiement : `BACKEND_URL`, `WAVE_API_KEY`, `WAVE_WEB
 - Répertoire : `uploads/`
 - Taille max : 10MB
 - Servis via : `GET /uploads/:filename` (Express static)
-- Types acceptés : images (jpg, jpeg, png, webp, gif)
+- Types acceptés : images (jpg, jpeg, png, webp, gif), contrôle de l'extension **et** du type MIME
+- Route : `POST /api/upload/image` (admin, multipart, champ `image`) → `{ url: '/uploads/<fichier>' }`
+- La base stocke ce chemin **relatif** ; le frontend le préfixe avec l'origine de l'API (`frontend/src/utils/media.ts`).
+- `helmet` est réglé avec `crossOriginResourcePolicy: 'cross-origin'`, sinon le navigateur bloque les images affichées depuis le frontend (autre port / domaine).
+- Les fichiers retirés d'une fiche ne sont pas supprimés du disque.
 
 ## Scripts npm
 

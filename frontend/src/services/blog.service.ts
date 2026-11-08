@@ -11,6 +11,7 @@
  */
 
 import { apiClient } from './apiClient';
+import { resolveMediaUrl, toStoredMediaUrl } from '../utils/media';
 import { USE_MOCK, MOCK_DELAY, ENDPOINTS } from '../config/api';
 import { blogArticles, blogCategories } from '../mocks/blog';
 import { fullName, normalizeCategory } from './normalize';
@@ -69,7 +70,7 @@ function normalizeArticle(raw: BackendArticle): BlogPost {
     author: publicAuthor(fullName(raw.author_first, raw.author_last)),
     authorRole: 'Rédaction',
     readTime: `${raw.read_time ?? 5} min`,
-    image: raw.image_url ?? '',
+    image: resolveMediaUrl(raw.image_url) ?? '',
     status: raw.status,
     published: raw.status === 'published',
   };
@@ -83,7 +84,7 @@ function denormalizeArticle(data: Partial<BlogPost>): Record<string, unknown> {
     title: data.title,
     excerpt: data.excerpt ?? '',
     content: data.content ?? '',
-    image_url: data.image || undefined,
+    image_url: data.image ? toStoredMediaUrl(data.image) : undefined,
     read_time: Number.isFinite(readTime) && readTime > 0 ? readTime : 5,
     status: data.status ?? (data.published ? 'published' : 'draft'),
   };

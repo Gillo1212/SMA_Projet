@@ -61,6 +61,11 @@ export interface Machine {
   stock: 'En stock' | 'Stock limité' | 'Rupture de stock';
   /** Quantité réelle en base — conservée pour ne pas la perdre à l'édition */
   stockQuantity?: number;
+  /** Champs de la base renvoyés tels quels à l'enregistrement (sinon remis à NULL) */
+  brand?: string;
+  modelRef?: string;
+  unit?: string;
+  isActive?: boolean;
 }
 
 // ── Produit ────────────────────────────────────────────────────────────────
@@ -89,6 +94,10 @@ export interface Product {
   volumeDiscounts: VolumeDiscount[];
   relatedProducts: string[];
   weight?: string;
+  /** ID de la catégorie — requis par POST/PUT /products */
+  categoryId?: string;
+  /** Spécifications brutes : les clés non éditées sont conservées à l'enregistrement */
+  specifications?: Record<string, unknown>;
 }
 
 export interface VolumeDiscount {

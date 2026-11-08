@@ -6,6 +6,7 @@
  */
 
 import { apiClient } from './apiClient';
+import { resolveMediaUrl, toStoredMediaUrl } from '../utils/media';
 import { USE_MOCK, MOCK_DELAY, ENDPOINTS } from '../config/api';
 import { machines as mockMachines } from '../mocks/machines';
 import { normalizeCategory } from './normalize';
@@ -85,12 +86,12 @@ function formatPrice(price: number): string {
 
 /** Convert a backend machine row to the frontend Machine shape */
 function normalizeMachine(raw: BackendMachine): Machine {
-  const gallery = parseJSON<string[]>(raw.gallery, []);
+  const gallery = parseJSON<string[]>(raw.gallery, []).map(resolveMediaUrl);
   const specs   = parseJSON<Record<string, string>>(raw.specifications, {});
   const modes   = parseJSON<string[]>(raw.payment_modes, []);
 
   const price    = Number(raw.price) || 0;
-  const imageUrl = raw.image_url ?? gallery[0] ?? '';
+  const imageUrl = resolveMediaUrl(raw.image_url) ?? gallery[0] ?? '';
 
   // Ensure gallery always has at least the main image
   const galleryImages = gallery.length > 0 ? gallery : (imageUrl ? [imageUrl] : []);
@@ -128,6 +129,10 @@ function normalizeMachine(raw: BackendMachine): Machine {
     deliveryTime: raw.delivery_delay ?? '',
     stock: stockLabel(Number(raw.stock) || 0),
     stockQuantity: Number(raw.stock) || 0,
+    brand: raw.brand ?? '',
+    modelRef: raw.model_ref ?? '',
+    unit: raw.unit ?? 'unité',
+    isActive: raw.is_active === undefined ? true : Boolean(raw.is_active),
   };
 }
 
@@ -161,13 +166,15 @@ function denormalizeMachine(data: Partial<Machine>): Record<string, unknown> {
     description: data.description || data.shortDescription || '',
     price: data.price ?? 0,
     stock: data.stockQuantity ?? (data.stock ? stockFromLabel[data.stock] : 0),
-    brand: data.category ?? '',
+    unit: data.unit || 'unité',
+    brand: data.brand ?? '',
+    model_ref: data.modelRef ?? '',
     delivery_delay: data.deliveryTime ?? '',
-    image_url: data.image ?? '',
-    gallery: data.gallery ?? [],
+    image_url: toStoredMediaUrl(data.image ?? ''),
+    gallery: (data.gallery ?? []).map(toStoredMediaUrl),
     specifications: data.specifications ?? {},
     payment_modes: paymentModes,
-    is_active: true,
+    is_active: data.isActive ?? true,
     is_featured: Boolean(data.badge),
   };
 }

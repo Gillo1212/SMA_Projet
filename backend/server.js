@@ -30,7 +30,10 @@ const PORT = process.env.PORT || 5000;
 // ───────────────────────────────────────────
 // Middlewares globaux
 // ───────────────────────────────────────────
-app.use(helmet());
+// Les images de /uploads sont affichées par le frontend, servi depuis une autre
+// origine (port 5173 en dev) : la politique CORP par défaut (same-origin) les
+// ferait bloquer par le navigateur.
+app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 
 // CORS
