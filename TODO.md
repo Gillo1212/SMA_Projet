@@ -17,7 +17,7 @@ Périmètre décidé le 2026-10-25 : **site public + espace client**. Le portail
 - ✅ Lot C : espace client (tableau de bord, commandes, devis, factures, machines, support, profil, sidebar, layout, notifications) + sélecteur de langue dans l'espace client.
 - ✅ Reliquats des pages déjà traduites : contact, panier, checkout, fiche machine, article de blog.
 - Vérifié dans Chrome (Playwright) : chaque page en FR et en EN, inscription, connexion, espace client, commande complète jusqu'au paiement simulé.
-- Volontairement non traduits : `paiement/simulation` (outil de dev), `commande/confirmation` (page morte, voir §7).
+- Volontairement non traduits : `paiement/simulation` (outil de dev), `commande/confirmation` (page supprimée, voir §7).
 - **Limites restantes** :
   - Les messages d'erreur renvoyés par le backend (« Cet email est déjà utilisé », « Email ou mot de passe incorrect »…) restent en français.
   - `machines.service.ts` fabrique des libellés en français : « Sur devis », « Populaire », niveaux de stock.
@@ -99,10 +99,9 @@ Le catalogue ne contient plus que les produits de la banque d'images : 5 machine
 - Décider : implémenter Stripe (paiement par carte) ou retirer la variable et la mention du CLAUDE.md.
 - Wave et Orange Money n'ont jamais été testés contre les vraies API : à valider avec les contrats marchands avant la production.
 
-## 7. Nettoyage du dépôt
+## 7. ~~Nettoyage du dépôt~~ ✅ fait le 2026-11-08
 
-- `backend/` contient des fichiers qui semblent venir du frontend : `index.html`, `vite.config.ts`, `vite-env.d.ts`, `tailwind.config.ts`, `postcss.config.ts`, `eslint.config.ts`, `tsconfig*.json`. À vérifier puis supprimer.
-- Page morte `frontend/src/pages/commande/confirmation/` : plus aucun lien n'y mène depuis le passage au paiement Wave / Orange Money (le checkout redirige vers `/paiement/retour`). À supprimer avec sa route, ou à rebrancher.
-- Fichiers SQL de session inutiles : `SMA.session.sql` (racine, vide) et `backend/SenMartAli.session.sql`.
-- Vidéo `WhatsApp Video 2026-03-29 at 19.18.16.mp4` (6 Mo) à la racine : ignorée par git, à déplacer ou supprimer.
-- Images encore hébergées chez readdy.ai (illustrations de la page d'accueil, de la page À propos, du blog, des mocks) : à remplacer par des visuels propres à SMALIM au fur et à mesure.
+- Supprimés : les anciennes copies de fichiers du frontend dans `backend/` (`index.html`, `vite.config.ts`, `vite-env.d.ts`, `tailwind.config.ts`, `postcss.config.ts`, `eslint.config.ts`, `tsconfig*.json`), utilisées par aucun script du backend ; la page morte `commande/confirmation` et sa route (l'adresse affiche maintenant la page 404) ; les brouillons `SMA.session.sql` et `backend/SenMartAli.session.sql`. Les `*.session.sql` sont désormais ignorés par git.
+- Vérifié : compilation TypeScript, ESLint et build de production ; API démarrée ; dans Chrome, page 404 sur l'ancienne adresse, panier et checkout intacts.
+- **Reste de ton côté** : la vidéo `WhatsApp Video 2026-03-29 at 19.18.16.mp4` (6 Mo, ignorée par git) est toujours à la racine : la déplacer ou la supprimer toi-même (elle n'est pas dans git, une suppression serait définitive).
+- **Reste** : images encore hébergées chez readdy.ai (accueil, À propos, blog, mocks, logos Wave / Orange Money) à remplacer par des visuels propres à SMALIM (voir aussi §3).

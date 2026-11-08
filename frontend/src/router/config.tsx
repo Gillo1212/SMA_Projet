@@ -14,7 +14,6 @@ const ProductsPage = lazy(() => import('../pages/produits/page'));
 const ProductDetailPage = lazy(() => import('../pages/produits/detail/page'));
 const PanierPage = lazy(() => import('../pages/panier/page'));
 const CheckoutPage = lazy(() => import('../pages/checkout/page'));
-const ConfirmationPage = lazy(() => import('../pages/commande/confirmation/page'));
 const PaiementRetourPage = lazy(() => import('../pages/paiement/retour/page'));
 const PaiementSimulationPage = lazy(() => import('../pages/paiement/simulation/page'));
 const NotFound = lazy(() => import('../pages/NotFound'));
@@ -98,10 +97,6 @@ const routes: RouteObject[] = [
   {
     path: '/checkout',
     element: <CheckoutPage />,
-  },
-  {
-    path: '/commande/confirmation',
-    element: <ConfirmationPage />,
   },
   {
     // Retour depuis le prestataire de paiement

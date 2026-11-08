@@ -49,3 +49,6 @@ desktop.ini
 .eslintcache
 *.mp4
 *.mov
+
+# Brouillons de requêtes (extension SQLTools de VS Code)
+*.session.sql
