@@ -213,7 +213,7 @@ export default function DevisPage() {
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Form */}
             <div className="lg:col-span-2">
-              <form onSubmit={handleSubmit} data-readdy-form className="bg-white rounded-2xl p-8 space-y-8">
+              <form onSubmit={handleSubmit} className="bg-white rounded-2xl p-8 space-y-8">
                 {/* Personal Info */}
                 <div>
                   <h2 className="text-xl font-bold text-[#00272B] mb-6 flex items-center gap-3">

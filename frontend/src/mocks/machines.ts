@@ -34,12 +34,12 @@ export const machines = [
     badge: 'Populaire',
     shortDescription: 'Machine à café professionnelle haute capacité – 20 boissons, 160 gobelets',
     description: 'La TCN-NCF-7N(V22) est une machine à café commerciale conçue pour les environnements à fort trafic. Elle propose 20 variétés de boissons chaudes avec un système de mouture fraîche intégré. Sa chaudière haute performance maintient une température constante de 92°C pour un café d\'exception. Idéale pour les grandes entreprises, hôtels et centres commerciaux.',
-    image: 'https://readdy.ai/api/search-image?query=TCN+professional+coffee+vending+machine+commercial+sleek+black+tall+unit+touchscreen+interface+dispensing+hot+coffee&width=600&height=800&seq=tcn-cafe-001&orientation=portrait',
+    image: '/images/machines/sen-coffee-distributeur-cafe-grains/1.webp',
     gallery: [
-      'https://readdy.ai/api/search-image?query=TCN+professional+coffee+vending+machine+commercial+sleek+black+tall+unit+touchscreen+interface+dispensing+hot+coffee&width=600&height=800&seq=tcn-cafe-001&orientation=portrait',
-      'https://readdy.ai/api/search-image?query=commercial+coffee+vending+machine+touchscreen+beverage+selection+interface+modern+UI&width=600&height=800&seq=tcn-cafe-002&orientation=portrait',
-      'https://readdy.ai/api/search-image?query=coffee+vending+machine+freshly+ground+bean+container+interior+professional&width=600&height=800&seq=tcn-cafe-003&orientation=portrait',
-      'https://readdy.ai/api/search-image?query=person+using+coffee+vending+machine+office+dispensing+hot+beverage&width=600&height=800&seq=tcn-cafe-004&orientation=portrait'
+      '/images/machines/sen-coffee-distributeur-cafe-grains/1.webp',
+      '/images/machines/sen-coffee-distributeur-cafe-grains/2.webp',
+      '/images/machines/sen-coffee-distributeur-cafe-grains/3.webp',
+      '/images/machines/sen-coffee-distributeur-cafe-grains/4.webp'
     ],
     specifications: {
       dimensions: 'H: 194 cm × L: 73,5 cm × P: 79 cm',
@@ -78,12 +78,12 @@ export const machines = [
     badge: 'Compact',
     shortDescription: 'Machine à café compacte avec mouture fraîche – idéale pour PME',
     description: 'La TCN-NCF-4N(V10.1) est la solution idéale pour les espaces réduits sans compromis sur la qualité. Malgré son format compact, elle intègre un système de mouture fraîche et 4 conteneurs d\'ingrédients pour une diversité de boissons chaudes. Puissance de pointe 3000W pour une chauffe rapide.',
-    image: 'https://readdy.ai/api/search-image?query=TCN+compact+mini+coffee+vending+machine+small+countertop+fresh+ground+bean+professional&width=600&height=800&seq=tcn-mini-cafe-001&orientation=portrait',
+    image: '/images/machines/lecon-machine-cafe-instantane/1.webp',
     gallery: [
-      'https://readdy.ai/api/search-image?query=TCN+compact+mini+coffee+vending+machine+small+countertop+fresh+ground+bean+professional&width=600&height=800&seq=tcn-mini-cafe-001&orientation=portrait',
-      'https://readdy.ai/api/search-image?query=compact+coffee+machine+digital+interface+beverage+options+small+office&width=600&height=800&seq=tcn-mini-cafe-002&orientation=portrait',
-      'https://readdy.ai/api/search-image?query=mini+coffee+vending+machine+installed+small+office+break+room&width=600&height=800&seq=tcn-mini-cafe-003&orientation=portrait',
-      'https://readdy.ai/api/search-image?query=person+using+compact+coffee+machine+dispensing+espresso+small+workplace&width=600&height=800&seq=tcn-mini-cafe-004&orientation=portrait'
+      '/images/machines/lecon-machine-cafe-instantane/1.webp',
+      '/images/machines/lecon-machine-cafe-instantane/2.webp',
+      '/images/machines/lecon-machine-cafe-instantane/3.webp',
+      '/images/machines/lecon-machine-cafe-instantane/4.webp'
     ],
     specifications: {
       dimensions: 'H: 81 cm × L: 50 cm × P: 45 cm',
@@ -123,12 +123,12 @@ export const machines = [
     badge: 'Best-seller',
     shortDescription: 'Distributeur snack & boissons 60 spirales / 300 bouteilles – réfrigéré 2-25°C',
     description: 'Le TCN-CSC-10G(H5) est le distributeur automatique polyvalent par excellence. Il combine 60 emplacements snacks avec un compartiment boissons de 300 bouteilles, le tout maintenu à une température idéale entre 2 et 25°C. Son écran LED 5 pouces et sa puissance de réfrigération de 422W en font le choix numéro un pour les entreprises et lieux publics.',
-    image: 'https://readdy.ai/api/search-image?query=TCN+snack+drink+combo+vending+machine+tall+glass+front+illuminated+snacks+beverages+modern+professional&width=600&height=800&seq=tcn-snack-drink-001&orientation=portrait',
+    image: '/images/machines/nexx-distributeur-snacks-boissons/1.webp',
     gallery: [
-      'https://readdy.ai/api/search-image?query=TCN+snack+drink+combo+vending+machine+tall+glass+front+illuminated+snacks+beverages+modern+professional&width=600&height=800&seq=tcn-snack-drink-001&orientation=portrait',
-      'https://readdy.ai/api/search-image?query=snack+vending+machine+interior+organized+spiral+shelves+chips+snacks+drinks+illuminated&width=600&height=800&seq=tcn-snack-drink-002&orientation=portrait',
-      'https://readdy.ai/api/search-image?query=vending+machine+LED+payment+panel+digital+screen+mobile+payment+QR+code&width=600&height=800&seq=tcn-snack-drink-003&orientation=portrait',
-      'https://readdy.ai/api/search-image?query=office+snack+vending+machine+person+selecting+product+modern+workplace&width=600&height=800&seq=tcn-snack-drink-004&orientation=portrait'
+      '/images/machines/nexx-distributeur-snacks-boissons/1.webp',
+      '/images/machines/nexx-distributeur-snacks-boissons/2.webp',
+      '/images/machines/nexx-distributeur-snacks-boissons/3.webp',
+      '/images/machines/nexx-distributeur-snacks-boissons/4.webp'
     ],
     specifications: {
       dimensions: 'H: 194 cm × L: 103,6 cm × P: 79 cm',
@@ -169,12 +169,12 @@ export const machines = [
     badge: '',
     shortDescription: 'Distributeur snack & boissons format slim – 36 spirales / 180 bouteilles',
     description: 'Le TCN-CSC-6G(H5) offre la même technologie que son grand frère dans un format plus étroit, idéal pour les espaces contraints. Avec 36 emplacements snacks et 180 boissons réfrigérées, il convient parfaitement aux PME, salles d\'attente et petits espaces communs.',
-    image: 'https://readdy.ai/api/search-image?query=TCN+compact+slim+snack+drink+vending+machine+narrow+glass+front+illuminated+snacks+beverages&width=600&height=800&seq=tcn-slim-001&orientation=portrait',
+    image: '/images/machines/sapoe-avm/1.webp',
     gallery: [
-      'https://readdy.ai/api/search-image?query=TCN+compact+slim+snack+drink+vending+machine+narrow+glass+front+illuminated+snacks+beverages&width=600&height=800&seq=tcn-slim-001&orientation=portrait',
-      'https://readdy.ai/api/search-image?query=slim+snack+vending+machine+interior+spiral+shelves+compact+design&width=600&height=800&seq=tcn-slim-002&orientation=portrait',
-      'https://readdy.ai/api/search-image?query=compact+vending+machine+payment+panel+LED+screen+mobile+payment&width=600&height=800&seq=tcn-slim-003&orientation=portrait',
-      'https://readdy.ai/api/search-image?query=slim+vending+machine+small+office+waiting+room+installation&width=600&height=800&seq=tcn-slim-004&orientation=portrait'
+      '/images/machines/sapoe-avm/1.webp',
+      '/images/machines/sapoe-avm/2.webp',
+      '/images/machines/sapoe-avm/3.webp',
+      '/images/machines/sapoe-avm/4.webp'
     ],
     specifications: {
       dimensions: 'H: 194 cm × L: 73,2 cm × P: 79 cm',
@@ -214,12 +214,12 @@ export const machines = [
     badge: 'Nouveau',
     shortDescription: 'Distributeur snack & boissons avec grand écran 32" – expérience premium',
     description: 'Le TCN-CSC-10C(32V) redéfinit l\'expérience distributeur grâce à son imposant écran de 32 pouces. Interface intuitive, catalogue produit visuel et publicités en temps réel font de cette machine un outil marketing autant qu\'un distributeur. Capacité identique au modèle standard : 60 spirales et 300 boissons réfrigérées.',
-    image: 'https://readdy.ai/api/search-image?query=TCN+large+screen+32+inch+snack+drink+vending+machine+big+display+premium+modern+commercial&width=600&height=800&seq=tcn-32v-001&orientation=portrait',
+    image: '/images/machines/lecon-good-taste-50s/1.webp',
     gallery: [
-      'https://readdy.ai/api/search-image?query=TCN+large+screen+32+inch+snack+drink+vending+machine+big+display+premium+modern+commercial&width=600&height=800&seq=tcn-32v-001&orientation=portrait',
-      'https://readdy.ai/api/search-image?query=32+inch+touchscreen+vending+machine+display+product+catalog+visual+interface&width=600&height=800&seq=tcn-32v-002&orientation=portrait',
-      'https://readdy.ai/api/search-image?query=large+screen+vending+machine+advertising+display+digital+signage+products&width=600&height=800&seq=tcn-32v-003&orientation=portrait',
-      'https://readdy.ai/api/search-image?query=customer+using+large+screen+vending+machine+selecting+product+modern+mall&width=600&height=800&seq=tcn-32v-004&orientation=portrait'
+      '/images/machines/lecon-good-taste-50s/1.webp',
+      '/images/machines/lecon-good-taste-50s/2.webp',
+      '/images/machines/lecon-good-taste-50s/3.webp',
+      '/images/machines/lecon-good-taste-50s/4.webp'
     ],
     specifications: {
       dimensions: 'H: 194,5 cm × L: 143 cm × P: 79 cm',
@@ -259,12 +259,12 @@ export const machines = [
     badge: 'Premium',
     shortDescription: 'Distributeur snack & boissons avec écran tactile 49" et affichage publicitaire',
     description: 'Le TCN-CSC-8C(50SP) est le fleuron de la gamme distributeurs publicitaires. Son imposant écran tactile de 49 pouces transforme chaque interaction en expérience de marque. Interface de commande intuitive, diffusion de contenus publicitaires HD, et technologie de vente avancée – tout en assurant la distribution de 48 snacks et 240 boissons réfrigérées.',
-    image: 'https://readdy.ai/api/search-image?query=TCN+49+inch+touchscreen+advertising+vending+machine+large+digital+display+snack+drink+premium+commercial&width=600&height=800&seq=tcn-49sp-001&orientation=portrait',
+    image: '/images/machines/sen-coffee-distributeur-cafe-grains/1.webp',
     gallery: [
-      'https://readdy.ai/api/search-image?query=TCN+49+inch+touchscreen+advertising+vending+machine+large+digital+display+snack+drink+premium+commercial&width=600&height=800&seq=tcn-49sp-001&orientation=portrait',
-      'https://readdy.ai/api/search-image?query=49+inch+touch+screen+vending+machine+digital+signage+advertising+mall&width=600&height=800&seq=tcn-49sp-002&orientation=portrait',
-      'https://readdy.ai/api/search-image?query=interactive+vending+machine+touchscreen+product+selection+modern+interface&width=600&height=800&seq=tcn-49sp-003&orientation=portrait',
-      'https://readdy.ai/api/search-image?query=customer+interacting+large+touch+screen+vending+machine+buying+snack&width=600&height=800&seq=tcn-49sp-004&orientation=portrait'
+      '/images/machines/sen-coffee-distributeur-cafe-grains/1.webp',
+      '/images/machines/sen-coffee-distributeur-cafe-grains/2.webp',
+      '/images/machines/sen-coffee-distributeur-cafe-grains/3.webp',
+      '/images/machines/sen-coffee-distributeur-cafe-grains/4.webp'
     ],
     specifications: {
       dimensions: 'H: 196 cm × L: 104,2 cm × P: 89 cm',
@@ -306,12 +306,12 @@ export const machines = [
     badge: 'Tout-en-un',
     shortDescription: 'Solution 3-en-1 : café fraîchement moulu + snacks + boissons réfrigérées',
     description: 'Le TCN-60G-C4 est la solution tout-en-un ultime. Cette machine combine en un seul appareil un système de café fraîchement moulu (130 gobelets), 60 emplacements snacks et un compartiment boissons réfrigérées. Une seule machine pour couvrir tous les besoins, optimisant l\'espace et l\'investissement.',
-    image: 'https://readdy.ai/api/search-image?query=TCN+combo+vending+machine+coffee+snack+drinks+combined+all+in+one+professional+wide+unit&width=600&height=800&seq=tcn-combo-001&orientation=portrait',
+    image: '/images/machines/lecon-machine-cafe-instantane/1.webp',
     gallery: [
-      'https://readdy.ai/api/search-image?query=TCN+combo+vending+machine+coffee+snack+drinks+combined+all+in+one+professional+wide+unit&width=600&height=800&seq=tcn-combo-001&orientation=portrait',
-      'https://readdy.ai/api/search-image?query=combination+vending+machine+coffee+section+freshly+ground+beans+dispenser&width=600&height=800&seq=tcn-combo-002&orientation=portrait',
-      'https://readdy.ai/api/search-image?query=combo+vending+machine+snack+section+spiral+shelves+products+glass+display&width=600&height=800&seq=tcn-combo-003&orientation=portrait',
-      'https://readdy.ai/api/search-image?query=combo+vending+machine+refrigerated+drinks+section+cold+beverages&width=600&height=800&seq=tcn-combo-004&orientation=portrait'
+      '/images/machines/lecon-machine-cafe-instantane/1.webp',
+      '/images/machines/lecon-machine-cafe-instantane/2.webp',
+      '/images/machines/lecon-machine-cafe-instantane/3.webp',
+      '/images/machines/lecon-machine-cafe-instantane/4.webp'
     ],
     specifications: {
       dimensions: 'H: 194 cm × L: 140 cm × P: 79 cm',
@@ -352,12 +352,12 @@ export const machines = [
     badge: '24h/24',
     shortDescription: 'Réfrigérateur intelligent 510L en libre-service 24h/24 – jusqu\'à 200 bouteilles',
     description: 'Le TCN-CFZ-510L est un réfrigérateur intelligent connecté accessible 24h/24. Avec sa capacité de 510 litres et sa plage de température 0–10°C, il maintient vos boissons à la fraîcheur optimale. Son système de paiement intégré et sa gestion à distance en font le choix idéal pour les commerces de proximité, hôtels et espaces connectés.',
-    image: 'https://readdy.ai/api/search-image?query=TCN+smart+fridge+refrigerated+vending+machine+510L+glass+door+cold+drinks+bottles+smart+cooler&width=600&height=800&seq=tcn-fridge-001&orientation=portrait',
+    image: '/images/machines/nexx-distributeur-snacks-boissons/1.webp',
     gallery: [
-      'https://readdy.ai/api/search-image?query=TCN+smart+fridge+refrigerated+vending+machine+510L+glass+door+cold+drinks+bottles+smart+cooler&width=600&height=800&seq=tcn-fridge-001&orientation=portrait',
-      'https://readdy.ai/api/search-image?query=smart+refrigerator+vending+machine+glass+front+cold+bottles+organized+shelves+illuminated&width=600&height=800&seq=tcn-fridge-002&orientation=portrait',
-      'https://readdy.ai/api/search-image?query=smart+fridge+payment+panel+NFC+mobile+payment+temperature+display&width=600&height=800&seq=tcn-fridge-003&orientation=portrait',
-      'https://readdy.ai/api/search-image?query=person+taking+cold+drink+smart+refrigerator+hotel+lobby+24h+service&width=600&height=800&seq=tcn-fridge-004&orientation=portrait'
+      '/images/machines/nexx-distributeur-snacks-boissons/1.webp',
+      '/images/machines/nexx-distributeur-snacks-boissons/2.webp',
+      '/images/machines/nexx-distributeur-snacks-boissons/3.webp',
+      '/images/machines/nexx-distributeur-snacks-boissons/4.webp'
     ],
     specifications: {
       dimensions: 'H: 210 cm × L: 65 cm × P: 69 cm',
@@ -395,12 +395,12 @@ export const machines = [
     badge: '',
     shortDescription: 'Réfrigérateur intelligent grande capacité – 5 étagères, 3 kWh/j, 0-10°C',
     description: 'Le TCN-CFZ-1200(V10) est le réfrigérateur intelligent pour les volumes importants. Avec ses 5 étagères de 30 plateaux chacune, il offre une capacité exceptionnelle pour les grandes surfaces et supermarchés. Sa consommation optimisée de 3 kWh/jour et son système de gestion multi-systèmes IA en font une solution économique et performante.',
-    image: 'https://readdy.ai/api/search-image?query=TCN+large+smart+cooler+refrigerator+1200L+wide+multiple+shelves+glass+door+illuminated+supermarket&width=600&height=800&seq=tcn-cooler-001&orientation=portrait',
+    image: '/images/machines/sapoe-avm/1.webp',
     gallery: [
-      'https://readdy.ai/api/search-image?query=TCN+large+smart+cooler+refrigerator+1200L+wide+multiple+shelves+glass+door+illuminated+supermarket&width=600&height=800&seq=tcn-cooler-001&orientation=portrait',
-      'https://readdy.ai/api/search-image?query=large+smart+refrigerator+multiple+shelves+organized+products+cold+beverages+food&width=600&height=800&seq=tcn-cooler-002&orientation=portrait',
-      'https://readdy.ai/api/search-image?query=smart+cooler+vending+system+payment+panel+NFC+touch+screen&width=600&height=800&seq=tcn-cooler-003&orientation=portrait',
-      'https://readdy.ai/api/search-image?query=supermarket+smart+fridge+large+capacity+commercial+cold+storage&width=600&height=800&seq=tcn-cooler-004&orientation=portrait'
+      '/images/machines/sapoe-avm/1.webp',
+      '/images/machines/sapoe-avm/2.webp',
+      '/images/machines/sapoe-avm/3.webp',
+      '/images/machines/sapoe-avm/4.webp'
     ],
     specifications: {
       dimensions: 'H: 212 cm × L: 126,5 cm × P: 71,5 cm',

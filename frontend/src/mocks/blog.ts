@@ -27,7 +27,7 @@ export const blogArticles = [
     author: 'Amadou Diop',
     authorRole: 'Directeur Général',
     readTime: '5 min',
-    image: 'https://readdy.ai/api/search-image?query=modern%20african%20person%20using%20mobile%20payment%20on%20vending%20machine%2C%20smartphone%20scanning%20QR%20code%2C%20Wave%20Orange%20Money%20interface%2C%20contemporary%20Senegal%20urban%20setting%2C%20digital%20payment%20technology&width=800&height=500&seq=blog-payment-001&orientation=landscape'
+    image: '/images/machines/sen-coffee-distributeur-cafe-grains/3.webp'
   },
   {
     id: 'choisir-distributeur-entreprise',
@@ -52,7 +52,7 @@ export const blogArticles = [
     author: 'Aïssatou Ba',
     authorRole: 'Responsable Commerciale',
     readTime: '7 min',
-    image: 'https://readdy.ai/api/search-image?query=variety%20of%20modern%20vending%20machines%20in%20bright%20corporate%20office%20space%2C%20different%20sizes%20and%20models%2C%20professional%20business%20environment%2C%20clean%20contemporary%20design%2C%20Senegal%20workplace&width=800&height=500&seq=blog-choose-001&orientation=landscape'
+    image: '/images/machines/sapoe-avm/6.webp'
   },
   {
     id: 'maintenance-distributeurs',
@@ -74,7 +74,7 @@ export const blogArticles = [
     author: 'Moussa Ndiaye',
     authorRole: 'Responsable Technique',
     readTime: '6 min',
-    image: 'https://readdy.ai/api/search-image?query=professional%20african%20technician%20maintaining%20vending%20machine%2C%20wearing%20uniform%2C%20using%20diagnostic%20tools%2C%20clean%20technical%20work%2C%20modern%20equipment%20maintenance%2C%20Senegal%20service%20quality&width=800&height=500&seq=blog-maintenance-001&orientation=landscape'
+    image: '/images/machines/nexx-distributeur-snacks-boissons/2.webp'
   },
   {
     id: 'temoignage-sonatel',
@@ -98,7 +98,7 @@ export const blogArticles = [
     author: 'Fatou Sall',
     authorRole: 'Directrice des Opérations',
     readTime: '5 min',
-    image: 'https://readdy.ai/api/search-image?query=happy%20african%20office%20workers%20using%20modern%20vending%20machine%20in%20bright%20corporate%20break%20room%2C%20diverse%20team%2C%20professional%20workplace%2C%20satisfied%20employees%2C%20Senegal%20business%20environment&width=800&height=500&seq=blog-testimonial-001&orientation=landscape'
+    image: '/images/machines/sen-coffee-distributeur-cafe-grains/5.webp'
   },
   {
     id: 'nouveaux-produits-bio',
@@ -120,7 +120,7 @@ export const blogArticles = [
     author: 'Amadou Diop',
     authorRole: 'Directeur Général',
     readTime: '4 min',
-    image: 'https://readdy.ai/api/search-image?query=organic%20healthy%20snacks%20and%20beverages%20display%2C%20fresh%20local%20Senegalese%20products%2C%20natural%20bio%20food%20packaging%2C%20colorful%20healthy%20options%2C%20sustainable%20local%20brands&width=800&height=500&seq=blog-bio-001&orientation=landscape'
+    image: '/images/machines/lecon-machine-cafe-instantane/4.webp'
   },
   {
     id: 'expansion-regions',
@@ -142,6 +142,6 @@ export const blogArticles = [
     author: 'Fatou Sall',
     authorRole: 'Directrice des Opérations',
     readTime: '5 min',
-    image: 'https://readdy.ai/api/search-image?query=map%20of%20Senegal%20with%20location%20markers%2C%20business%20expansion%20concept%2C%20regional%20development%2C%20modern%20logistics%20network%2C%20professional%20business%20growth%20illustration&width=800&height=500&seq=blog-expansion-001&orientation=landscape'
+    image: '/images/machines/sapoe-avm/4.webp'
   }
 ];

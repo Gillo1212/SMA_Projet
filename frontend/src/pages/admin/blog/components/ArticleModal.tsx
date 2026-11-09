@@ -104,7 +104,7 @@ export default function ArticleModal({ mode, article, onClose, onSave }: Props) 
       status: form.status,
       published: form.status === 'published',
       date: form.date,
-      image: form.image || 'https://readdy.ai/api/search-image?query=modern%20professional%20business%20article%20cover%20image%20clean%20minimal&width=800&height=500&seq=article-new-001&orientation=landscape',
+      image: form.image || '/images/machines/sapoe-avm/6.webp',
       content: form.content,
     } as Article;
 

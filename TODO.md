@@ -70,7 +70,7 @@ Le catalogue ne contient plus que les produits de la banque d'images : 5 machine
 - **Catégories machines vides** : « Machines à glace » et « Équipements frigorifiques » n'ont aucun produit. Les garder pour de futurs produits, ou les supprimer depuis l'admin.
 - **Mocks frontend** (`src/mocks/`, utilisés seulement sans `VITE_API_URL`) : toujours l'ancien catalogue TCN.
 - **Panier, checkout, confirmation de commande** : pas d'image de repli si un produit n'a pas de photo.
-- **Logos Wave et Orange Money** : encore chargés depuis readdy.ai (accueil, fiche machine, checkout). À héberger dans `frontend/public/images/`.
+- **Logos Wave et Orange Money** : hébergés dans `frontend/public/images/payments/` ; à remplacer par les fichiers officiels des kits marchands (Wave Business, Orange Money).
 - Le dossier source `Banque d'images_SMA/` (27 Mo) n'est pas suivi par git : décider s'il faut le versionner ou l'ajouter au `.gitignore`. Les versions optimisées (≈ 3 Mo) sont dans `frontend/public/images/`, et les détourages dans `frontend/public/images/cutouts/`.
 
 ## 3 bis. Refonte visuelle : à finir
@@ -103,9 +103,9 @@ Le catalogue ne contient plus que les produits de la banque d'images : 5 machine
   - blog : une image envoyée depuis l'admin était refusée à l'enregistrement ; **créer un article depuis l'admin échouait toujours** (catégorie jamais envoyée) ; aucun moyen de **publier** un article (tout restait en brouillon malgré le message « publié »).
 - **À faire ensuite** : quelques tests de bout en bout dans le navigateur (Playwright) ; lancer les tests automatiquement à chaque push (GitHub Actions, avec un service MySQL).
 
-## 6. ~~Paiement Stripe~~ ✅ décidé le 2026-11-08 : Wave à la place de Stripe (Wave seul pour le moment)
+## 6. ~~Paiement en ligne~~ ✅ décidé le 2026-11-08 : Wave seul pour le moment
 
-- Stripe abandonné : paquet `@stripe/react-stripe-js` retiré du frontend, `STRIPE_SECRET_KEY` / `VITE_STRIPE_PUBLIC_KEY` retirées de `.env.example` et des CLAUDE.md, mention « Carte bancaire » retirée du devis PDF.
+- Pas de paiement par carte bancaire en ligne ; mention « Carte bancaire » retirée du devis PDF.
 - L'API refuse désormais `payment_method: 'card'` (400). Une ancienne commande « carte » encore en attente se règle par Wave (`POST /api/payments/initiate` la bascule sur Wave). La valeur `card` reste dans l'ENUM de la base et son libellé reste affiché, pour l'historique.
 - Les « Carte bancaire » des fiches machines (moyens de paiement acceptés par le distributeur lui-même) ne sont pas concernées.
 - **Wave seul pour le moment** (décision du 2026-11-08) : Orange Money n'est plus proposé au checkout et l'API refuse `orange_money` pour une nouvelle commande ; une commande Orange Money encore en attente se règle par Wave. Le code Orange Money (`orangeMoney.provider.js`) et ses webhooks restent en place : pour le réactiver, l'ajouter à `ONLINE_METHODS` (`backend/services/payment/index.js`) et remettre son choix dans `frontend/src/pages/checkout/page.tsx`. Les textes marketing qui citent Orange Money parlent des distributeurs (moyens de paiement acceptés par les machines), pas du site.
@@ -118,11 +118,11 @@ Le catalogue ne contient plus que les produits de la banque d'images : 5 machine
 - Supprimés : les anciennes copies de fichiers du frontend dans `backend/` (`index.html`, `vite.config.ts`, `vite-env.d.ts`, `tailwind.config.ts`, `postcss.config.ts`, `eslint.config.ts`, `tsconfig*.json`), utilisées par aucun script du backend ; la page morte `commande/confirmation` et sa route (l'adresse affiche maintenant la page 404) ; les brouillons `SMA.session.sql` et `backend/SenMartAli.session.sql`. Les `*.session.sql` sont désormais ignorés par git.
 - Vérifié : compilation TypeScript, ESLint et build de production ; API démarrée ; dans Chrome, page 404 sur l'ancienne adresse, panier et checkout intacts.
 - **Reste de ton côté** : la vidéo `WhatsApp Video 2026-03-29 at 19.18.16.mp4` (6 Mo, ignorée par git) est toujours à la racine : la déplacer ou la supprimer toi-même (elle n'est pas dans git, une suppression serait définitive).
-- **Reste** : images encore hébergées chez readdy.ai (accueil, À propos, blog, mocks, logos Wave / Orange Money) à remplacer par des visuels propres à SMALIM (voir aussi §3).
+- **Fait le 2026-11-09** : plus aucune ressource chargée depuis l'outil qui a généré le site (logos de paiement rapatriés, emails avec le nom SMALIM en texte, données fictives illustrées par les photos du catalogue). Reste à remplacer les visuels provisoires par des visuels propres à SMALIM (voir aussi §3).
 
 ## 8. ~~Messages de contact et newsletter~~ ✅ fait le 2026-11-09
 
-- **Avant** : le formulaire de la page Contact envoyait les messages à un service tiers (`readdy.ai`, l'outil qui a généré le site), jamais au backend ; le bouton « S'inscrire » de la newsletter ne faisait que vider le champ.
+- **Avant** : le formulaire de la page Contact envoyait les messages à un service tiers (l'outil qui a généré le site), jamais au backend ; le bouton « S'inscrire » de la newsletter ne faisait que vider le champ.
 - **Maintenant** : messages et inscrits enregistrés en base ; email à l'équipe (Paramètres → Notifications → « Nouveau message de contact ») et accusé de réception au visiteur ; pages admin « Messages » (pastille des non lus, lu / répondu / archivé, note interne, répondre par email ou WhatsApp) et « Newsletter » (liste, désinscription, export CSV) ; lien de désinscription dans l'email de bienvenue ; protection anti-robot et limite de débit. Testé dans le navigateur et par 20 tests d'API.
-- **À faire de ton côté** : renseigner l'email de l'équipe dans Paramètres → Notifications (vide en développement : aucune notification ne part) ; récupérer dans ton compte Readdy les messages éventuellement reçus avant ce changement.
+- **À faire de ton côté** : renseigner l'email de l'équipe dans Paramètres → Notifications (vide en développement : aucune notification ne part) ; récupérer auprès de l'ancien outil de formulaire les messages éventuellement reçus avant ce changement.
 - **Plus tard** : envoi de campagnes (aujourd'hui : export CSV vers Brevo / Mailchimp) ; double confirmation de l'inscription si nécessaire.

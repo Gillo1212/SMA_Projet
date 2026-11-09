@@ -40,8 +40,8 @@ export const products: Product[] = [
     isAvailable: true,
     isPopular: true,
     images: [
-      'https://readdy.ai/api/search-image?query=Premium%20arabica%20coffee%20powder%20bag%20on%20clean%20white%20surface%20with%20coffee%20beans%20scattered%20around%2C%20professional%20product%20photography%2C%20bright%20lighting%2C%20high%20quality%20packaging%20design%2C%20modern%20minimalist%20aesthetic%2C%20commercial%20product%20shot&width=800&height=800&seq=001&orientation=squarish',
-      'https://readdy.ai/api/search-image?query=Close%20up%20of%20rich%20dark%20brown%20arabica%20coffee%20powder%20texture%20in%20white%20ceramic%20bowl%2C%20macro%20photography%2C%20studio%20lighting%2C%20premium%20quality%20coffee%20grounds&width=800&height=800&seq=002&orientation=squarish'
+      '/images/products/craft-roasters-cafe-colombie/1.webp',
+      '/images/products/craft-roasters-cafe-colombie/2.webp'
     ],
     description: 'Notre café Arabica Premium est soigneusement sélectionné dans les meilleures plantations d\'Amérique du Sud. Son arôme intense et son goût corsé en font le choix parfait pour les amateurs de café authentique. Torréfaction artisanale pour préserver tous les arômes.',
     ingredients: '100% café Arabica pur',
@@ -68,7 +68,7 @@ export const products: Product[] = [
     isAvailable: true,
     isNew: true,
     images: [
-      'https://readdy.ai/api/search-image?query=Premium%20robusta%20coffee%20powder%20package%20on%20white%20background%2C%20intense%20dark%20roast%2C%20professional%20product%20photography%2C%20modern%20packaging%20design%2C%20studio%20lighting%2C%20commercial%20quality&width=800&height=800&seq=003&orientation=squarish'
+      '/images/products/kingsmill-creamy-hot-chocolate/1.webp'
     ],
     description: 'Un café robusta au caractère bien trempé, idéal pour ceux qui recherchent un expresso puissant et énergisant. Cultivé en Afrique et en Asie, ce café offre une crème onctueuse et une amertume équilibrée.',
     ingredients: '100% café Robusta',
@@ -93,7 +93,7 @@ export const products: Product[] = [
     stock: 120,
     isAvailable: true,
     images: [
-      'https://readdy.ai/api/search-image?query=Premium%20hot%20chocolate%20powder%20tin%20container%20on%20white%20surface%2C%20rich%20chocolate%20color%2C%20professional%20product%20photography%2C%20modern%20packaging%2C%20studio%20lighting%2C%20commercial%20shot&width=800&height=800&seq=004&orientation=squarish'
+      '/images/products/kingsmill-french-vanilla-cappuccino/1.webp'
     ],
     description: 'Une poudre de chocolat chaud onctueuse et gourmande, parfaite pour les pauses réconfortantes. Fabriquée avec du cacao de qualité supérieure, elle se dissout facilement et offre une texture veloutée.',
     ingredients: 'Sucre, cacao en poudre (25%), lait écrémé en poudre, émulsifiant (lécithine de soja)',
@@ -119,7 +119,7 @@ export const products: Product[] = [
     isAvailable: true,
     isPopular: true,
     images: [
-      'https://readdy.ai/api/search-image?query=Vanilla%20cappuccino%20powder%20package%20on%20clean%20white%20background%2C%20creamy%20color%20packaging%2C%20professional%20product%20photography%2C%20modern%20design%2C%20studio%20lighting%2C%20commercial%20quality%20shot&width=800&height=800&seq=005&orientation=squarish'
+      '/images/products/kingsmill-creamy-white-hot-chocolate/1.webp'
     ],
     description: 'Un cappuccino onctueux aux notes délicates de vanille naturelle. Le mélange parfait de café, de lait et de vanille pour une pause gourmande et raffinée. Mousse légère garantie.',
     ingredients: 'Sucre, lait écrémé en poudre, café soluble (15%), arôme naturel de vanille, stabilisant',
@@ -146,7 +146,7 @@ export const products: Product[] = [
     isAvailable: true,
     isPopular: true,
     images: [
-      'https://readdy.ai/api/search-image?query=Premium%20sea%20salt%20potato%20chips%20bag%20on%20white%20background%2C%20golden%20crispy%20chips%2C%20professional%20product%20photography%2C%20modern%20packaging%20design%2C%20studio%20lighting%2C%20commercial%20quality&width=800&height=800&seq=006&orientation=squarish'
+      '/images/products/kingsmill-iced-cappuccino/1.webp'
     ],
     description: 'Des chips croustillantes parfaitement salées au sel de mer. Pommes de terre sélectionnées et frites à la perfection pour un goût authentique et irrésistible.',
     ingredients: 'Pommes de terre, huile de tournesol, sel de mer (1,5%)',
@@ -171,7 +171,7 @@ export const products: Product[] = [
     stock: 180,
     isAvailable: true,
     images: [
-      'https://readdy.ai/api/search-image?query=Paprika%20flavored%20potato%20chips%20tube%20on%20white%20background%2C%20red%20colored%20packaging%2C%20professional%20product%20photography%2C%20modern%20design%2C%20studio%20lighting%2C%20commercial%20shot&width=800&height=800&seq=007&orientation=squarish'
+      '/images/products/craft-roasters-cafe-colombie/3.webp'
     ],
     description: 'Des chips empilables au délicieux goût de paprika fumé. Forme parfaite et croquant incomparable pour des moments de partage savoureux.',
     ingredients: 'Pommes de terre déshydratées, huiles végétales, farine de blé, fécule de maïs, arôme paprika, sel',
@@ -196,7 +196,7 @@ export const products: Product[] = [
     isAvailable: true,
     isNew: true,
     images: [
-      'https://readdy.ai/api/search-image?query=Premium%20chocolate%20sandwich%20cookies%20package%20on%20white%20background%2C%20dark%20cookies%20with%20cream%20filling%2C%20professional%20product%20photography%2C%20modern%20packaging%2C%20studio%20lighting%2C%20commercial%20quality&width=800&height=800&seq=008&orientation=squarish'
+      '/images/products/craft-roasters-cafe-colombie/1.webp'
     ],
     description: 'Les biscuits sandwich au chocolat les plus célèbres au monde. Deux biscuits croquants au cacao enrobent une délicieuse crème vanillée.',
     ingredients: 'Farine de blé, sucre, huiles végétales, cacao maigre en poudre (4,6%), sirop de glucose-fructose, arômes',
@@ -220,7 +220,7 @@ export const products: Product[] = [
     stock: 140,
     isAvailable: true,
     images: [
-      'https://readdy.ai/api/search-image?query=Chocolate%20cereal%20bars%20multipack%20on%20white%20background%2C%20healthy%20snack%20bars%20with%20chocolate%20coating%2C%20professional%20product%20photography%2C%20modern%20packaging%2C%20studio%20lighting%2C%20commercial%20shot&width=800&height=800&seq=009&orientation=squarish'
+      '/images/products/craft-roasters-cafe-colombie/2.webp'
     ],
     description: 'Des barres de céréales enrobées de chocolat noir, parfaites pour une pause énergétique. Source de fibres et de vitamines, elles allient plaisir et équilibre.',
     ingredients: 'Céréales (riz, blé complet), chocolat noir (25%), sirop de glucose, sucre, huile de tournesol, vitamines',
@@ -247,7 +247,7 @@ export const products: Product[] = [
     isAvailable: true,
     isPopular: true,
     images: [
-      'https://readdy.ai/api/search-image?query=Classic%20red%20Coca%20Cola%20can%20on%20white%20background%2C%20condensation%20droplets%2C%20professional%20product%20photography%2C%20studio%20lighting%2C%20commercial%20quality%20shot%2C%20iconic%20red%20can&width=800&height=800&seq=010&orientation=squarish'
+      '/images/products/kingsmill-creamy-hot-chocolate/1.webp'
     ],
     description: 'La boisson gazeuse iconique au goût unique et rafraîchissant. Depuis plus d\'un siècle, Coca-Cola accompagne vos moments de plaisir et de partage.',
     ingredients: 'Eau gazéifiée, sucre, colorant E150d, acidifiant acide phosphorique, arômes naturels, caféine',
@@ -272,7 +272,7 @@ export const products: Product[] = [
     stock: 450,
     isAvailable: true,
     images: [
-      'https://readdy.ai/api/search-image?query=Green%20Sprite%20lemon%20soda%20can%20on%20white%20background%2C%20fresh%20condensation%20droplets%2C%20professional%20product%20photography%2C%20studio%20lighting%2C%20commercial%20quality%2C%20refreshing%20appearance&width=800&height=800&seq=011&orientation=squarish'
+      '/images/products/kingsmill-french-vanilla-cappuccino/1.webp'
     ],
     description: 'Une limonade pétillante au goût citron authentique. Sans colorants artificiels, Sprite est la boisson rafraîchissante idéale pour étancher votre soif.',
     ingredients: 'Eau gazéifiée, sucre, acidifiant acide citrique, arômes naturels de citron et citron vert',
@@ -296,7 +296,7 @@ export const products: Product[] = [
     stock: 400,
     isAvailable: true,
     images: [
-      'https://readdy.ai/api/search-image?query=Orange%20Fanta%20can%20on%20white%20background%2C%20bright%20orange%20colored%20soda%2C%20condensation%20droplets%2C%20professional%20product%20photography%2C%20studio%20lighting%2C%20commercial%20quality%20shot&width=800&height=800&seq=012&orientation=squarish'
+      '/images/products/kingsmill-creamy-white-hot-chocolate/1.webp'
     ],
     description: 'Le goût fruité et pétillant de l\'orange dans une boisson désaltérante. Fanta Orange apporte une touche de fun et de fraîcheur à vos journées.',
     ingredients: 'Eau gazéifiée, sucre, jus d\'orange à base de concentré (4%), acidifiant acide citrique, arômes naturels, colorant bêta-carotène',
@@ -321,7 +321,7 @@ export const products: Product[] = [
     isAvailable: true,
     isNew: true,
     images: [
-      'https://readdy.ai/api/search-image?query=Premium%20Evian%20mineral%20water%20bottle%20on%20white%20background%2C%20clear%20plastic%20bottle%20with%20blue%20label%2C%20professional%20product%20photography%2C%20studio%20lighting%2C%20commercial%20quality%2C%20pure%20and%20clean%20aesthetic&width=800&height=800&seq=013&orientation=squarish'
+      '/images/products/kingsmill-iced-cappuccino/1.webp'
     ],
     description: 'Une eau minérale naturelle pure, provenant des Alpes françaises. Équilibrée en minéraux, Evian est l\'eau idéale pour une hydratation quotidienne optimale.',
     ingredients: 'Eau minérale naturelle',
