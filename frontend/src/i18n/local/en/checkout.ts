@@ -103,6 +103,8 @@ export default {
     failedKept: 'Your order is kept: you can restart the payment.',
     seeOrders: 'View my orders',
     backToCart: 'Back to cart',
+    retryWave: 'Retry the Wave payment',
+    retrying: 'Opening Wave…',
     timeoutTitle: 'Confirmation pending',
     timeoutHint:
       'Your payment is still being processed by the provider. No charge is lost: as soon as it arrives, your order will automatically be confirmed.',

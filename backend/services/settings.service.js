@@ -103,6 +103,7 @@ const DEFINITIONS = {
   notif_new_order:   { default: '1', validate: bool },
   notif_new_quote:   { default: '1', validate: bool },
   notif_new_client:  { default: '0', validate: bool },
+  notif_new_contact: { default: '1', validate: bool },
   notif_low_stock:   { default: '1', validate: bool },
   notif_admin_email: { default: '',  validate: email },
   /** Alerte « stock faible » quand le stock d'un article passe à ce niveau ou en dessous */

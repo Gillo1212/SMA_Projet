@@ -53,7 +53,10 @@
           "<rootDir>/tests/api/env.js"
         ],
         "globalSetup": "<rootDir>/tests/api/globalSetup.js",
-        "clearMocks": true
+        "clearMocks": true,
+        "setupFilesAfterEnv": [
+          "<rootDir>/tests/api/timeout.js"
+        ]
       }
     ]
   }

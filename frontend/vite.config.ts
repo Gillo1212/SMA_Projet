@@ -5,6 +5,8 @@ import AutoImport from "unplugin-auto-import/vite";
 
 const base = process.env.BASE_PATH || "/";
 const isPreview = process.env.IS_PREVIEW ? true : false;
+/** Backend local vers lequel le serveur de dev relaie /api et /uploads */
+const backendProxyTarget = process.env.BACKEND_PROXY_TARGET || "http://localhost:5000";
 // https://vite.dev/config/
 export default defineConfig({
   define: {
@@ -79,5 +81,13 @@ export default defineConfig({
   server: {
     port: 5173,
     host: "0.0.0.0",
+    // Tunnel HTTPS ngrok (Wave exige du https, même en développement)
+    allowedHosts: [".ngrok-free.app", ".ngrok-free.dev", ".ngrok.app", ".ngrok.dev"],
+    // Avec VITE_API_URL=/api, l'API et les images passent par ce serveur : une
+    // seule adresse (locale ou tunnel) pour le site, l'API et le webhook Wave.
+    proxy: {
+      "/api": { target: backendProxyTarget },
+      "/uploads": { target: backendProxyTarget },
+    },
   },
 });

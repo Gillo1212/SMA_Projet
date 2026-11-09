@@ -103,6 +103,8 @@ export default {
     failedKept: 'Votre commande est conservée : vous pouvez relancer le règlement.',
     seeOrders: 'Voir mes commandes',
     backToCart: 'Retour au panier',
+    retryWave: 'Relancer le paiement Wave',
+    retrying: 'Ouverture de Wave…',
     timeoutTitle: 'Confirmation en attente',
     timeoutHint:
       "Votre paiement est toujours en cours de traitement chez le prestataire. Aucun débit n'est perdu : dès réception, votre commande passera automatiquement en confirmée.",

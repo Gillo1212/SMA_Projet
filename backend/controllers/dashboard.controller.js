@@ -14,10 +14,11 @@ const LAST_MONTH = "created_at >= DATE_FORMAT(CURDATE() - INTERVAL 1 MONTH, '%Y-
  * GET /api/dashboard/counters
  */
 async function loadCounters() {
-  const [orders, quotes, tickets] = await Promise.all([
+  const [orders, quotes, tickets, contact] = await Promise.all([
     query('SELECT status, COUNT(*) AS n FROM orders GROUP BY status'),
     query('SELECT status, COUNT(*) AS n FROM quotes GROUP BY status'),
     queryOne("SELECT COUNT(*) AS n FROM support_tickets WHERE status IN ('open','in_progress')"),
+    queryOne("SELECT COUNT(*) AS n FROM contact_messages WHERE status = 'new'"),
   ]);
   const byStatus = rows => Object.fromEntries(rows.map(r => [r.status, Number(r.n)]));
   const o = byStatus(orders);
@@ -31,6 +32,8 @@ async function loadCounters() {
     quotes_new: q.pending ?? 0,
     quotes_to_handle: (q.pending ?? 0) + (q.processing ?? 0),
     open_tickets: Number(tickets.n),
+    /** Messages de contact pas encore ouverts */
+    contact_new: Number(contact.n),
   };
 }
 

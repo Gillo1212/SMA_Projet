@@ -41,7 +41,7 @@ const TABLES = [
   'ticket_messages', 'support_tickets', 'invoices', 'client_machines', 'payment_transactions',
   'order_tracking', 'order_items', 'orders', 'quotes', 'blog_articles', 'blog_categories',
   'products', 'product_categories', 'machines', 'machine_categories', 'promo_codes',
-  'auth_tokens', 'settings', 'clients', 'admins',
+  'auth_tokens', 'settings', 'contact_messages', 'newsletter_subscribers', 'clients', 'admins',
 ];
 
 const json = v => JSON.stringify(v);

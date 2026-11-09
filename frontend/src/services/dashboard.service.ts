@@ -120,6 +120,8 @@ export interface AdminCounters {
   /** Nouveaux + en cours */
   quotesToHandle: number;
   openTickets: number;
+  /** Messages de contact pas encore ouverts */
+  contactNew: number;
 }
 
 // ── Service ────────────────────────────────────────────────────────────────
@@ -137,6 +139,7 @@ export const dashboardService = {
       quotesNew: toNumber(raw.quotes_new),
       quotesToHandle: toNumber(raw.quotes_to_handle),
       openTickets: toNumber(raw.open_tickets),
+      contactNew: toNumber(raw.contact_new),
     };
   },
 

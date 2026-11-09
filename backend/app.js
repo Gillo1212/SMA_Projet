@@ -25,6 +25,8 @@ const uploadRoutes = require('./routes/upload');
 const paymentsRoutes = require('./routes/payments');
 const settingsRoutes = require('./routes/settings');
 const promoCodesRoutes = require('./routes/promoCodes');
+const contactRoutes = require('./routes/contact');
+const newsletterRoutes = require('./routes/newsletter');
 
 const app = express();
 
@@ -36,6 +38,11 @@ const app = express();
 // ferait bloquer par le navigateur.
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 if (process.env.NODE_ENV !== 'test') app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
+
+// Derrière un relais (serveur Vite, tunnel ngrok, reverse proxy), l'adresse du
+// visiteur est dans X-Forwarded-For : sans cela, la limite de débit compterait
+// tout le monde comme une seule adresse. Par défaut, seul un relais local est cru.
+app.set('trust proxy', process.env.TRUST_PROXY || 'loopback');
 
 // CORS
 app.use(cors({
@@ -73,6 +80,15 @@ if (!isTest) app.use([
   '/api/auth/resend-verification',
 ], authLimiter);
 
+// Formulaires publics (contact, newsletter) : limite anti-spam par adresse IP
+const publicFormLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: { success: false, message: 'Trop d’envois depuis cette connexion. Réessayez dans quelques minutes.' },
+});
+if (!isTest) app.use(['/api/contact', '/api/newsletter/subscribe'], (req, res, next) =>
+  (req.method === 'POST' ? publicFormLimiter(req, res, next) : next()));
+
 // Body parsers
 // `verify` conserve les octets reçus : la signature des webhooks de paiement
 // se calcule sur le corps brut, pas sur le JSON re-sérialisé.
@@ -101,6 +117,8 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/payments', paymentsRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/promo-codes', promoCodesRoutes);
+app.use('/api/contact', contactRoutes);
+app.use('/api/newsletter', newsletterRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

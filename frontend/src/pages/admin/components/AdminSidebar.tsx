@@ -21,6 +21,8 @@ const navItems: NavItem[] = [
   { to: '/admin/machines', label: 'Machines', icon: 'ri-settings-2-line' },
   { to: '/admin/produits', label: 'Produits', icon: 'ri-archive-line' },
   { to: '/admin/clients', label: 'Clients', icon: 'ri-group-line' },
+  { to: '/admin/messages', label: 'Messages', icon: 'ri-mail-line' },
+  { to: '/admin/newsletter', label: 'Newsletter', icon: 'ri-mail-send-line' },
   { to: '/admin/blog', label: 'Blog', icon: 'ri-article-line' },
 ];
 
@@ -39,6 +41,7 @@ export default function AdminSidebar({ onClose }: AdminSidebarProps) {
   const badges: Record<string, { value: number; title: string } | undefined> = {
     '/admin/commandes': counters ? { value: counters.ordersNew, title: `${counters.ordersNew} commande(s) en attente` } : undefined,
     '/admin/devis': counters ? { value: counters.quotesNew, title: `${counters.quotesNew} nouvelle(s) demande(s) de devis` } : undefined,
+    '/admin/messages': counters ? { value: counters.contactNew, title: `${counters.contactNew} message(s) non lu(s)` } : undefined,
   };
 
   const handleLogout = async () => {

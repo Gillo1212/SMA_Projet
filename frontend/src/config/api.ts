@@ -129,6 +129,25 @@ export const ENDPOINTS = {
     DELETE: (id: number) => `/promo-codes/${id}`,
   },
 
+  // ── Messages de contact ───────────────────────────────────
+  // POST public (page Contact) ; liste et traitement dans le back-office
+  CONTACT: {
+    SEND:   '/contact',
+    LIST:   '/contact',
+    UPDATE: (id: number) => `/contact/${id}`,
+    DELETE: (id: number) => `/contact/${id}`,
+  },
+
+  // ── Newsletter ────────────────────────────────────────────
+  NEWSLETTER: {
+    SUBSCRIBE:   '/newsletter/subscribe',
+    UNSUBSCRIBE: '/newsletter/unsubscribe',
+    LIST:        '/newsletter',
+    EXPORT:      '/newsletter/export',
+    UPDATE: (id: number) => `/newsletter/${id}`,
+    DELETE: (id: number) => `/newsletter/${id}`,
+  },
+
   // ── Images (back-office) ──────────────────────────────────
   // Backend : POST /api/upload/image (multipart, champ `image`) → { url: '/uploads/…' }
   UPLOAD: {

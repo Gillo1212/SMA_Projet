@@ -6,6 +6,7 @@ import Footer from '../home/components/Footer';
 import CTABanner from '../../components/feature/CTABanner';
 import PageHero from '../../components/feature/PageHero';
 import { useMachines } from '../../hooks/useMachines';
+import { revealDelay } from '../../components/feature/RevealObserver';
 
 export default function MachinesPage() {
   const { t } = useTranslation();
@@ -108,23 +109,26 @@ export default function MachinesPage() {
             <p className="text-sm text-[#00272B]/60 mb-8">{t('machines.count', { count: filteredMachines.length })}</p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredMachines.map(machine => (
+              {filteredMachines.map((machine, index) => (
                 <Link
                   key={machine.id}
                   to={`/machines/${machine.slug}`}
-                  className="group flex flex-col bg-white rounded-2xl border border-[#00272B]/10 overflow-hidden hover:border-[#00272B]/25 hover:shadow-[0_20px_40px_-24px_rgba(0,39,43,0.35)] transition-all"
+                  data-reveal
+                  style={revealDelay(index % 3)}
+                  className="group card-lift flex flex-col bg-white rounded-2xl border border-[#00272B]/10 overflow-hidden hover:border-[#1AAA3F]/40"
                 >
-                  <div className="relative h-80 bg-white flex items-center justify-center p-6">
+                  <div className="media-stage relative h-80 flex items-center justify-center p-6">
                     {machine.image ? (
                       <img
                         src={machine.image}
                         alt={machine.name}
-                        className="max-h-full w-auto object-contain group-hover:scale-[1.03] transition-transform duration-500"
+                        loading="lazy"
+                        className="max-h-full w-auto object-contain group-hover:scale-[1.06] transition-transform duration-700 ease-out"
                       />
                     ) : (
                       <i className="ri-store-line text-6xl text-[#00272B]/15"></i>
                     )}
-                    <span className="absolute top-4 left-4 px-3 py-1 bg-[#F6F3EC] text-[#00272B] text-xs font-semibold rounded-full">
+                    <span className="absolute top-4 left-4 px-3 py-1 bg-white/90 backdrop-blur text-[#00272B] text-xs font-semibold rounded-full shadow-sm">
                       {machine.stock}
                     </span>
                   </div>
@@ -153,7 +157,7 @@ export default function MachinesPage() {
                           {machine.price > 0 ? machine.priceDisplay : t('common.onQuote')}
                         </p>
                       </div>
-                      <span className="w-10 h-10 rounded-full border border-[#00272B]/15 flex items-center justify-center text-[#00272B] group-hover:bg-[#00272B] group-hover:text-white transition-colors">
+                      <span className="w-10 h-10 rounded-full border border-[#00272B]/15 flex items-center justify-center text-[#00272B] group-hover:bg-[#1AAA3F] group-hover:border-[#1AAA3F] group-hover:text-white group-hover:rotate-45 transition-all duration-300">
                         <i className="ri-arrow-right-up-line"></i>
                       </span>
                     </div>

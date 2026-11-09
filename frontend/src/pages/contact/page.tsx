@@ -6,6 +6,7 @@ import PageHero from '../../components/feature/PageHero';
 import CTABanner from '../../components/feature/CTABanner';
 import { useShopConfig } from '../../hooks/useShopConfig';
 import { telHref, whatsappHref } from '../../utils/contact';
+import { contactService } from '../../services/contact.service';
 
 export default function ContactPage() {
   const { t } = useTranslation();
@@ -31,6 +32,9 @@ export default function ContactPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [errorDetail, setErrorDetail] = useState<string | null>(null);
+  // Champ piège invisible : seul un robot le remplit (le serveur ignore alors l'envoi)
+  const [website, setWebsite] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({
@@ -44,34 +48,28 @@ export default function ContactPage() {
     setIsSubmitting(true);
     setSubmitStatus('idle');
 
+    setErrorDetail(null);
     try {
-      const formBody = new URLSearchParams();
-      Object.entries(formData).forEach(([key, value]) => {
-        formBody.append(key, value);
+      await contactService.send({
+        name: formData.nom,
+        email: formData.email,
+        phone: formData.telephone,
+        subject: formData.sujet,
+        message: formData.message,
+        website,
       });
-
-      const response = await fetch('https://readdy.ai/api/form/d6sblelsbgrc47fimvfg', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: formBody.toString()
+      setSubmitStatus('success');
+      setFormData({
+        nom: '',
+        email: '',
+        telephone: '',
+        sujet: '',
+        message: ''
       });
-
-      if (response.ok) {
-        setSubmitStatus('success');
-        setFormData({
-          nom: '',
-          email: '',
-          telephone: '',
-          sujet: '',
-          message: ''
-        });
-      } else {
-        setSubmitStatus('error');
-      }
     } catch (error) {
       setSubmitStatus('error');
+      // Message du serveur (champ invalide, trop d'envois…) quand il y en a un
+      setErrorDetail(error instanceof Error ? error.message : null);
     } finally {
       setIsSubmitting(false);
     }
@@ -123,7 +121,13 @@ export default function ContactPage() {
                 {t('contact.formHint')}
               </p>
 
-              <form id="contact-form" data-readdy-form onSubmit={handleSubmit} className="space-y-6">
+              <form id="contact-form" onSubmit={handleSubmit} className="space-y-6">
+                <div aria-hidden="true" className="absolute -left-[9999px] w-px h-px overflow-hidden">
+                  <label>
+                    Site web
+                    <input type="text" name="website" tabIndex={-1} autoComplete="off" value={website} onChange={e => setWebsite(e.target.value)} />
+                  </label>
+                </div>
                 <div>
                   <label htmlFor="nom" className="block text-sm font-semibold text-[#00272B] mb-2">
                     {t('contact.fullName')}
@@ -237,7 +241,7 @@ export default function ContactPage() {
                       <i className="ri-error-warning-line text-xl"></i>
                       <span className="font-semibold">{t('contact.errorTitle')}</span>
                     </div>
-                    <p className="text-sm mt-1">{t('contact.errorHint')}</p>
+                    <p className="text-sm mt-1">{errorDetail && errorDetail !== 'Erreur serveur' ? `${errorDetail}. ` : ''}{t('contact.errorHint')}</p>
                   </div>
                 )}
               </form>

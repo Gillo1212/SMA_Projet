@@ -34,6 +34,9 @@ const AdminProduitsPage = lazy(() => import('../pages/admin/produits/page'));
 const AdminClientsPage = lazy(() => import('../pages/admin/clients/page'));
 const AdminBlogPage = lazy(() => import('../pages/admin/blog/page'));
 const AdminParametresPage = lazy(() => import('../pages/admin/parametres/page'));
+const AdminMessagesPage = lazy(() => import('../pages/admin/messages/page'));
+const AdminNewsletterPage = lazy(() => import('../pages/admin/newsletter/page'));
+const NewsletterDesinscriptionPage = lazy(() => import('../pages/newsletter/desinscription/page'));
 
 const ClientConnexionPage = lazy(() => import('../pages/espace-client/connexion/page'));
 const ClientLayout = lazy(() => import('../pages/espace-client/layout'));
@@ -99,6 +102,11 @@ const routes: RouteObject[] = [
     element: <CheckoutPage />,
   },
   {
+    // Lien de désinscription des emails de la newsletter
+    path: '/newsletter/desinscription',
+    element: <NewsletterDesinscriptionPage />,
+  },
+  {
     // Retour depuis le prestataire de paiement
     path: '/paiement/retour',
     element: <PaiementRetourPage />,
@@ -144,6 +152,8 @@ const routes: RouteObject[] = [
       { path: 'produits', element: <AdminProduitsPage /> },
       { path: 'clients', element: <AdminClientsPage /> },
       { path: 'blog', element: <AdminBlogPage /> },
+      { path: 'messages', element: <AdminMessagesPage /> },
+      { path: 'newsletter', element: <AdminNewsletterPage /> },
       { path: 'parametres', element: <AdminParametresPage /> },
     ],
   },

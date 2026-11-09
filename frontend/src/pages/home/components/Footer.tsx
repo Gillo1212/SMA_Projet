@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
+import { newsletterService } from '../../../services/newsletter.service';
 
 const SOCIALS = [
   { label: 'Instagram', icon: 'ri-instagram-line', href: 'https://www.instagram.com/senmartalim?igsh=MXFlMHBjbGNvNmI2cQ%3D%3D&utm_source=qr' },
@@ -9,12 +10,21 @@ const SOCIALS = [
 ];
 
 export default function Footer() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [email, setEmail] = useState('');
+  const [website, setWebsite] = useState(''); // champ piège anti-robot
+  const [state, setState] = useState<'idle' | 'sending' | 'done' | 'error'>('idle');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setEmail('');
+    setState('sending');
+    try {
+      await newsletterService.subscribe(email, i18n.language, website);
+      setEmail('');
+      setState('done');
+    } catch {
+      setState('error');
+    }
   };
 
   const linkClass = 'block text-sm text-white/60 hover:text-white transition-colors';
@@ -70,21 +80,30 @@ export default function Footer() {
             <p className="eyebrow text-white/40 mb-5">{t('footer.stayInformed')}</p>
             <p className="text-sm text-white/60 mb-5">{t('footer.newsletterHint')}</p>
             <form onSubmit={handleSubmit} className="flex gap-2">
+              <div aria-hidden="true" className="absolute -left-[9999px] w-px h-px overflow-hidden">
+                <input type="text" name="website" tabIndex={-1} autoComplete="off" value={website} onChange={(e) => setWebsite(e.target.value)} />
+              </div>
               <input
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => { setEmail(e.target.value); if (state !== 'sending') setState('idle'); }}
                 placeholder={t('footer.emailPlaceholder')}
+                aria-label={t('footer.emailPlaceholder')}
                 className="flex-1 min-w-0 h-12 bg-white/5 border border-white/15 rounded-md px-4 text-white placeholder-white/40 text-sm focus:outline-none focus:border-[#4FD07A] transition-colors"
                 required
               />
               <button
                 type="submit"
-                className="h-12 px-5 bg-[#1AAA3F] text-white text-sm font-semibold rounded-md hover:bg-[#0D8C2E] transition-colors whitespace-nowrap"
+                disabled={state === 'sending'}
+                className="h-12 px-5 bg-[#1AAA3F] text-white text-sm font-semibold rounded-md hover:bg-[#0D8C2E] disabled:opacity-60 transition-colors whitespace-nowrap"
               >
-                {t('footer.subscribe')}
+                {state === 'sending' ? <i className="ri-loader-4-line animate-spin" aria-label={t('footer.subscribing')}></i> : t('footer.subscribe')}
               </button>
             </form>
+            <p role="status" aria-live="polite" className={`text-sm mt-3 min-h-[1.25rem] ${state === 'error' ? 'text-red-300' : 'text-[#4FD07A]'}`}>
+              {state === 'done' && <><i className="ri-checkbox-circle-line mr-1"></i>{t('footer.subscribed')}</>}
+              {state === 'error' && t('footer.subscribeError')}
+            </p>
           </div>
         </div>
 

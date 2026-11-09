@@ -62,7 +62,7 @@ interface BackendStatus {
   amount: number | string;
   currency: string;
   failure_reason?: string | null;
-  order_id: number | string;
+  order_id?: number | string;
   order_number: string;
   payment_status: string;
   order_status: string;
@@ -76,7 +76,8 @@ function normalizeStatus(raw: BackendStatus): PaymentStatusResult {
     amount: Number(raw.amount),
     currency: raw.currency,
     failureReason: raw.failure_reason ?? undefined,
-    orderId: String(raw.order_id),
+    // Absent quand le client n'est pas connecté (réponse réduite au statut)
+    orderId: raw.order_id != null ? String(raw.order_id) : '',
     orderNumber: raw.order_number,
     orderPaymentStatus: raw.payment_status,
     orderStatus: raw.order_status,

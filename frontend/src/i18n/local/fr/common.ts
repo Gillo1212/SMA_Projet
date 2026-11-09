@@ -20,6 +20,12 @@ export default {
     quote: 'Demander un devis',
   },
 
+  floating: {
+    backToTop: 'Revenir en haut de la page',
+    whatsapp: 'Discuter avec SMALIM sur WhatsApp',
+    whatsappShort: 'Une question ?',
+  },
+
   footer: {
     stayInformed: 'Restez informé',
     newsletterHint: 'Recevez nos actualités et nos nouveautés par email.',
@@ -27,6 +33,9 @@ export default {
     contactTitle: 'Contact',
     emailPlaceholder: 'Votre adresse email',
     subscribe: "S'inscrire",
+    subscribing: 'Inscription en cours',
+    subscribed: 'Merci ! Votre inscription est enregistrée.',
+    subscribeError: "L'inscription n'a pas abouti. Vérifiez l'adresse et réessayez.",
     navigation: 'Navigation',
     followUs: 'Suivez-nous',
     rights: 'Tous droits réservés.',

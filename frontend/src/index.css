@@ -31,9 +31,124 @@
   html {
     scroll-behavior: smooth;
   }
+
+  ::selection {
+    background: rgba(26, 170, 63, 0.22);
+    color: #00272B;
+  }
+
+  /* Contour net pour la navigation au clavier, invisible à la souris */
+  :focus-visible {
+    outline: 2px solid #1AAA3F;
+    outline-offset: 2px;
+  }
+
+  /* Pas d'à-coups au toucher sur mobile */
+  a, button {
+    -webkit-tap-highlight-color: transparent;
+  }
 }
 
 @layer components {
+  /*
+   * Apparition au défilement : un élément marqué data-reveal monte en fondu
+   * quand il entre à l'écran (voir RevealObserver, qui pose data-visible). Le masquage initial n'a
+   * lieu que si le script est actif (classe .js-reveal posée sur <html>) :
+   * sans JavaScript, tout reste visible. Variantes : data-reveal="left",
+   * "right", "zoom" ; décalage en cascade avec style={{ '--reveal-delay': '120ms' }}.
+   */
+  .js-reveal [data-reveal] {
+    opacity: 0;
+    transform: translateY(28px);
+    transition:
+      opacity 0.75s cubic-bezier(0.2, 0.7, 0.2, 1) var(--reveal-delay, 0ms),
+      transform 0.75s cubic-bezier(0.2, 0.7, 0.2, 1) var(--reveal-delay, 0ms);
+    will-change: opacity, transform;
+  }
+  .js-reveal [data-reveal='left'] { transform: translateX(-32px); }
+  .js-reveal [data-reveal='right'] { transform: translateX(32px); }
+  .js-reveal [data-reveal='zoom'] { transform: scale(0.96); }
+  .js-reveal [data-reveal][data-visible] {
+    opacity: 1;
+    transform: none;
+    /* Une fois apparu, plus d'indice de rendu : sinon les éléments fixes
+       contenus (fenêtres, menus) seraient positionnés par rapport au bloc */
+    will-change: auto;
+  }
+
+  /*
+   * Présentoir des photos de machines et de produits. Les photos ont un fond
+   * blanc : en mode « multiply », ce blanc prend la teinte du présentoir, sans
+   * cadre visible. Halo clair derrière l'article, ombre douce au sol.
+   */
+  .media-stage {
+    position: relative;
+    isolation: isolate;
+    background:
+      radial-gradient(ellipse 70% 55% at 50% 38%, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 70%),
+      linear-gradient(170deg, #F8F6F0 0%, #F1EEE5 55%, #E8EFE6 100%);
+    transition: background-color 0.5s ease;
+  }
+  .media-stage::after {
+    content: '';
+    position: absolute;
+    left: 22%;
+    right: 22%;
+    bottom: 6%;
+    height: 7%;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(0, 39, 43, 0.22), rgba(0, 39, 43, 0));
+    filter: blur(3px);
+    z-index: -1;
+    pointer-events: none;
+    transition: transform 0.5s ease, opacity 0.5s ease;
+  }
+  .media-stage img {
+    mix-blend-mode: multiply;
+  }
+  /* Survol d'une carte : la lumière passe au vert SMALIM, l'ombre s'étire */
+  .group:hover .media-stage {
+    background:
+      radial-gradient(ellipse 70% 55% at 50% 38%, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 70%),
+      linear-gradient(170deg, #F4FAF5 0%, #E9F5EC 55%, #DDEFE2 100%);
+  }
+  .group:hover .media-stage::after {
+    transform: scaleX(0.85);
+    opacity: 0.8;
+  }
+  /* Variante sombre (fond bleu nuit) : pas de multiply */
+  .media-stage-dark img {
+    mix-blend-mode: normal;
+  }
+
+  /* Carte qui se soulève au survol (souris uniquement) */
+  @media (hover: hover) {
+    .card-lift {
+      transition: transform 0.4s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.4s ease, border-color 0.3s ease;
+    }
+    .card-lift:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 28px 50px -28px rgba(0, 39, 43, 0.4);
+    }
+  }
+
+  /* Pression des boutons : retour visuel immédiat */
+  .press {
+    transition: transform 0.15s ease, background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .press:active {
+    transform: scale(0.97);
+  }
+
+  /* Flèche qui glisse au survol du lien parent */
+  .group:hover .arrow-slide {
+    transform: translateX(4px);
+  }
+  .arrow-slide {
+    display: inline-block;
+    transition: transform 0.3s ease;
+  }
+
   /* Surtitre : petites capitales espacées, comme le menu */
   .eyebrow {
     font-family: 'ADLaM Display', 'Manrope', sans-serif;
@@ -41,5 +156,25 @@
     line-height: 1.6;
     text-transform: uppercase;
     letter-spacing: 0.24em;
+  }
+}
+
+/*
+ * Mouvement réduit (réglage du téléphone ou de l'ordinateur) : contenu affiché
+ * directement, sans animations ni défilement fluide.
+ */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .js-reveal [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

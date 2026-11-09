@@ -22,7 +22,7 @@ SMA-PROJECT/
 | Frontend | React 19, TypeScript 5.8, Vite 7 |
 | Style | Tailwind CSS 3 |
 | Auth | JWT (access + refresh tokens, 7j) |
-| Paiement | Wave (principal), Orange Money — pas de carte bancaire |
+| Paiement | Wave (Orange Money codé mais désactivé pour le moment) — pas de carte bancaire |
 | Email | SMTP via nodemailer |
 | i18n | i18next (FR/EN) |
 

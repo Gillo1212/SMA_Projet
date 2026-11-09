@@ -8,6 +8,7 @@ import ConfirmDialog from '../../../components/admin/ConfirmDialog';
 import Toasts, { useToasts } from '../../../components/admin/Toasts';
 import { useStatusLabels } from '../../../i18n/useStatusLabels';
 import type { Order, OrderStatus, PaymentMethod, PaymentStatus } from '../../../types/models';
+import { paymentsService } from '../../../services/payments.service';
 
 // Parcours normal d'une commande ; annulation et remboursement en sortent
 const FLOW: OrderStatus[] = ['En attente', 'Confirmée', 'En préparation', 'Expédiée', 'Livrée'];
@@ -246,6 +247,24 @@ function ClientOrderModal({ listOrder, onClose, onConfirm }: ClientOrderModalPro
   const order: Order = detail ? { ...detail, statut: listOrder.statut } : listOrder;
   const [confirming, setConfirming] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [paying, setPaying] = useState(false);
+  const [payError, setPayError] = useState<string | null>(null);
+  // Commande Wave pas encore réglée (paiement refusé, abandonné, expiré)
+  const canPay = order.paiement === 'Wave' && order.paiementStatut === 'En attente' && !CLOSED.includes(order.statut);
+
+  const payWithWave = async () => {
+    setPayError(null);
+    setPaying(true);
+    try {
+      const session = await paymentsService.initiate(order.id);
+      // Même onglet (jamais de fenêtre intégrée) : sur téléphone, le lien ouvre l'appli Wave
+      window.location.href = session.checkoutUrl;
+    } catch (err) {
+      setPayError(err instanceof Error ? err.message : t('clientPortal.orders.payError'));
+      setPaying(false);
+      reload();
+    }
+  };
 
   const closed = CLOSED.includes(order.statut);
   const stepIndex = FLOW.indexOf(order.statut);
@@ -327,6 +346,28 @@ function ClientOrderModal({ listOrder, onClose, onConfirm }: ClientOrderModalPro
             </ol>
           )}
         </section>
+
+        {canPay && (
+          <section className="mb-6 p-4 sm:p-5 rounded-2xl bg-amber-50 border border-amber-200">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center flex-shrink-0">
+                <i className="ri-wallet-3-line text-lg text-amber-600"></i>
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-bold text-amber-950">{t('clientPortal.orders.payPendingTitle')}</p>
+                <p className="text-xs text-amber-900/70 mt-0.5 leading-relaxed">{t('clientPortal.orders.payPendingHint')}</p>
+                {payError && <p role="alert" className="text-xs text-red-600 mt-2">{payError}</p>}
+              </div>
+            </div>
+            <div className="mt-4 grid sm:flex sm:justify-end">
+              <button type="button" onClick={payWithWave} disabled={paying}
+                className="h-10 px-5 rounded-lg bg-[#1AAA3F] text-white text-sm font-semibold hover:bg-[#158f35] disabled:opacity-60 cursor-pointer shadow-sm shadow-[#1AAA3F]/30">
+                <i className={`${paying ? 'ri-loader-4-line animate-spin' : 'ri-smartphone-line'} mr-1.5`}></i>
+                {paying ? t('clientPortal.orders.payOpening') : t('clientPortal.orders.payWithWave')}
+              </button>
+            </div>
+          </section>
+        )}
 
         {/* Réception : la dernière étape revient au client */}
         {order.statut === 'Expédiée' && (

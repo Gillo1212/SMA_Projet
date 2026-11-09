@@ -6,6 +6,7 @@ export default function CTASection() {
   return (
     <section className="px-4 sm:px-6 lg:px-10 pb-20 sm:pb-28 bg-white">
       <div
+        data-reveal="zoom"
         className="max-w-7xl mx-auto rounded-3xl bg-[#00272B] overflow-hidden"
         style={{ backgroundImage: 'radial-gradient(ellipse 55% 80% at 80% 100%, rgba(26,170,63,0.25), transparent 70%)' }}
       >
@@ -19,16 +20,18 @@ export default function CTASection() {
             <p className="text-base sm:text-lg text-white/70 leading-relaxed mb-10 max-w-lg">{t('home.cta.text')}</p>
             <Link
               to="/produits"
-              className="inline-flex items-center gap-2 px-7 py-4 bg-white text-[#00272B] font-semibold rounded-md hover:bg-[#EEFFF2] transition-colors"
+              className="group press inline-flex items-center gap-2 px-7 py-4 bg-white text-[#00272B] font-semibold rounded-md hover:bg-[#EEFFF2]"
             >
               {t('home.cta.button')}
-              <i className="ri-arrow-right-line"></i>
+              <i className="ri-arrow-right-line arrow-slide"></i>
             </Link>
           </div>
           <div className="lg:col-span-6 relative h-[300px] sm:h-[380px]" aria-hidden="true">
-            <img src="/images/cutouts/kingsmill-vanilla.webp" alt="" className="absolute bottom-0 left-[2%] h-[78%] w-auto drop-shadow-[0_18px_24px_rgba(0,0,0,0.4)]" />
-            <img src="/images/cutouts/craft-roasters.webp" alt="" className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[96%] w-auto z-10 drop-shadow-[0_22px_30px_rgba(0,0,0,0.45)]" />
-            <img src="/images/cutouts/kingsmill-hot-chocolate.webp" alt="" className="absolute bottom-0 right-[2%] h-[80%] w-auto drop-shadow-[0_18px_24px_rgba(0,0,0,0.4)]" />
+            <img src="/images/cutouts/kingsmill-vanilla.webp" alt="" className="absolute bottom-0 left-[2%] h-[78%] w-auto drop-shadow-[0_18px_24px_rgba(0,0,0,0.4)] will-change-transform motion-safe:animate-float-slow [animation-delay:-3s]" />
+            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[96%] z-10">
+              <img src="/images/cutouts/craft-roasters.webp" alt="" className="h-full w-auto drop-shadow-[0_22px_30px_rgba(0,0,0,0.45)] will-change-transform motion-safe:animate-float" />
+            </div>
+            <img src="/images/cutouts/kingsmill-hot-chocolate.webp" alt="" className="absolute bottom-0 right-[2%] h-[80%] w-auto drop-shadow-[0_18px_24px_rgba(0,0,0,0.4)] will-change-transform motion-safe:animate-float-slow [animation-delay:-6s]" />
           </div>
         </div>
       </div>

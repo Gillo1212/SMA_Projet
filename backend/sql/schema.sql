@@ -388,3 +388,44 @@ CREATE INDEX idx_tickets_client ON support_tickets(client_id);
 CREATE INDEX idx_tickets_status ON support_tickets(status);
 CREATE INDEX idx_client_machines_client ON client_machines(client_id);
 CREATE INDEX idx_invoices_client ON invoices(client_id);
+
+-- ────────────────────────────────────────────────────────────
+-- MESSAGES DE CONTACT (formulaire de la page Contact)
+-- ────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS contact_messages (
+  id            INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  name          VARCHAR(150) NOT NULL,
+  email         VARCHAR(255) NOT NULL,
+  phone         VARCHAR(30) NULL,
+  subject       VARCHAR(200) NULL,
+  message       TEXT NOT NULL,
+  /** new : pas encore ouvert ; read : lu ; replied : réponse envoyée ; archived : classé */
+  status        ENUM('new','read','replied','archived') NOT NULL DEFAULT 'new',
+  admin_note    TEXT NULL,
+  /** Dernier membre de l'équipe ayant changé le statut */
+  handled_by    INT UNSIGNED NULL,
+  handled_at    DATETIME NULL,
+  ip_address    VARCHAR(45) NULL,
+  created_at    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  KEY idx_contact_status (status, created_at),
+  FOREIGN KEY (handled_by) REFERENCES admins(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+-- ────────────────────────────────────────────────────────────
+-- NEWSLETTER (inscription depuis le pied de page)
+-- ────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS newsletter_subscribers (
+  id                INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  email             VARCHAR(255) NOT NULL,
+  status            ENUM('subscribed','unsubscribed') NOT NULL DEFAULT 'subscribed',
+  /** Formulaire d'origine (footer…) */
+  source            VARCHAR(50) NOT NULL DEFAULT 'footer',
+  locale            VARCHAR(5) NULL,
+  /** Lien de désinscription des emails, renouvelé à chaque réinscription */
+  unsubscribe_token CHAR(64) NOT NULL,
+  subscribed_at     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  unsubscribed_at   DATETIME NULL,
+  UNIQUE KEY uq_newsletter_email (email),
+  UNIQUE KEY uq_newsletter_token (unsubscribe_token)
+) ENGINE=InnoDB;

@@ -20,6 +20,12 @@ export default {
     quote: 'Request a quote',
   },
 
+  floating: {
+    backToTop: 'Back to top',
+    whatsapp: 'Chat with SMALIM on WhatsApp',
+    whatsappShort: 'Questions?',
+  },
+
   footer: {
     stayInformed: 'Stay informed',
     newsletterHint: 'Get our news and new products by email.',
@@ -27,6 +33,9 @@ export default {
     contactTitle: 'Contact',
     emailPlaceholder: 'Your email address',
     subscribe: 'Subscribe',
+    subscribing: 'Subscribing',
+    subscribed: 'Thank you! You are now subscribed.',
+    subscribeError: 'Subscription failed. Check the address and try again.',
     navigation: 'Navigation',
     followUs: 'Follow us',
     rights: 'All rights reserved.',

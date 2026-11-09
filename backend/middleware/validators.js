@@ -1,4 +1,5 @@
 const { body, param, validationResult } = require('express-validator');
+const { ONLINE_METHODS, OFFLINE_METHODS } = require('../services/payment');
 
 /**
  * Middleware qui lit les résultats de validation et retourne 400 si des erreurs existent.
@@ -158,8 +159,8 @@ const orderCreateRules = [
   body('items.*.quantity')
     .isInt({ min: 1 }).withMessage('Quantité invalide (minimum 1)'),
   body('payment_method')
-    // Pas de paiement par carte (Stripe abandonné) : le paiement en ligne passe par Wave ou Orange Money
-    .isIn(['wave', 'orange_money', 'bank_transfer', 'cash'])
+    // Modes proposés uniquement (pas de carte ; Orange Money désactivé pour le moment)
+    .isIn([...ONLINE_METHODS, ...OFFLINE_METHODS])
     .withMessage('Mode de paiement invalide'),
   body('shipping_address').notEmpty().withMessage('Adresse de livraison requise'),
   // La TVA et les frais de port sont calculés par le serveur : le client
@@ -288,8 +289,50 @@ const blogUpdateRules = [
   ...blogCreateRules,
 ];
 
+// ── Contact et newsletter ─────────────────────────────────────
+
+const contactCreateRules = [
+  body('name').trim().notEmpty().withMessage('Nom requis')
+    .isLength({ max: 150 }).withMessage('Nom trop long (150 caractères maximum)'),
+  body('email').trim().isEmail().withMessage('Email invalide').normalizeEmail({ gmail_remove_dots: false }),
+  body('phone').optional({ values: 'falsy' }).trim()
+    .matches(/^[+0-9 ().-]{6,30}$/).withMessage('Téléphone invalide'),
+  body('subject').optional({ values: 'falsy' }).trim()
+    .isLength({ max: 200 }).withMessage('Sujet trop long (200 caractères maximum)'),
+  body('message').trim().notEmpty().withMessage('Message requis')
+    .isLength({ max: 5000 }).withMessage('Message trop long (5000 caractères maximum)'),
+];
+
+const contactUpdateRules = [
+  param('id').isInt({ min: 1 }).withMessage('ID invalide'),
+  body('status').optional().isIn(['new', 'read', 'replied', 'archived']).withMessage('Statut invalide'),
+  body('admin_note').optional({ values: 'null' }).isString().isLength({ max: 2000 }).withMessage('Note trop longue (2000 caractères maximum)'),
+];
+
+const newsletterSubscribeRules = [
+  body('email').trim().isEmail().withMessage('Email invalide')
+    .isLength({ max: 255 }).normalizeEmail({ gmail_remove_dots: false }),
+  body('source').optional().trim().isLength({ max: 50 }),
+  body('locale').optional().isIn(['fr', 'en']),
+];
+
+const newsletterUnsubscribeRules = [
+  body('token').isString().matches(/^[0-9a-f]{64}$/).withMessage('Lien de désinscription invalide'),
+];
+
+const newsletterUpdateRules = [
+  param('id').isInt({ min: 1 }).withMessage('ID invalide'),
+  body('status').isIn(['subscribed', 'unsubscribed']).withMessage('Statut invalide'),
+];
+
 module.exports = {
   validate,
+  // Contact et newsletter
+  contactCreateRules,
+  contactUpdateRules,
+  newsletterSubscribeRules,
+  newsletterUnsubscribeRules,
+  newsletterUpdateRules,
   // Auth
   adminLoginRules,
   adminRegisterRules,

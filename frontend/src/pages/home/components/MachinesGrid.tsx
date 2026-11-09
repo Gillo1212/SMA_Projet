@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useMachines } from '../../../hooks/useMachines';
+import { revealDelay } from '../../../components/feature/RevealObserver';
 
 export default function MachinesGrid() {
   const { t } = useTranslation();
@@ -15,7 +16,7 @@ export default function MachinesGrid() {
   return (
     <section className="py-20 sm:py-28 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
-        <div className="grid lg:grid-cols-12 gap-6 items-end mb-12 sm:mb-16">
+        <div className="grid lg:grid-cols-12 gap-6 items-end mb-12 sm:mb-16" data-reveal>
           <div className="lg:col-span-7">
             <p className="eyebrow text-[#0D8C2E] mb-5">{t('home.machines.eyebrow')}</p>
             <h2 className="text-4xl sm:text-5xl text-[#00272B]">
@@ -29,17 +30,20 @@ export default function MachinesGrid() {
         </div>
 
         <div className={`grid grid-cols-1 sm:grid-cols-2 gap-6 ${featured.length >= 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-3'}`}>
-          {featured.map((machine) => (
+          {featured.map((machine, index) => (
             <Link
               key={machine.id}
               to={`/machines/${machine.slug}`}
-              className="group flex flex-col bg-white rounded-2xl border border-[#00272B]/10 overflow-hidden hover:border-[#00272B]/25 hover:shadow-[0_20px_40px_-24px_rgba(0,39,43,0.35)] transition-all"
+              data-reveal
+              style={revealDelay(index)}
+              className="group card-lift flex flex-col bg-white rounded-2xl border border-[#00272B]/10 overflow-hidden hover:border-[#1AAA3F]/40"
             >
-              <div className="h-72 bg-white flex items-center justify-center p-6">
+              <div className="media-stage h-72 flex items-center justify-center p-6">
                 <img
                   src={machine.image}
                   alt={machine.name}
-                  className="max-h-full w-auto object-contain group-hover:scale-[1.03] transition-transform duration-500"
+                  loading="lazy"
+                  className="max-h-full w-auto object-contain group-hover:scale-[1.06] transition-transform duration-700 ease-out"
                 />
               </div>
               <div className="flex flex-col flex-1 p-6 border-t border-[#00272B]/8">
@@ -53,7 +57,7 @@ export default function MachinesGrid() {
                       {machine.price > 0 ? machine.priceDisplay : t('common.onQuote')}
                     </p>
                   </div>
-                  <span className="w-10 h-10 rounded-full border border-[#00272B]/15 flex items-center justify-center text-[#00272B] group-hover:bg-[#00272B] group-hover:text-white transition-colors">
+                  <span className="w-10 h-10 rounded-full border border-[#00272B]/15 flex items-center justify-center text-[#00272B] group-hover:bg-[#1AAA3F] group-hover:border-[#1AAA3F] group-hover:text-white group-hover:rotate-45 transition-all duration-300">
                     <i className="ri-arrow-right-up-line"></i>
                   </span>
                 </div>
@@ -65,10 +69,10 @@ export default function MachinesGrid() {
         <div className="mt-12 text-center">
           <Link
             to="/machines"
-            className="inline-flex items-center gap-2 px-7 py-3.5 bg-[#00272B] text-white font-semibold rounded-md hover:bg-[#0D8C2E] transition-colors"
+            className="group press inline-flex items-center gap-2 px-7 py-3.5 bg-[#00272B] text-white font-semibold rounded-md hover:bg-[#0D8C2E]"
           >
             {t('home.machines.seeAll')}
-            <i className="ri-arrow-right-line"></i>
+            <i className="ri-arrow-right-line arrow-slide"></i>
           </Link>
         </div>
       </div>

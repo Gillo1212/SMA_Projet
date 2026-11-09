@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { PAYMENT_LOGOS } from '../../constants/paymentLogos';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Navbar from '../home/components/Navbar';
@@ -23,7 +24,8 @@ interface ShippingAddress {
   country: string;
 }
 
-type PaymentMethod = 'wave' | 'orange_money';
+// Wave seul pour le moment (Orange Money codé côté serveur mais pas proposé)
+type PaymentMethod = 'wave';
 
 export default function CheckoutPage() {
   const { t } = useTranslation();
@@ -118,7 +120,7 @@ export default function CheckoutPage() {
           type: 'product' as const,
           quantity: item.quantity,
         })),
-        paiement: paymentMethod === 'wave' ? 'Wave' : 'Orange Money',
+        paiement: 'Wave',
         promoCode: promo?.code,
         adresseLivraison: {
           first_name: shippingAddress.firstName,
@@ -406,7 +408,7 @@ export default function CheckoutPage() {
                         </div>
                         <div className="w-20 h-14 flex items-center justify-center bg-white rounded-xl border border-gray-100 p-2">
                           <img
-                            src="https://storage.readdy-site.link/project_files/aa6dbb4c-c575-457d-a3a9-db6ddc27815b/768bed2b-5283-47bc-b9e6-f4dae5cf304f_Wave.png?v=c76ba778473ee3601f42a6ffe67df37c"
+                            src={PAYMENT_LOGOS.wave}
                             alt="Wave"
                             className="h-10 w-auto object-contain"
                           />
@@ -420,52 +422,6 @@ export default function CheckoutPage() {
                           <div className="flex items-center space-x-2 text-sm text-gray-500">
                             <i className="ri-shield-check-line text-[#1AAA3F]"></i>
                             <span>{t('checkout.payment.waveHint')}</span>
-                          </div>
-                        </div>
-                      )}
-                    </button>
-
-                    {/* Orange Money */}
-                    <button
-                      onClick={() => setPaymentMethod('orange_money')}
-                      className={`w-full p-6 border-2 rounded-xl transition-all cursor-pointer ${
-                        paymentMethod === 'orange_money'
-                          ? 'border-[#1AAA3F] bg-[#F6F3EC]'
-                          : 'border-gray-200 hover:border-gray-300'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center space-x-4">
-                          <div
-                            className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                              paymentMethod === 'orange_money' ? 'border-[#1AAA3F]' : 'border-gray-300'
-                            }`}
-                          >
-                            {paymentMethod === 'orange_money' && (
-                              <div className="w-3 h-3 bg-[#1AAA3F] rounded-full"></div>
-                            )}
-                          </div>
-                          <div className="text-left">
-                            <p className="text-base font-bold text-[#00272B]">Orange Money</p>
-                            <p className="text-sm text-gray-600">{t('checkout.payment.orangeSubtitle')}</p>
-                          </div>
-                        </div>
-                        <div className="w-20 h-14 flex items-center justify-center bg-white rounded-xl border border-gray-100 p-2">
-                          <img
-                            src="https://storage.readdy-site.link/project_files/aa6dbb4c-c575-457d-a3a9-db6ddc27815b/7601a307-e87f-40c7-84ba-40ace6edbf5e_Orange-money.png?v=e2d6d95468557e3a937a2d097b94b09e"
-                            alt="Orange Money"
-                            className="h-10 w-auto object-contain"
-                          />
-                        </div>
-                      </div>
-                      {paymentMethod === 'orange_money' && (
-                        <div className="p-4 bg-white rounded-lg border border-gray-200">
-                          <p className="text-sm text-gray-600 mb-3">
-                            {t('checkout.payment.orangeRedirect')}
-                          </p>
-                          <div className="flex items-center space-x-2 text-sm text-gray-500">
-                            <i className="ri-shield-check-line text-[#1AAA3F]"></i>
-                            <span>{t('checkout.payment.orangeHint')}</span>
                           </div>
                         </div>
                       )}
@@ -544,9 +500,7 @@ export default function CheckoutPage() {
                       </button>
                     </div>
                     <p className="text-sm text-gray-700">
-                      {paymentMethod === 'wave'
-                        ? `Wave - ${t('checkout.payment.waveSubtitle')}`
-                        : `Orange Money - ${t('checkout.payment.orangeSubtitle')}`}
+                      {`Wave - ${t('checkout.payment.waveSubtitle')}`}
                     </p>
                   </div>
 

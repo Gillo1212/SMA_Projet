@@ -19,6 +19,7 @@ export const mockSettings: Record<string, string> = {
   notif_new_order: '1',
   notif_new_quote: '1',
   notif_new_client: '0',
+  notif_new_contact: '1',
   notif_low_stock: '1',
   notif_admin_email: 'admin@smalim.com',
 };

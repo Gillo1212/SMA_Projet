@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { revealDelay } from '../../../components/feature/RevealObserver';
 
 export default function Testimonials() {
   const { t } = useTranslation();
@@ -16,7 +17,7 @@ export default function Testimonials() {
   return (
     <section className="py-20 sm:py-28 bg-[#F6F3EC]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
-        <div className="mb-12 sm:mb-16 max-w-2xl">
+        <div className="mb-12 sm:mb-16 max-w-2xl" data-reveal>
           <p className="eyebrow text-[#0D8C2E] mb-5">{t('testimonials.eyebrow')}</p>
           <h2 className="text-4xl sm:text-5xl text-[#00272B]">
             {t('testimonials.titleLine1')}{' '}
@@ -24,8 +25,8 @@ export default function Testimonials() {
           </h2>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {testimonials.map((testimonial) => (
-            <figure key={testimonial.id} className="bg-white rounded-2xl p-8 flex flex-col">
+          {testimonials.map((testimonial, index) => (
+            <figure key={testimonial.id} data-reveal style={revealDelay(index % 3)} className="card-lift bg-white rounded-2xl p-8 flex flex-col">
               <span className="font-serif text-6xl leading-[0.8] h-9 text-[#1AAA3F]/50" aria-hidden="true">“</span>
               <blockquote className="text-[15px] text-[#00272B]/80 leading-relaxed mb-8">
                 {testimonial.content}

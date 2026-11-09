@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { PAYMENT_LOGOS } from '../../../constants/paymentLogos';
+import { revealDelay } from '../../../components/feature/RevealObserver';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Navbar from '../../home/components/Navbar';
@@ -63,11 +65,13 @@ export default function MachineDetailPage() {
             {/* Gallery */}
             <div>
               {/* Main Image */}
-              <div className="relative h-[520px] sm:h-[600px] bg-white border border-[#00272B]/10 rounded-2xl overflow-hidden mb-4 p-6">
-                <img 
+                            <div className="media-stage relative h-[440px] sm:h-[600px] border border-[#00272B]/8 rounded-2xl overflow-hidden mb-4 p-6" data-reveal="zoom">
+                {/* La clé relance le fondu à chaque changement de photo */}
+                <img
+                  key={selectedImage}
                   src={machine.gallery[selectedImage]}
                   alt={machine.name}
-                  className="w-full h-full object-contain object-center"
+                  className="w-full h-full object-contain object-center motion-safe:animate-fade-in"
                 />
                 {machine.badge && (
                   <div className="absolute top-6 right-6 px-4 py-1.5 bg-[#00272B] text-white text-xs font-semibold rounded-full">
@@ -82,12 +86,15 @@ export default function MachineDetailPage() {
                   <button
                     key={index}
                     onClick={() => setSelectedImage(index)}
-                    className={`relative h-24 bg-white rounded-lg overflow-hidden cursor-pointer transition-all border ${selectedImage === index ? 'border-[#00272B] ring-1 ring-[#00272B]' : 'border-[#00272B]/10 hover:border-[#00272B]/40'}`}
+                                        aria-label={`${machine.name} ${index + 1}`}
+                    aria-pressed={selectedImage === index}
+                    className={`press media-stage relative h-24 rounded-lg overflow-hidden cursor-pointer transition-all border ${selectedImage === index ? 'border-[#1AAA3F] ring-2 ring-[#1AAA3F]/30' : 'border-[#00272B]/10 hover:border-[#00272B]/40 opacity-80 hover:opacity-100'}`}
                   >
-                    <img 
+                    <img
                       src={img}
-                      alt={`${machine.name} ${index + 1}`}
-                      className="w-full h-full object-cover object-center"
+                      alt=""
+                      loading="lazy"
+                      className="w-full h-full object-contain object-center p-1.5"
                     />
                   </button>
                 ))}
@@ -129,24 +136,14 @@ export default function MachineDetailPage() {
                 <div className="flex flex-wrap gap-3">
                   {machine.paymentMethods.includes('wave') && (
                     <div className="flex items-center gap-2 px-4 py-2 border border-[#00272B]/10 rounded-md">
-                      <div className="h-7 w-14 flex items-center justify-center">
-                        <img
-                          src="https://storage.readdy-site.link/project_files/aa6dbb4c-c575-457d-a3a9-db6ddc27815b/768bed2b-5283-47bc-b9e6-f4dae5cf304f_Wave.png?v=c76ba778473ee3601f42a6ffe67df37c"
-                          alt="Wave"
-                          className="h-7 w-auto object-contain"
-                        />
-                      </div>
+                      <img src={PAYMENT_LOGOS.wave} alt="" className="h-6 w-6 rounded-md object-cover" />
+                      <span className="text-sm font-semibold text-[#00272B]">Wave</span>
                     </div>
                   )}
                   {machine.paymentMethods.includes('orange') && (
                     <div className="flex items-center gap-2 px-4 py-2 border border-[#00272B]/10 rounded-md">
-                      <div className="h-7 w-14 flex items-center justify-center">
-                        <img
-                          src="https://storage.readdy-site.link/project_files/aa6dbb4c-c575-457d-a3a9-db6ddc27815b/7601a307-e87f-40c7-84ba-40ace6edbf5e_Orange-money.png?v=e2d6d95468557e3a937a2d097b94b09e"
-                          alt="Orange Money"
-                          className="h-7 w-auto object-contain"
-                        />
-                      </div>
+                      <img src={PAYMENT_LOGOS.orangeMoney} alt="" className="h-5 w-auto object-contain" />
+                      <span className="text-sm font-semibold text-[#00272B]">Orange <span className="text-[#FF7900]">Money</span></span>
                     </div>
                   )}
                   {machine.paymentMethods.includes('carte') && (
@@ -270,18 +267,21 @@ export default function MachineDetailPage() {
           {similarMachines.length > 0 && (
             <div>
               <h2 className="text-3xl font-bold text-[#00272B] mb-8">{t('machineDetail.similar')}</h2>
-              <div className="grid md:grid-cols-3 gap-8">
-                {similarMachines.map(similar => (
-                  <Link 
+                            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
+                {similarMachines.map((similar, index) => (
+                  <Link
                     key={similar.id}
                     to={`/machines/${similar.slug}`}
-                    className="group bg-white border border-[#00272B]/10 rounded-2xl overflow-hidden hover:border-[#00272B]/25 transition-all duration-300 cursor-pointer"
+                    data-reveal
+                    style={revealDelay(index)}
+                    className="group card-lift bg-white border border-[#00272B]/10 rounded-2xl overflow-hidden hover:border-[#1AAA3F]/40 cursor-pointer"
                   >
-                    <div className="relative h-64 overflow-hidden bg-white">
-                      <img 
+                    <div className="media-stage relative h-64 overflow-hidden">
+                      <img
                         src={similar.image}
                         alt={similar.name}
-                        className="w-full h-full object-contain object-center p-4 group-hover:scale-105 transition-transform duration-300"
+                        loading="lazy"
+                        className="w-full h-full object-contain object-center p-4 group-hover:scale-[1.06] transition-transform duration-700 ease-out"
                       />
                     </div>
                     <div className="p-6">

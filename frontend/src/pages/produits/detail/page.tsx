@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { revealDelay } from '../../../components/feature/RevealObserver';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useTranslation, Trans } from 'react-i18next';
 import Navbar from '../../home/components/Navbar';
@@ -117,12 +118,13 @@ export default function ProductDetailPage() {
           <div className="grid lg:grid-cols-2 gap-16">
             {/* Image Gallery */}
             <div>
-              <div className="aspect-square bg-gray-50 rounded-2xl overflow-hidden mb-6">
+                            <div className="media-stage aspect-square rounded-2xl overflow-hidden mb-6 border border-[#00272B]/8" data-reveal="zoom">
                 {product.images[selectedImage] ? (
                   <img
+                    key={selectedImage}
                     src={product.images[selectedImage]}
                     alt={product.name}
-                    className="w-full h-full object-contain object-center p-12"
+                    className="w-full h-full object-contain object-center p-10 sm:p-14 motion-safe:animate-fade-in"
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center"><i className="ri-image-line text-8xl text-gray-300"></i></div>
@@ -135,13 +137,16 @@ export default function ProductDetailPage() {
                     <button
                       key={index}
                       onClick={() => setSelectedImage(index)}
-                      className={`aspect-square bg-gray-50 rounded-xl overflow-hidden cursor-pointer transition-all ${
-                        selectedImage === index ? 'ring-2 ring-[#1AAA3F]' : 'hover:ring-2 hover:ring-gray-300'
+                                            aria-label={`${product.name} ${index + 1}`}
+                      aria-pressed={selectedImage === index}
+                      className={`press media-stage aspect-square rounded-xl overflow-hidden cursor-pointer transition-all ${
+                        selectedImage === index ? 'ring-2 ring-[#1AAA3F]' : 'opacity-80 hover:opacity-100 hover:ring-2 hover:ring-[#00272B]/15'
                       }`}
                     >
                       <img
                         src={image}
-                        alt={`${product.name} ${index + 1}`}
+                        alt=""
+                        loading="lazy"
                         className="w-full h-full object-contain object-center p-3"
                       />
                     </button>
@@ -385,19 +390,22 @@ export default function ProductDetailPage() {
           {relatedProducts.length > 0 && (
             <div className="mt-20">
               <h2 className="text-3xl font-bold text-[#00272B] mb-8">{t('productDetail.similar')}</h2>
-              <div className="grid grid-cols-4 gap-8">
-                {relatedProducts.map(relatedProduct => (
+                            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8">
+                {relatedProducts.map((relatedProduct, index) => (
                   <Link
                     key={relatedProduct.id}
                     to={`/produits/${relatedProduct.id}`}
-                    className="group bg-white rounded-2xl border border-gray-100 hover:border-[#1AAA3F] hover:shadow-lg transition-all duration-300 overflow-hidden"
+                    data-reveal
+                    style={revealDelay(index)}
+                    className="group card-lift bg-white rounded-2xl border border-[#00272B]/8 hover:border-[#1AAA3F]/40 overflow-hidden"
                   >
-                    <div className="aspect-square bg-gray-50 overflow-hidden">
+                    <div className="media-stage aspect-square overflow-hidden">
                       {relatedProduct.images[0] ? (
                         <img
                           src={relatedProduct.images[0]}
                           alt={relatedProduct.name}
-                          className="w-full h-full object-contain object-center p-6 group-hover:scale-105 transition-transform duration-300"
+                          loading="lazy"
+                          className="w-full h-full object-contain object-center p-6 group-hover:scale-[1.07] transition-transform duration-700 ease-out"
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center"><i className="ri-image-line text-6xl text-gray-300"></i></div>

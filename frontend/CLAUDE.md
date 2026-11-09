@@ -88,7 +88,7 @@ const { client, login, logout, isAuthenticated } = useClientAuth();
 ### Client axios (`services/apiClient.ts`)
 
 Le client est pré-configuré avec :
-- Base URL : `VITE_API_URL` (défaut : `http://localhost:5000/api`)
+- Base URL : `VITE_API_URL`, de préférence relative (`/api`) : le serveur Vite relaie `/api` et `/uploads` vers le backend (`server.proxy` dans `vite.config.ts`, cible `BACKEND_PROXY_TARGET`, défaut `http://localhost:5000`). Une URL absolue (`http://localhost:5000/api`) marche aussi en local, mais pas derrière le tunnel HTTPS.
 - Injection automatique du token JWT dans les headers
 - Gestion des erreurs 401 (refresh token ou logout)
 
@@ -193,8 +193,19 @@ npm test             # Tests Vitest (*.test.ts) — dont la parité des montants
 ## Variables d'environnement
 
 ```env
-VITE_API_URL=http://localhost:5000/api
+VITE_API_URL=/api
 ```
+
+### Tunnel HTTPS (ngrok) pour tester Wave
+
+Wave exige des adresses https (retour après paiement, webhook). Un seul tunnel suffit, vers Vite, qui relaie l'API :
+
+```bash
+ngrok http 5173                      # ou --url=https://<domaine-fixe>.ngrok-free.app
+```
+
+Puis dans `backend/.env` : `FRONTEND_URL` et `BACKEND_URL` = l'adresse https du tunnel, et redémarrer le backend. Le webhook à déclarer chez Wave est `<adresse>/api/payments/webhook/wave`. `allowedHosts` (vite.config.ts) accepte les domaines ngrok. Sans tunnel, remettre `FRONTEND_URL=http://localhost:5173`.
+Compte ngrok gratuit : page d'avertissement au premier passage d'un navigateur (pas pour les appels serveur de Wave) ; l'adresse aléatoire change à chaque redémarrage de ngrok, d'où l'intérêt du domaine fixe gratuit (dashboard.ngrok.com → Domains).
 
 ## Conventions de code
 
@@ -222,7 +233,11 @@ Accessibles uniquement aux utilisateurs avec `type: "admin"`. Structure :
 - `/admin/devis` - Gestion des devis
 - `/admin/clients` - Gestion des clients
 - `/admin/blog` - CMS articles
+- `/admin/messages` - Messages de la page Contact (lu, répondu, archivé, note interne, réponse par email / WhatsApp)
+- `/admin/newsletter` - Inscrits à la newsletter (recherche, désinscription, export CSV)
 - `/admin/parametres` - Paramètres système
+
+Formulaires publics : la page Contact (`contactService.send`) et le pied de page (`newsletterService.subscribe`) passent par le backend, avec un champ piège `website` caché. La page `/newsletter/desinscription?token=…` traite le lien de désinscription des emails.
 
 ## Espace client (`/espace-client/*`)
 

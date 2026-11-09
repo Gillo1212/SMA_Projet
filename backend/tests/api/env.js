@@ -20,6 +20,7 @@ const overrides = {
   // Paiements : simulateur uniquement, jamais les API réelles
   WAVE_API_KEY: '',
   WAVE_WEBHOOK_SECRET: '',
+  WAVE_API_SIGNING_SECRET: '',
   ORANGE_MONEY_CLIENT_ID: '',
   ORANGE_MONEY_CLIENT_SECRET: '',
   ORANGE_MONEY_MERCHANT_KEY: '',

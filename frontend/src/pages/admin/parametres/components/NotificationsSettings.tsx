@@ -24,6 +24,14 @@ const notifItems = [
     description: "Dès qu'un prospect ou un client envoie une demande de devis",
   },
   {
+    key: 'notif_new_contact',
+    icon: 'ri-mail-line',
+    color: 'text-[#1AAA3F]',
+    bg: 'bg-[#1AAA3F]/10',
+    label: 'Nouveau message de contact',
+    description: 'Dès qu’un visiteur écrit depuis la page Contact du site',
+  },
+  {
     key: 'notif_new_client',
     icon: 'ri-user-add-line',
     color: 'text-sky-600',
@@ -49,6 +57,7 @@ export default function NotificationsSettings({ settings, onSave }: Props) {
     notif_new_order: settings.notif_new_order ?? '1',
     notif_new_quote: settings.notif_new_quote ?? '1',
     notif_new_client: settings.notif_new_client ?? '0',
+    notif_new_contact: settings.notif_new_contact ?? '1',
     notif_low_stock: settings.notif_low_stock ?? '1',
     notif_low_stock_threshold: settings.notif_low_stock_threshold ?? '5',
     notif_admin_email: settings.notif_admin_email ?? '',

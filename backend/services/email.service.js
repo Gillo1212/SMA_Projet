@@ -56,7 +56,8 @@ function loadTemplate(templateName, variables = {}) {
   const templatePath = path.join(__dirname, '../templates', `${templateName}.html`);
   let html = fs.readFileSync(templatePath, 'utf-8');
   Object.entries(variables).forEach(([key, value]) => {
-    html = html.replace(new RegExp(`{{${key}}}`, 'g'), value ?? '');
+    // Remplacement par fonction : un « $& » ou « $1 » saisi par un visiteur reste du texte
+    html = html.replace(new RegExp(`{{${key}}}`, 'g'), () => String(value ?? ''));
   });
   return html;
 }
@@ -349,8 +350,48 @@ async function sendAdminNotification(to, { subject, title, intro, lines = [], li
   });
 }
 
+const escapeHtml = v => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+/**
+ * Accusé de réception d'un message laissé via la page Contact. Le message est
+ * recopié (échappé) pour que le visiteur garde une trace de ce qu'il a envoyé.
+ */
+async function sendContactAcknowledgment(msg) {
+  return sendEmail({
+    to: msg.email,
+    subject: 'Nous avons bien reçu votre message - SMALIM',
+    templateName: 'contact-acknowledgment',
+    variables: {
+      name: escapeHtml(msg.name),
+      subject: escapeHtml(msg.subject || 'Votre message'),
+      message: escapeHtml(msg.message).replace(/\r?\n/g, '<br />'),
+      siteUrl: process.env.FRONTEND_URL || '',
+      year: new Date().getFullYear(),
+    },
+    text: `Bonjour ${msg.name},\n\nNous avons bien reçu votre message et vous répondrons dans les meilleurs délais.\n\nVotre message :\n${msg.message}\n\nL'équipe SMALIM`,
+  });
+}
+
+/** Bienvenue dans la newsletter, avec le lien de désinscription */
+async function sendNewsletterWelcome(subscriber) {
+  const unsubscribeUrl = `${process.env.FRONTEND_URL}/newsletter/desinscription?token=${subscriber.unsubscribe_token}`;
+  return sendEmail({
+    to: subscriber.email,
+    subject: 'Bienvenue dans la newsletter SMALIM',
+    templateName: 'newsletter-welcome',
+    variables: {
+      siteUrl: process.env.FRONTEND_URL || '',
+      unsubscribeUrl,
+      year: new Date().getFullYear(),
+    },
+    text: `Merci pour votre inscription à la newsletter SMALIM.\n\nPour vous désinscrire : ${unsubscribeUrl}`,
+  });
+}
+
 module.exports = {
   sendEmail,
+  sendContactAcknowledgment,
+  sendNewsletterWelcome,
   testSmtp,
   logEmailConfig,
   sendAdminNotification,

@@ -28,6 +28,35 @@ export default function PaiementRetourPage() {
   const [status, setStatus] = useState<PaymentStatusResult | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const attemptsRef = useRef(0);
+  const [retrying, setRetrying] = useState(false);
+
+  /**
+   * Nouvelle tentative de paiement. L'identifiant de commande n'est renvoyé
+   * qu'au client connecté propriétaire : sans lui, on passe par « Mes commandes ».
+   */
+  const retryPayment = async () => {
+    if (!status?.orderId) return;
+    setRetrying(true);
+    try {
+      const session = await paymentsService.initiate(status.orderId);
+      window.location.href = session.checkoutUrl;
+    } catch (err) {
+      setRetrying(false);
+      setMessage(err instanceof Error ? err.message : t('paymentReturn.statusUnavailable'));
+    }
+  };
+
+  const retryButton = status?.orderId ? (
+    <button
+      type="button"
+      onClick={retryPayment}
+      disabled={retrying}
+      className="w-full py-3 bg-[#1AAA3F] text-white text-sm font-semibold rounded-xl hover:bg-[#158f35] disabled:opacity-60 transition-all whitespace-nowrap cursor-pointer"
+    >
+      <i className={`${retrying ? 'ri-loader-4-line animate-spin' : 'ri-smartphone-line'} mr-1.5`}></i>
+      {retrying ? t('paymentReturn.retrying') : t('paymentReturn.retryWave')}
+    </button>
+  ) : null;
 
   const finalize = useCallback((result: PaymentStatusResult) => {
     setStatus(result);
@@ -142,9 +171,12 @@ export default function PaiementRetourPage() {
                 {' '}{t('paymentReturn.failedKept')}
               </p>
               <div className="flex flex-col gap-3">
+                {retryButton}
                 <Link
                   to="/espace-client/commandes"
-                  className="w-full py-3 bg-[#1AAA3F] text-white text-sm font-semibold rounded-xl hover:bg-[#158f35] transition-all whitespace-nowrap"
+                  className={retryButton
+                    ? 'w-full py-3 border border-[#1AAA3F] text-[#1AAA3F] text-sm font-semibold rounded-xl hover:bg-[#1AAA3F]/5 transition-all whitespace-nowrap'
+                    : 'w-full py-3 bg-[#1AAA3F] text-white text-sm font-semibold rounded-xl hover:bg-[#158f35] transition-all whitespace-nowrap'}
                 >
                   {t('paymentReturn.seeOrders')}
                 </Link>

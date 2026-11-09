@@ -154,4 +154,26 @@ function newClient(client) {
   })());
 }
 
-module.exports = { newOrder, lowStockAfterOrder, deliveryConfirmed, newQuote, quoteAnswered, newClient };
+/** Nouveau message laissé via la page Contact */
+function newContactMessage(msg) {
+  fireAndForget('nouveau message', (async () => {
+    const to = await recipientFor('notif_new_contact');
+    if (!to) return;
+    const excerpt = msg.message.length > 300 ? `${msg.message.slice(0, 300)}…` : msg.message;
+    await sendAdminNotification(to, {
+      subject: `Nouveau message${msg.subject ? ` : ${msg.subject}` : ''} (${msg.name})`,
+      title: 'Nouveau message de contact',
+      intro: `${msg.name} a écrit depuis la page Contact du site.`,
+      lines: [
+        ['Sujet', msg.subject || '-'],
+        ['Email', msg.email],
+        ['Téléphone', msg.phone || '-'],
+        ['Message', excerpt],
+      ],
+      linkPath: '/admin/messages',
+      linkLabel: 'Voir les messages',
+    });
+  })());
+}
+
+module.exports = { newOrder, lowStockAfterOrder, deliveryConfirmed, newQuote, quoteAnswered, newClient, newContactMessage };

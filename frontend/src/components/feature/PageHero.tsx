@@ -22,8 +22,8 @@ export default function PageHero({ eyebrow, title, titleAccent, subtitle, childr
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-14 sm:py-20">
         <div className="max-w-3xl">
-          {eyebrow && <p className="eyebrow text-[#4FD07A] mb-5">{eyebrow}</p>}
-          <h1 className="text-4xl sm:text-5xl lg:text-[56px] text-white">
+          {eyebrow && <p className="eyebrow text-[#4FD07A] mb-5 motion-safe:animate-rise">{eyebrow}</p>}
+          <h1 className="text-4xl sm:text-5xl lg:text-[56px] text-white motion-safe:animate-rise [animation-delay:100ms]">
             {title}
             {titleAccent && (
               <>
@@ -33,9 +33,9 @@ export default function PageHero({ eyebrow, title, titleAccent, subtitle, childr
             )}
           </h1>
           {subtitle && (
-            <p className="mt-6 text-base sm:text-lg text-white/70 leading-relaxed max-w-2xl">{subtitle}</p>
+            <p className="mt-6 text-base sm:text-lg text-white/70 leading-relaxed max-w-2xl motion-safe:animate-rise [animation-delay:200ms]">{subtitle}</p>
           )}
-          {children && <div className="mt-8">{children}</div>}
+          {children && <div className="mt-8 motion-safe:animate-rise [animation-delay:300ms]">{children}</div>}
         </div>
       </div>
     </section>

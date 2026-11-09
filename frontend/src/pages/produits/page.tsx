@@ -6,6 +6,7 @@ import Footer from '../home/components/Footer';
 import PageHero from '../../components/feature/PageHero';
 import { useProducts } from '../../hooks/useProducts';
 import { LoadingState, ErrorState } from '../../components/feature/AsyncState';
+import { revealDelay } from '../../components/feature/RevealObserver';
 
 type SortOption = 'price-asc' | 'price-desc' | 'popularity' | 'newest';
 
@@ -360,19 +361,21 @@ export default function ProductsPage() {
 
               {filteredProducts.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-                  {filteredProducts.map(product => (
+                  {filteredProducts.map((product, index) => (
                     <Link
                       key={product.id}
                       to={`/produits/${product.id}`}
-                      className="group bg-white rounded-2xl border border-gray-100 hover:border-[#1AAA3F] hover:shadow-lg transition-all duration-300 overflow-hidden"
+                      data-reveal
+                      style={revealDelay(index % 3)}
+                      className="group card-lift bg-white rounded-2xl border border-[#00272B]/8 hover:border-[#1AAA3F]/40 overflow-hidden"
                     >
-                      <div className="relative aspect-square bg-white overflow-hidden">
+                      <div className="media-stage relative aspect-square overflow-hidden">
                         {product.images[0] ? (
-                          <img src={product.images[0]} alt={product.name} className="w-full h-full object-contain object-center p-6 group-hover:scale-105 transition-transform duration-300" />
+                          <img src={product.images[0]} alt={product.name} loading="lazy" className="w-full h-full object-contain object-center p-8 group-hover:scale-[1.07] transition-transform duration-700 ease-out" />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center"><i className="ri-image-line text-6xl text-gray-300"></i></div>
                         )}
-                        {product.isNew && <div className="absolute top-4 left-4 px-3 py-1 bg-[#F6F3EC] text-[#00272B] text-xs font-semibold rounded-full">{t('products.badgeNew')}</div>}
+                        {product.isNew && <div className="absolute top-4 left-4 px-3 py-1 bg-white/90 backdrop-blur text-[#00272B] text-xs font-semibold rounded-full shadow-sm">{t('products.badgeNew')}</div>}
                         {product.isPopular && <div className="absolute top-4 right-4 px-3 py-1 bg-[#00272B] text-white text-xs font-semibold rounded-full">{t('products.badgePopular')}</div>}
                         {!product.isAvailable && (
                           <div className="absolute inset-0 bg-white/90 flex items-center justify-center">
@@ -390,7 +393,7 @@ export default function ProductsPage() {
                           <p className="text-lg sm:text-2xl font-bold text-[#00272B]">
                             {product.price.toLocaleString('fr-FR')} <span className="text-xs sm:text-base">FCFA</span>
                           </p>
-                          <div className="w-10 h-10 border border-[#00272B]/15 rounded-full flex items-center justify-center group-hover:bg-[#00272B] transition-colors">
+                          <div className="w-10 h-10 border border-[#00272B]/15 rounded-full flex items-center justify-center group-hover:bg-[#1AAA3F] group-hover:border-[#1AAA3F] group-hover:rotate-45 transition-all duration-300">
                             <i className="ri-arrow-right-up-line text-[#00272B] group-hover:text-white transition-colors"></i>
                           </div>
                         </div>

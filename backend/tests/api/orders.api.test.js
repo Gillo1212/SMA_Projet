@@ -236,15 +236,15 @@ describe('paiement en ligne (simulateur)', () => {
     expect((await api.post('/api/payments/initiate').set(auth('client')).send({ order_id: cash.body.data.id })).status).toBe(400);
   });
 
-  test('paiement par carte : plus accepté à la commande (400)', async () => {
-    const res = await api.post('/api/orders').set(auth('client')).send(orderBody({ payment_method: 'card' }));
+  test.each(['card', 'orange_money'])('mode « %s » : pas proposé à la commande (400)', async (method) => {
+    const res = await api.post('/api/orders').set(auth('client')).send(orderBody({ payment_method: method }));
     expect(res.status).toBe(400);
   });
 
-  test('ancienne commande « carte » : réglée par Wave', async () => {
+  test.each(['card', 'orange_money'])('ancienne commande « %s » en attente : réglée par Wave', async (method) => {
     const created = await api.post('/api/orders').set(auth('client')).send(orderBody({ items: [{ id: ids.product, type: 'product', quantity: 1 }] }));
     const legacyId = created.body.data.id;
-    await query("UPDATE orders SET payment_method = 'card' WHERE id = ?", [legacyId]);
+    await query('UPDATE orders SET payment_method = ? WHERE id = ?', [method, legacyId]);
     const res = await api.post('/api/payments/initiate').set(auth('client')).send({ order_id: legacyId });
     expect(res.status).toBe(200);
     expect(res.body.data.provider).toBe('wave');
@@ -259,6 +259,14 @@ describe('paiement en ligne (simulateur)', () => {
     expect(res.body.data.client_id).toBeUndefined();
     expect((await api.get(`/api/payments/status/${reference}`).set(auth('otherClient'))).status).toBe(403);
     expect((await api.get('/api/payments/status/inconnue').set(auth('client'))).status).toBe(404);
+  });
+
+  test('statut sans connexion (retour de Wave sur un autre appareil) : statut seulement, rien du compte', async () => {
+    const res = await api.get(`/api/payments/status/${reference}`);
+    expect(res.status).toBe(200);
+    expect(Object.keys(res.body.data).sort()).toEqual(['amount', 'currency', 'order_number', 'order_status', 'payment_status', 'reference', 'status']);
+    expect(res.body.data).toMatchObject({ status: 'processing', payment_status: 'pending' });
+    expect((await api.get('/api/payments/status/inconnue')).status).toBe(404);
   });
 
   test('POST /api/payments/simulate (succès) : commande payée et confirmée, une seule fois', async () => {
@@ -288,7 +296,51 @@ describe('paiement en ligne (simulateur)', () => {
   test('GET /api/payments/config : admin seulement', async () => {
     const res = await api.get('/api/payments/config').set(auth('admin'));
     expect(res.status).toBe(200);
-    expect(res.body.data).toMatchObject({ wave: false, orange_money: false, simulation_active: true });
+    expect(res.body.data).toMatchObject({ wave: false, orange_money: false, enabled_methods: ['wave'], simulation_active: true });
     expect((await api.get('/api/payments/config').set(auth('client'))).status).toBe(403);
+  });
+});
+
+describe('relance d’un paiement (échoué, abandonné, expiré)', () => {
+  let orderId;
+  let first;
+  let second;
+
+  beforeAll(async () => {
+    const res = await api.post('/api/orders').set(auth('client')).send(orderBody({ items: [{ id: ids.product, type: 'product', quantity: 1 }] }));
+    orderId = res.body.data.id;
+  });
+
+  test('nouvelle tentative : la précédente est annulée, une seule reste ouverte', async () => {
+    first = (await api.post('/api/payments/initiate').set(auth('client')).send({ order_id: orderId })).body.data.reference;
+    second = (await api.post('/api/payments/initiate').set(auth('client')).send({ order_id: orderId })).body.data.reference;
+    expect(second).not.toBe(first);
+    const rows = await query('SELECT reference, status, failure_reason FROM payment_transactions WHERE order_id = ? ORDER BY id', [orderId]);
+    expect(rows).toEqual([
+      { reference: first, status: 'cancelled', failure_reason: 'Remplacée par une nouvelle tentative de paiement' },
+      { reference: second, status: 'processing', failure_reason: null },
+    ]);
+  });
+
+  test('la nouvelle tentative est payée : commande confirmée', async () => {
+    await api.post('/api/payments/simulate').send({ reference: second, status: 'succeeded' });
+    const [order] = await query('SELECT payment_status, status, payment_reference FROM orders WHERE id = ?', [orderId]);
+    expect(order).toMatchObject({ payment_status: 'paid', status: 'confirmed', payment_reference: second });
+  });
+
+  test('l’ancienne session payée quand même : encaissement signalé à rembourser, commande inchangée', async () => {
+    const res = await api.post('/api/payments/simulate').send({ reference: first, status: 'succeeded' });
+    expect(res.body).toMatchObject({ applied: false, reason: expect.stringMatching(/déjà payée/) });
+    const [tx] = await query('SELECT status, failure_reason FROM payment_transactions WHERE reference = ?', [first]);
+    expect(tx.status).toBe('succeeded');
+    expect(tx.failure_reason).toMatch(/rembourser/);
+    const [order] = await query('SELECT payment_reference FROM orders WHERE id = ?', [orderId]);
+    expect(order.payment_reference).toBe(second);
+    const tracking = await query("SELECT COUNT(*) AS n FROM order_tracking WHERE order_id = ? AND note = 'Paiement confirmé'", [orderId]);
+    expect(tracking[0].n).toBe(1);
+  });
+
+  test('commande payée : plus de nouvelle tentative (409)', async () => {
+    expect((await api.post('/api/payments/initiate').set(auth('client')).send({ order_id: orderId })).status).toBe(409);
   });
 });

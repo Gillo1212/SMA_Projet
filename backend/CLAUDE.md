@@ -61,6 +61,8 @@ backend/
 | `blog_categories` | Catégories d'articles |
 | `blog_articles` | Articles (draft / published / archived) |
 | `promo_codes` | Codes promotionnels (percentage / fixed) |
+| `contact_messages` | Messages de la page Contact (new / read / replied / archived, note interne, qui a traité) |
+| `newsletter_subscribers` | Inscrits à la newsletter (subscribed / unsubscribed, jeton de désinscription) |
 
 ### Helpers disponibles dans `config/database.js`
 
@@ -137,16 +139,16 @@ res.status(500).json({ error: "Erreur interne du serveur" });
 ### Flux
 
 1. `POST /api/orders` crée la commande. **Le serveur calcule le sous-total, la TVA (18 %) et les frais de port** à partir des prix en base et du `delivery_mode` : les montants envoyés par le client sont ignorés.
-2. `POST /api/payments/initiate { order_id }` ouvre une session chez le prestataire et renvoie l'`checkout_url` de redirection.
-3. Le prestataire notifie `POST /api/payments/webhook/:provider` — c'est cette notification qui fait foi, pas le retour navigateur.
-4. Le frontend interroge `GET /api/payments/status/:reference` le temps que le webhook arrive.
+2. `POST /api/payments/initiate { order_id }` ouvre une session chez le prestataire et renvoie l'`checkout_url` de redirection (session Wave valable 30 min).
+3. Le prestataire notifie `POST /api/payments/webhook/:provider`. Pour Wave, la notification est authentifiée (signature) **puis contre-vérifiée** : la session est relue chez Wave (`fetchPayment`, `GET /v1/checkout/sessions/:id`), et c'est cette lecture (statut + montant) qui fait foi, jamais le retour navigateur.
+4. Le frontend interroge `GET /api/payments/status/:reference` (connexion facultative : sans connexion, réponse réduite au statut, au montant et au numéro de commande — le client revient souvent de Wave dans le navigateur de son téléphone). Tant que la transaction attend, cette route relit aussi la session chez le prestataire configuré (`reconcileWithProvider`) : un webhook perdu, retardé ou impossible (serveur local injoignable depuis Internet) est ainsi rattrapé.
 
 ### Prestataires (`services/payment/`)
 
 | Fichier | Rôle |
 |---------|------|
-| `wave.provider.js` | Wave Checkout, signature webhook HMAC-SHA256 |
-| `orangeMoney.provider.js` | Orange Money WebPay (OAuth + `notif_token`) |
+| `wave.provider.js` | Wave Checkout : création et lecture de session, webhook `SIGNING_SECRET` (HMAC-SHA256, 5 min max, plusieurs `v1`) ou `SHARED_SECRET` (`Authorization: Bearer`), signature des requêtes optionnelle (`WAVE_API_SIGNING_SECRET`) |
+| `orangeMoney.provider.js` | Orange Money WebPay (OAuth + `notif_token`) — **désactivé pour le moment** : absent de `ONLINE_METHODS` dans `index.js`, seuls ses webhooks restent acceptés |
 | `simulator.provider.js` | Repli développement — refusé si `NODE_ENV=production` |
 | `index.js` | Choix du prestataire et repli automatique |
 
@@ -158,12 +160,17 @@ Sans clés configurées, `getProvider()` retombe sur le simulateur : le tunnel r
 - **Contrôle de montant** : si le prestataire annonce une somme différente de celle attendue, la transaction est marquée `failed` et la commande reste impayée.
 - **Cloisonnement** : un client ne peut ni payer ni consulter la commande d'un autre.
 - **Corps brut** : `express.json({ verify })` conserve les octets reçus, indispensable pour valider la signature Wave.
+- **Statut Wave** : payé seulement si `checkout_status = complete` **et** `payment_status = succeeded` ; `expired` → transaction `expired` ; `cancelled` / `failed` → `failed` (le client peut relancer un paiement).
+- **Nouvelle tentative de paiement** (bouton « Payer avec Wave » dans l'espace client et sur la page d'échec) : `initiate` relit d'abord les tentatives encore ouvertes de la commande (`closePreviousAttempt`). Payée entre-temps → paiement appliqué et 409, pas de nouvelle session ; encore ouverte → expirée chez Wave (`expireCheckout`) puis transaction `cancelled` ; état impossible à vérifier → 502 (on n'ouvre pas une seconde session payable).
+- **Double paiement** : si une deuxième session de la même commande est payée malgré tout, l'encaissement est enregistré (`succeeded`) avec `failure_reason` « … À rembourser », journalisé en erreur (`DOUBLE PAIEMENT`), et la commande n'est pas reconfirmée.
+- **Wave injoignable pendant un webhook** : réponse 502, Wave rejoue la notification (pendant 3 jours). Secret du webhook absent : 500, même effet.
+- **Diagnostic** : `GET /api/payments/config` (admin) et le journal de démarrage listent les réglages manquants (`warnings`) : secret du webhook, `FRONTEND_URL` / `BACKEND_URL` pas en https.
 
 ### Variables d'environnement
 
-Voir `.env.example`, section Paiement : `BACKEND_URL`, `WAVE_API_KEY`, `WAVE_WEBHOOK_SECRET`, `ORANGE_MONEY_CLIENT_ID` / `_SECRET` / `_MERCHANT_KEY`.
+Voir `.env.example`, section Paiement (avec les étapes dans le portail Wave Business) : `BACKEND_URL`, `WAVE_API_KEY`, `WAVE_WEBHOOK_SECRET`, `WAVE_API_SIGNING_SECRET` (optionnel), `ORANGE_MONEY_CLIENT_ID` / `_SECRET` / `_MERCHANT_KEY`. Le backend ne relit pas `.env` à chaud : redémarrer après un changement. Pour tester Wave en développement : tunnel HTTPS ngrok vers le serveur Vite, qui relaie `/api` (voir `frontend/CLAUDE.md`, « Tunnel HTTPS »). `app.set('trust proxy', TRUST_PROXY || 'loopback')` : l'adresse du visiteur relayée par Vite / ngrok est prise en compte par la limite de débit (en production derrière un reverse proxy, régler `TRUST_PROXY`).
 
-> Les URL et formats de payload des deux prestataires proviennent de leur documentation publique. **À confirmer avec la documentation de votre contrat marchand** avant la mise en production : ces intégrations n'ont pas été testées contre les API réelles.
+> L'intégration Wave suit la documentation publique de Wave (spécification Afro.tools `wave`, non encore vérifiée contre l'API réelle). Wave n'a **pas d'environnement de test** : le premier essai réel se fait avec un petit montant sur le vrai compte. En développement, Wave exige des adresses https : passer par un tunnel HTTPS pour le frontend (`FRONTEND_URL`) et, pour recevoir les webhooks, pour le backend (`BACKEND_URL`).
 
 ## Paramètres de la plateforme
 
@@ -182,6 +189,13 @@ Voir `.env.example`, section Paiement : `BACKEND_URL`, `WAVE_API_KEY`, `WAVE_WEB
 - **Réponse du client à un devis** (`PATCH /quotes/:id/status` avec un token client) : seulement `accepted` / `refused`, sur son propre devis (404 sinon), au statut `quoted` et avant `expires_at` (409 sinon).
 - **Compteurs** : `GET /dashboard/counters` (admin) et `GET /dashboard/client/counters` (client) alimentent les pastilles du menu ; le frontend les relit toutes les minutes et après chaque action.
 - **Comptes admin** : `/api/settings/admins` (écriture `super_admin`) ; on ne peut ni se désactiver, ni se supprimer, ni changer son propre rôle.
+
+## Contact et newsletter
+
+- **Contact** : `POST /api/contact` (public) enregistre le message, notifie l'équipe (`notif_new_contact`, Paramètres → Notifications) et envoie un accusé de réception au visiteur (`templates/contact-acknowledgment.html`, message recopié et échappé). Back-office : `GET /api/contact?status=&search=` (archivés masqués par défaut, `status=all` pour tout), `PATCH /api/contact/:id { status, admin_note }` (enregistre qui et quand), `DELETE` réservé à `super_admin` / `admin`. Compteur `contact_new` dans `GET /dashboard/counters` (pastille du menu).
+- **Newsletter** : `POST /api/newsletter/subscribe` (public, même réponse que l'adresse soit nouvelle ou déjà inscrite, email de bienvenue avec lien `FRONTEND_URL/newsletter/desinscription?token=…`), `POST /api/newsletter/unsubscribe { token }`. Back-office : liste, `GET /api/newsletter/export` (CSV `;` avec BOM pour Excel, inscrits par défaut, cellules commençant par `= + - @` neutralisées), `PATCH /:id { status }`, `DELETE` (effacement sur demande, `super_admin` / `admin`). Pas d'envoi de campagnes depuis l'application : exporter vers un outil dédié (Brevo, Mailchimp…).
+- **Anti-spam** : champ piège `website` (rempli = réponse normale, rien d'enregistré ni d'envoyé) et limite de 5 envois / 15 min par IP sur les deux formulaires publics (désactivée en test).
+- `loadTemplate` remplace les variables par fonction : un `$&` ou `$1` saisi par un visiteur reste du texte.
 
 ## Uploads de fichiers
 
